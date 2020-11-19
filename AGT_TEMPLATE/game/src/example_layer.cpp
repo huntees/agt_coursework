@@ -270,32 +270,18 @@ void example_layer::on_update(const engine::timestep& time_step)
 {
 	m_intro_screen->on_update(time_step);
 
-
-	if (engine::input::key_pressed(engine::key_codes::KEY_C)) {
-		if (firstPerson && camSwitchDelayReady) {
-
-			firstPerson = false;
-			camSwitchDelayReady = false;
-			camSwitchTimer = 0.15f;
-			m_3d_camera.reset_camera();
-		}
-		else if (camSwitchDelayReady) {
-
-			firstPerson = true;
-			camSwitchDelayReady = false;
-			camSwitchTimer = 0.15f;
-			m_3d_camera.reset_camera();
-		}
-	}
-
-	if (firstPerson) {
-		//m_3d_camera.on_update(time_step);
+	if (CamMode == FirstPerson) {
 		m_player.update_first_person_camera(m_3d_camera);
 	}
-	else {
+	else if (CamMode == ThirdPerson){
 		m_player.update_third_person_camera(m_3d_camera);
 	}
+	else if (CamMode == FreeView) {
+		m_3d_camera.on_update(time_step);
+	}
 
+
+	//timer to prevent cam switching too fast, obsolete now that I've switeched over to on_event controls, keeping it here though incase i need a timer
 	if (camSwitchTimer > 0.0f)
 	{
 		camSwitchTimer -= (float)time_step;
@@ -537,6 +523,21 @@ void example_layer::on_event(engine::event& event)
 		{
 			engine::render_command::toggle_wireframe();
 		}
+		if (e.key_code() == engine::key_codes::KEY_C) {
+			if (CamMode != FirstPerson) {
+
+				CamMode = FirstPerson;
+				m_3d_camera.reset_camera();
+			}
+			else if (CamMode != ThirdPerson) {
+
+				CamMode = ThirdPerson;
+				m_3d_camera.reset_camera();
+			}
+		}
+		if (e.key_code() == engine::key_codes::KEY_F) {
+			CamMode = FreeView;
+		}
 		if (e.key_code() == engine::key_codes::KEY_LEFT_SHIFT)
 		{
 			m_player.sprint(true);
@@ -549,6 +550,7 @@ void example_layer::on_event(engine::event& event)
 		{
 			m_intro_screen->deactivate();
 		}
+
 
 	}
 

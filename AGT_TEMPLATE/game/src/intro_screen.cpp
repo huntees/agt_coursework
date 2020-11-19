@@ -6,7 +6,7 @@ intro_screen::intro_screen(const std::string& path, float width, float height)
 {
 	m_texture = engine::texture_2d::create(path, true);
 	m_quad = quad::create(glm::vec2(width, height));
-	s_active = true;
+	s_active = false;
 }
 
 intro_screen::~intro_screen()
