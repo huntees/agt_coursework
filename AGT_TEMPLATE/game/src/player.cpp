@@ -128,8 +128,7 @@ void player::update_third_person_camera(engine::perspective_camera& camera) {
 	glm::vec3 cam_pos = m_object->position() - mousepos;
 	cam_pos.y += 1.5f;
 
-	glm::vec3 cam_look_at = m_object->position();
-	cam_look_at.y = 1.5f;
+	glm::vec3 cam_look_at = m_object->position() + glm::vec3(0.f, 1.f, 0.f);
 
 	camera.set_view_matrix(cam_pos, cam_look_at);
 }

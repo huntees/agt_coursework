@@ -51,7 +51,6 @@ private:
 
 	engine::ref<intro_screen>	m_intro_screen{};
 
-	bool firstPerson;
 	enum CamState { FirstPerson, ThirdPerson, FreeView };
 	CamState CamMode = FirstPerson;
 
