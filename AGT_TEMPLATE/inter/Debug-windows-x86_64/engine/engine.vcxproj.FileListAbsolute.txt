@@ -1,0 +1,2 @@
+C:\Users\Huntees\Desktop\advanced-games-tech\AGT_TEMPLATE\bin\Debug-windows-x86_64\engine\engine.pdb
+C:\Users\Huntees\Desktop\advanced-games-tech\AGT_TEMPLATE\inter\Debug-windows-x86_64\engine\engine.pdb
