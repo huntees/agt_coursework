@@ -89,13 +89,18 @@ example_layer::example_layer()
 	engine::game_object_properties mannequin_props;
 	mannequin_props.animated_mesh = m_skinned_mesh;
 	mannequin_props.scale = glm::vec3(1.f / glm::max(m_skinned_mesh->size().x, glm::max(m_skinned_mesh->size().y, m_skinned_mesh->size().z)));
-	mannequin_props.position = glm::vec3(3.0f, 0.5f, -5.0f);
+	mannequin_props.position = glm::vec3(3.0f, 1.5f, -5.0f);
+	mannequin_props.rotation_amount = engine::PI;
+	mannequin_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	mannequin_props.type = 0;
-	mannequin_props.bounding_shape = m_skinned_mesh->size() / 2.f * mannequin_props.scale.x;
+	mannequin_props.bounding_shape = glm::vec3(m_skinned_mesh->size().x / 4.f,
+		m_skinned_mesh->size().y / 2.f, m_skinned_mesh->size().x / 4.f);
+	mannequin_props.friction = 0.0f;
 	m_mannequin = engine::game_object::create(mannequin_props);
-
-	// initialise player mesh
+	m_mannequin->set_offset(m_skinned_mesh->offset());
 	m_player.initialise(m_mannequin);
+	m_player.set_box(mannequin_props.bounding_shape.x * 2.f * mannequin_props.scale.x, mannequin_props.bounding_shape.y * 2.f *
+		mannequin_props.scale.x, mannequin_props.bounding_shape.z * 2.f * mannequin_props.scale.x, mannequin_props.position);
 
 	// Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
 	std::vector<engine::ref<engine::texture_2d>> terrain_textures = { engine::texture_2d::create("assets/textures/Slabs.jpg", false) };
@@ -115,10 +120,17 @@ example_layer::example_layer()
 	cow_props.meshes = cow_model->meshes();
 	cow_props.textures = cow_model->textures();
 	float cow_scale = 1.f / glm::max(cow_model->size().x, glm::max(cow_model->size().y, cow_model->size().z));
-	cow_props.position = { -4.f,0.5f, -5.f };
+	cow_props.position = { 9.3f, 0.8f, -0.2f };
+	cow_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	cow_props.rotation_amount = glm::radians(90.f);
 	cow_props.scale = glm::vec3(cow_scale);
-	cow_props.bounding_shape = cow_model->size() / 2.f * cow_scale;
+	cow_props.bounding_shape = cow_model->size() / 2.f;
+	cow_props.type = 0;
+	cow_props.is_static = true;
 	m_cow = engine::game_object::create(cow_props);
+	m_cow->set_offset(cow_model->offset());
+	m_cow_box.set_box(cow_props.bounding_shape.x * 2.f * cow_scale, cow_props.bounding_shape.y * 2.f * cow_scale, cow_props.bounding_shape.z * 2.f
+		* cow_scale, cow_props.position - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale());
 
 	// Load the jeep model.
 	engine::ref <engine::model> jeep_model = engine::model::create("assets/models/static/jeep1/jeep1.obj");
@@ -182,14 +194,16 @@ example_layer::example_layer()
 	m_tree = engine::game_object::create(tree_props);
 
 	// Load sphere
-	engine::ref<engine::sphere> sphere_shape = engine::sphere::create(10, 20, 0.5f);
+	float radius = 0.5f;
+	engine::ref<engine::sphere> sphere_shape = engine::sphere::create(10, 20, radius);
 	engine::game_object_properties sphere_props;
 	sphere_props.position = { 0.f, 5.f, -5.f };
 	sphere_props.meshes = { sphere_shape->mesh() };
 	sphere_props.type = 1;
-	sphere_props.bounding_shape = glm::vec3(0.5f);
+	sphere_props.bounding_shape = glm::vec3(radius);
 	sphere_props.restitution = 0.92f;
-	sphere_props.mass = 0.000001f;
+	sphere_props.mass = 0.1f;
+	sphere_props.rolling_friction = 0.1f;
 	m_ball = engine::game_object::create(sphere_props);
 
 	// Load tetrahedron
@@ -251,9 +265,10 @@ example_layer::example_layer()
 
 	m_game_objects.push_back(m_terrain);
 	m_game_objects.push_back(m_ball);
-	//m_game_objects.push_back(m_cow);
+	m_game_objects.push_back(m_cow);
 	//m_game_objects.push_back(m_tree);
 	//m_game_objects.push_back(m_pickup);
+	m_game_objects.push_back(m_mannequin);
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
 	m_text_manager = engine::text_manager::create();
@@ -265,43 +280,6 @@ example_layer::example_layer()
 }
 
 example_layer::~example_layer() {}
-
-void example_layer::on_update(const engine::timestep& time_step)
-{
-	m_intro_screen->on_update(time_step);
-
-	if (CamMode == FirstPerson) {
-		m_player.update_first_person_camera(m_3d_camera);
-	}
-	else if (CamMode == ThirdPerson){
-		m_player.update_third_person_camera(m_3d_camera);
-	}
-	else if (CamMode == FreeView) {
-		m_3d_camera.on_update(time_step);
-	}
-
-
-	//timer to prevent cam switching too fast, obsolete now that I've switeched over to on_event controls, keeping it here though incase i need a timer
-	if (camSwitchTimer > 0.0f)
-	{
-		camSwitchTimer -= (float)time_step;
-
-		if (camSwitchTimer < 0.0f)
-		{
-			camSwitchDelayReady = true;
-		}
-	}
-
-
-	//m_player.update_camera(m_3d_camera);
-
-	m_player.on_update(time_step);
-
-	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
-
-	check_bounce();
-
-}
 
 void example_layer::on_render()
 {
@@ -330,6 +308,9 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, m_skybox, skybox_tranform);
 
 	engine::renderer::submit(textured_lighting_shader, m_terrain);
+
+	m_player.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	m_cow_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 
 	engine::renderer::submit(textured_lighting_shader, m_tetrahedron);
 
@@ -401,8 +382,8 @@ void example_layer::on_render()
 	//engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
 
 	glm::mat4 cow_transform(1.0f);
-	cow_transform = glm::translate(cow_transform, glm::vec3(9.3f, 0.5f, -0.2f));
-	cow_transform = glm::rotate(cow_transform, m_cow->rotation_amount() + glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
+	cow_transform = glm::translate(cow_transform, m_cow->position() - m_cow->offset() * m_cow -> scale());
+	cow_transform = glm::rotate(cow_transform, m_cow->rotation_amount(), m_cow->rotation_axis());
 	cow_transform = glm::scale(cow_transform, m_cow->scale());
 	engine::renderer::submit(textured_lighting_shader, cow_transform, m_cow);
 
@@ -514,6 +495,59 @@ void example_layer::on_render()
 	//----------------------------------------------------2D Cam End--------------------------------------------------------------------------
 }
 
+void example_layer::on_update(const engine::timestep& time_step)
+{
+	m_intro_screen->on_update(time_step);
+
+	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
+
+	m_player.on_update(time_step);
+
+	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
+		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
+	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
+
+	if (CamMode == FirstPerson) {
+		m_player.update_first_person_camera(m_3d_camera);
+	}
+	else if (CamMode == ThirdPerson) {
+		m_player.update_third_person_camera(m_3d_camera);
+	}
+	else if (CamMode == FreeView) {
+		m_3d_camera.on_update(time_step);
+	}
+
+
+
+
+
+
+
+	//timer to prevent cam switching too fast, obsolete now that I've switeched over to on_event controls, keeping it here though incase i need a timer
+	if (camSwitchTimer > 0.0f)
+	{
+		camSwitchTimer -= (float)time_step;
+
+		if (camSwitchTimer < 0.0f)
+		{
+			camSwitchDelayReady = true;
+		}
+	}
+
+	check_bounce();
+
+	if (m_ball->is_colliding() && m_ball->collision_objects().size() > 1)
+	{
+		m_material->set_ambient(glm::vec3(0.f, 1.f, 0.f));
+		m_material->set_diffuse(glm::vec3(0.f, 1.f, 0.f));
+	}
+	else {
+		m_material->set_ambient(glm::vec3(1.f, 0.1f, 0.07f));
+		m_material->set_diffuse(glm::vec3(1.f, 0.1f, 0.07f));
+	}
+
+}
+
 void example_layer::on_event(engine::event& event)
 {
 	if (event.event_type() == engine::event_type_e::key_pressed)
@@ -535,16 +569,15 @@ void example_layer::on_event(engine::event& event)
 				m_3d_camera.reset_camera();
 			}
 		}
-		if (e.key_code() == engine::key_codes::KEY_F) {
+		if (e.key_code() == engine::key_codes::KEY_T) {
 			CamMode = FreeView;
+		}
+		if (e.key_code() == engine::key_codes::KEY_F) {
+			m_player.hover();
 		}
 		if (e.key_code() == engine::key_codes::KEY_LEFT_SHIFT)
 		{
 			m_player.sprint(true);
-		}
-		if (e.key_code() == engine::key_codes::KEY_SPACE)
-		{
-			m_player.jump();
 		}
 		if (e.key_code() == engine::key_codes::KEY_ENTER)
 		{
