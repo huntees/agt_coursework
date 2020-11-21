@@ -4,7 +4,7 @@
 #include "engine/key_codes.h"
 
 
-player::player() : m_timer(0.0f), m_speed(1.0f)
+player::player() : m_timer(0.0f), m_speed(2.f)
 {}
 
 player::~player()
@@ -20,6 +20,8 @@ void player::initialise(engine::ref<engine::game_object> object)
 
 void player::on_update(const engine::timestep& time_step)
 {
+	player_time_step = time_step;
+
 
 	//hold right click to rotate around player
 	rotateAround = false;
@@ -39,20 +41,24 @@ void player::on_update(const engine::timestep& time_step)
 	//set object rotation based on mouse input
 	m_object->set_rotation_amount(atan2(m_object->forward().x, m_object->forward().z));
 
+
+
+
+
 	//WASD Movement
 	//m_object->set_position(m_object->position() += m_object->forward() * m_speed * (float)time_step); 
 
 	if (engine::input::key_pressed(engine::key_codes::KEY_W)) {
-		//m_object->set_position(m_object->position() += player_front * m_speed * (float)time_step);
-		m_object->set_velocity(m_object->forward() * m_speed);
+		m_object->set_position(m_object->position() += player_front * m_speed * (float)time_step);
+		//m_object->set_velocity(m_object->forward() * m_speed);
 	}
 	else if (engine::input::key_pressed(engine::key_codes::KEY_S)) {
-		//m_object->set_position(m_object->position() -= player_front * m_speed * (float)time_step);
-		m_object->set_velocity(m_object->forward() * -m_speed);
+		m_object->set_position(m_object->position() -= player_front * m_speed * (float)time_step);
+		//m_object->set_velocity(m_object->forward() * -m_speed);
 	}
-	else {
-		m_object->set_velocity(m_object->forward() * 0.f);
-	}
+	//else {
+	//	m_object->set_velocity(m_object->forward() * 0.f);
+	//}
 	if (engine::input::key_pressed(engine::key_codes::KEY_A)) {
 		m_object->set_position(m_object->position() -= player_right * m_speed * (float)time_step);
 	}
@@ -60,9 +66,29 @@ void player::on_update(const engine::timestep& time_step)
 		m_object->set_position(m_object->position() += player_right * m_speed * (float)time_step);
 	}
 
-	//if (engine::input::key_pressed(engine::key_codes::KEY_SPACE)) {
-	//	jump();
-	//}
+	if (engine::input::key_pressed(engine::key_codes::KEY_SPACE)) {
+		jump();
+	}
+
+	if (isHoverMode) {
+
+		//prevents gravity from making the player fall
+		m_object->set_acceleration(glm::vec3(m_object->acceleration().x, 9.8f, m_object->acceleration().z));
+
+		//if space isnt held, keep the same position in air.
+		if (engine::input::key_pressed(engine::key_codes::KEY_SPACE)) {
+
+		}
+		else {
+			m_object->set_velocity(glm::vec3(m_object->velocity().x, 0.f, m_object->velocity().z));
+		}
+
+		//descend while in hover mode
+		if (engine::input::key_pressed(engine::key_codes::KEY_LEFT_CONTROL)) {
+
+			m_object->set_velocity(m_object->up() * -(m_speed * 2));
+		}
+	}
 
 	if (m_timer > 0.0f)
 	{
@@ -162,23 +188,34 @@ glm::vec3 player::process_mouse() {
 
 void player::jump() {
 
-	m_object->animated_mesh()->switch_root_movement(true);
-	m_object->animated_mesh()->switch_animation(3);
-	animation_speed = 1.5f;
+	//m_object->animated_mesh()->switch_root_movement(true);
+	//m_object->animated_mesh()->switch_animation(3);
+	//animation_speed = 1.5f;
 
-	m_timer = (m_object->animated_mesh()->animations().at(3)->mDuration * 0.5f);
+	//m_timer = (m_object->animated_mesh()->animations().at(3)->mDuration * 0.5f);
 
+	m_object->set_velocity(m_object->up() * (m_speed * 2));
+
+}
+
+void player::hover() {
+	if (isHoverMode) {
+		isHoverMode = false;
+	}
+	else {
+		isHoverMode = true;
+	}
 }
 
 void player::sprint(const bool& activateSprint) {
 
 	if (activateSprint) {
-		m_speed = 2.0f;
+		m_speed = 4.f;
 		animation_speed = 1.5f;
 	}
 	else {
 
-		m_speed = 1.0f;
+		m_speed = 2.f;
 		animation_speed = 1.f;
 	}
 

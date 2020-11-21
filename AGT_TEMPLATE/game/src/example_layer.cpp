@@ -569,16 +569,15 @@ void example_layer::on_event(engine::event& event)
 				m_3d_camera.reset_camera();
 			}
 		}
-		if (e.key_code() == engine::key_codes::KEY_F) {
+		if (e.key_code() == engine::key_codes::KEY_T) {
 			CamMode = FreeView;
+		}
+		if (e.key_code() == engine::key_codes::KEY_F) {
+			m_player.hover();
 		}
 		if (e.key_code() == engine::key_codes::KEY_LEFT_SHIFT)
 		{
 			m_player.sprint(true);
-		}
-		if (e.key_code() == engine::key_codes::KEY_SPACE)
-		{
-			m_player.jump();
 		}
 		if (e.key_code() == engine::key_codes::KEY_ENTER)
 		{
