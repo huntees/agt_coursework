@@ -203,6 +203,7 @@ example_layer::example_layer()
 	sphere_props.bounding_shape = glm::vec3(radius);
 	sphere_props.restitution = 0.92f;
 	sphere_props.mass = 0.1f;
+	sphere_props.rolling_friction = 0.1f;
 	m_ball = engine::game_object::create(sphere_props);
 
 	// Load tetrahedron

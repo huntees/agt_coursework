@@ -23,6 +23,7 @@ namespace engine
         float mass = 1.f;
 		float restitution = 0.1f;
 		float friction = 0.9f;
+		float rolling_friction = 0.0f;
         float rotation_amount = 0.f;
         bool is_static = false;
 	};
@@ -61,6 +62,7 @@ namespace engine
 		float     mass() const { return m_mass; }
 		float	  restitution() const { return m_restitution; }
 		float	  friction() const { return m_friction; }
+		float	  rolling_friction() const { return m_rolling_friction; }
 		int32_t   type() const { return m_type; }
 		glm::vec3 bounding_shape() const { return m_bounding_shape; }
 		const std::vector<ref<mesh>>& meshes() const { return m_meshes; }
@@ -157,6 +159,8 @@ namespace engine
 		float			m_restitution{ 0.1f };
 		// object's friction
 		float			m_friction{ 0.9f };
+		// object's rolling friction
+		float			m_rolling_friction{ 0.0f };
         // static/non-static object
 		bool			s_static{ false };
 

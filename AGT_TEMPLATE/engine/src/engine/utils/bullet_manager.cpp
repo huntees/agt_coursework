@@ -206,6 +206,7 @@ void engine::bullet_manager::add_physical_object(engine::ref<engine::game_object
 		body->setRestitution(game_object->restitution());
 		body->setFriction(game_object->friction());
 		//body->setRestitution(game_object->restitution());
+		body->setRollingFriction(game_object->rolling_friction());
 		physical_object* object = new physical_object(body);
 		physical_objects.push_back(object);
 	}
