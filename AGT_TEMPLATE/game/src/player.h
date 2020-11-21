@@ -1,6 +1,7 @@
 #pragma once
 #include <engine.h>
 #include "glm/gtx/rotate_vector.hpp"
+#include "engine/entities/bounding_box_bullet.h"
 
 class player
 {
@@ -19,6 +20,9 @@ public:
 	void update_third_person_camera(engine::perspective_camera& camera);
 	void jump();
 	void sprint(const bool& activateSprint);
+
+	void set_box(float width, float height, float depth, glm::vec3 position) { m_player_box.set_box(width, height, depth, position); }
+	bounding_box& getBox() { return m_player_box; };
 
 private:
 
@@ -39,4 +43,6 @@ private:
 	bool rotateAround = false;
 
 	engine::ref< engine::game_object> m_object;
+
+	bounding_box m_player_box;
 };

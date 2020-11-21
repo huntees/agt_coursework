@@ -34,47 +34,30 @@ void player::on_update(const engine::timestep& time_step)
 		m_object->set_forward(player_front);
 	}
 
+	//set rotation axis to y
+	m_object->set_rotation_axis(glm::vec3(0.f, 1.f, 0.f));
+	//set object rotation based on mouse input
+	m_object->set_rotation_amount(atan2(m_object->forward().x, m_object->forward().z));
 
 	//WASD Movement
-	//m_object->set_position(m_object->position() += m_object->forward() * m_speed * (float)time_step);
+	//m_object->set_position(m_object->position() += m_object->forward() * m_speed * (float)time_step); 
 
 	if (engine::input::key_pressed(engine::key_codes::KEY_W)) {
-		m_object->set_position(m_object->position() += player_front * m_speed * (float)time_step);
+		//m_object->set_position(m_object->position() += player_front * m_speed * (float)time_step);
+		m_object->set_velocity(m_object->forward() * m_speed);
 	}
 	else if (engine::input::key_pressed(engine::key_codes::KEY_S)) {
-		m_object->set_position(m_object->position() -= player_front * m_speed * (float)time_step);
+		//m_object->set_position(m_object->position() -= player_front * m_speed * (float)time_step);
+		m_object->set_velocity(m_object->forward() * -m_speed);
+	}
+	else {
+		m_object->set_velocity(m_object->forward() * 0.f);
 	}
 	if (engine::input::key_pressed(engine::key_codes::KEY_A)) {
 		m_object->set_position(m_object->position() -= player_right * m_speed * (float)time_step);
 	}
 	else if (engine::input::key_pressed(engine::key_codes::KEY_D)) {
 		m_object->set_position(m_object->position() += player_right * m_speed * (float)time_step);
-	}
-
-	//third person movement?
-	//if (engine::input::key_pressed(engine::key_codes::KEY_W)) {
-	//	m_object->set_position(m_object->position() += glm::vec3(0.f, 0.f, -m_speed * (float)time_step));
-	//}
-	//else if (engine::input::key_pressed(engine::key_codes::KEY_S)) {
-	//	m_object->set_position(m_object->position() -= glm::vec3(0.f, 0.f, m_speed * (float)time_step));
-	//}
-	//if (engine::input::key_pressed(engine::key_codes::KEY_A)) {
-	//	m_object->set_position(m_object->position() += glm::vec3(-m_speed * (float)time_step, 0.f, 0.f));
-	//}
-	//else if (engine::input::key_pressed(engine::key_codes::KEY_D)) {
-	//	m_object->set_position(m_object->position() += glm::vec3(m_speed * (float)time_step, 0.f, 0.f));
-	//}
-
-	//JUMP to be implemented down the line
-
-
-	m_object->set_rotation_amount(atan2(m_object->forward().x, m_object->forward().z));
-
-	if (engine::input::key_pressed(engine::key_codes::KEY_1)) {
-		turn(1.0f * time_step);
-	}
-	else if (engine::input::key_pressed(engine::key_codes::KEY_2)) {
-		turn(-1.0f * time_step);
 	}
 
 	//if (engine::input::key_pressed(engine::key_codes::KEY_SPACE)) {
@@ -93,10 +76,13 @@ void player::on_update(const engine::timestep& time_step)
 	}
 
 	m_object->animated_mesh()->on_update(time_step * animation_speed);
+
+	m_player_box.on_update(object()->position() - glm::vec3(0.f, object()->offset().y,
+		0.f) * object()->scale(), object()->rotation_amount(), object()->rotation_axis());
 }
 
 void player::turn(float angle) {
-	m_object->set_forward(glm::rotate(m_object->forward(), angle, glm::vec3(0.f, 1.f, 0.f)));
+	m_object->set_angular_velocity(glm::vec3(0.f, angle * 100.f, 0.f));
 }
 
 void player::update_first_person_camera(engine::perspective_camera& camera) {
@@ -105,7 +91,7 @@ void player::update_first_person_camera(engine::perspective_camera& camera) {
 
 	glm::vec3 mousepos = process_mouse();
 	
-	float A = 0.95f;
+	float A = 0.45f;
 	float B = 0.1f;
 
 	glm::vec3 cam_pos = m_object->position() + glm::normalize(m_object->forward()) * B;;
@@ -126,9 +112,9 @@ void player::update_third_person_camera(engine::perspective_camera& camera) {
 	mousepos.z *= 2.f;
 	 
 	glm::vec3 cam_pos = m_object->position() - mousepos;
-	cam_pos.y += 1.5f;
+	cam_pos.y += 1.f;
 
-	glm::vec3 cam_look_at = m_object->position() + glm::vec3(0.f, 1.f, 0.f);
+	glm::vec3 cam_look_at = m_object->position() + glm::vec3(0.f, 0.6f, 0.f);
 
 	camera.set_view_matrix(cam_pos, cam_look_at);
 }

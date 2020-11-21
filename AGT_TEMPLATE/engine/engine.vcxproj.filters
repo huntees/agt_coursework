@@ -1377,6 +1377,9 @@
     <ClInclude Include="src\engine\entities\shapes\bench.h">
       <Filter>src\engine\entities\shapes</Filter>
     </ClInclude>
+    <ClInclude Include="src\engine\entities\bounding_box_bullet.h">
+      <Filter>src\engine\entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\engine\core\application.cpp">
@@ -1516,6 +1519,9 @@
     </ClCompile>
     <ClCompile Include="src\engine\entities\shapes\bench.cpp">
       <Filter>src\engine\entities\shapes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\entities\bounding_box_bullet.cpp">
+      <Filter>src\engine\entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

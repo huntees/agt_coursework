@@ -105,6 +105,13 @@ namespace engine
 		// bind the object's textures if there are any
 		void bind_textures();
 
+		//for custom collision response
+		bool is_colliding() const { return s_colliding; }
+		std::vector<engine::ref<engine::game_object>> collision_objects() const { return m_collision_objects;}
+		void set_collision_state(bool col_state) { s_colliding = col_state; }
+		void clear_collision_objects() { m_collision_objects.clear(); }
+		void add_collision_object(engine::ref<engine::game_object> object) { m_collision_objects.push_back(object); }
+
     public:
         static ref<game_object> create(const game_object_properties& props);
 
@@ -162,5 +169,9 @@ namespace engine
 
 		//index of the bullet physical_object corresponding to this game_object. -1 if hasn't been assigned yet
 		int32_t m_physical_object_index{-1};
+
+		//for custom collision response
+		bool s_colliding = false;
+		std::vector<engine::ref<engine::game_object>> m_collision_objects;
     };
 }
