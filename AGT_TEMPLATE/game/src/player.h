@@ -48,6 +48,9 @@ private:
 	bool isHoverMode = false;
 
 	engine::ref< engine::game_object> m_object;
+	const float HOVER_TIME = 1.5f;
+	float hover_timer{ HOVER_TIME };
+	float hover_timer2{ HOVER_TIME };
 
 	bounding_box m_player_box;
 };

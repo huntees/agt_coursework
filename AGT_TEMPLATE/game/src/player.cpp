@@ -73,7 +73,23 @@ void player::on_update(const engine::timestep& time_step)
 	if (isHoverMode) {
 
 		//prevents gravity from making the player fall
-		m_object->set_acceleration(glm::vec3(m_object->acceleration().x, 9.8f, m_object->acceleration().z));
+		//m_object->set_acceleration(glm::vec3(m_object->acceleration().x, 9.8f, m_object->acceleration().z));
+		if (hover_timer > 0.0f)
+		{
+			hover_timer -= (float)time_step;
+			m_object->set_acceleration(glm::vec3(m_object->acceleration().x, (4.4f), m_object->acceleration().z));
+			hover_timer2 = HOVER_TIME;
+		}
+		else {
+
+			if (hover_timer2 > 0.0f) {
+				m_object->set_acceleration(glm::vec3(m_object->acceleration().x, (9.8f * 1.5), m_object->acceleration().z));
+				hover_timer2 -= (float)time_step;
+			}
+			else {
+				hover_timer = HOVER_TIME;
+			}
+		}
 
 		//if space isnt held, keep the same position in air.
 		if (engine::input::key_pressed(engine::key_codes::KEY_SPACE)) {
