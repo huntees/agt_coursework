@@ -48,22 +48,28 @@ void player::on_update(const engine::timestep& time_step)
 	//WASD Movement
 	//m_object->set_position(m_object->position() += m_object->forward() * m_speed * (float)time_step); 
 
-	if (engine::input::key_pressed(engine::key_codes::KEY_W)) {
-		m_object->set_position(m_object->position() += player_front * m_speed * (float)time_step);
-		//m_object->set_velocity(m_object->forward() * m_speed);
+	if (engine::input::key_pressed(engine::key_codes::KEY_W) || engine::input::key_pressed(engine::key_codes::KEY_S) ||
+		engine::input::key_pressed(engine::key_codes::KEY_A) || engine::input::key_pressed(engine::key_codes::KEY_D)) {
+		if (engine::input::key_pressed(engine::key_codes::KEY_W)) {
+			m_object->set_position(m_object->position() += player_front * m_speed * (float)time_step);
+			//m_object->set_velocity(m_object->forward() * m_speed);
+		}
+		else if (engine::input::key_pressed(engine::key_codes::KEY_S)) {
+			m_object->set_position(m_object->position() -= player_front * m_speed * (float)time_step);
+			//m_object->set_velocity(m_object->forward() * -m_speed);
+		}
+
+		if (engine::input::key_pressed(engine::key_codes::KEY_A)) {
+			m_object->set_position(m_object->position() -= player_right * m_speed * (float)time_step);
+			//m_object->set_velocity(m_object->right() * -m_speed);
+		}
+		else if (engine::input::key_pressed(engine::key_codes::KEY_D)) {
+			m_object->set_position(m_object->position() += player_right * m_speed * (float)time_step);
+			//m_object->set_velocity(m_object->right() * m_speed);
+		}
 	}
-	else if (engine::input::key_pressed(engine::key_codes::KEY_S)) {
-		m_object->set_position(m_object->position() -= player_front * m_speed * (float)time_step);
-		//m_object->set_velocity(m_object->forward() * -m_speed);
-	}
-	//else {
-	//	m_object->set_velocity(m_object->forward() * 0.f);
-	//}
-	if (engine::input::key_pressed(engine::key_codes::KEY_A)) {
-		m_object->set_position(m_object->position() -= player_right * m_speed * (float)time_step);
-	}
-	else if (engine::input::key_pressed(engine::key_codes::KEY_D)) {
-		m_object->set_position(m_object->position() += player_right * m_speed * (float)time_step);
+	else {
+		m_object->set_velocity(glm::vec3(0.f, m_object->velocity().y, 0.f));
 	}
 
 	if (engine::input::key_pressed(engine::key_codes::KEY_SPACE)) {
