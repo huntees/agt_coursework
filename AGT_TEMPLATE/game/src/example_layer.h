@@ -2,7 +2,8 @@
 #include <engine.h>
 #include "player.h"
 #include "intro_screen.h"
-#include "engine/entities/bounding_box_bullet.h" 
+#include "engine/entities/bounding_box_bullet.h"
+#include "effects/jetpack_trail.h"
 
 class example_layer : public engine::layer
 {
@@ -55,13 +56,16 @@ private:
 
 
 	engine::ref<intro_screen>	m_intro_screen{};
+	engine::ref<intro_screen>	m_HUD{};
 
 	enum CamState { FirstPerson, ThirdPerson, FreeView };
 	CamState CamMode = FirstPerson;
 
-	bool camSwitchDelayReady = true;
-	float camSwitchTimer;
+	bool jetpackTrailReady = true;
+	float jetpackTrailTimer;
+	bool jetpackHoverOn = false;
 
 	bool playState = false;
 
+	jetpack_trail m_jetpack_trail;
 };

@@ -6,7 +6,7 @@ intro_screen::intro_screen(const std::string& path, float width, float height)
 {
 	m_texture = engine::texture_2d::create(path, true);
 	m_quad = quad::create(glm::vec2(width, height));
-	s_active = false;
+	s_active = true;
 }
 
 intro_screen::~intro_screen()
@@ -32,6 +32,11 @@ void intro_screen::on_render(engine::ref<engine::shader> shader)
 
 	engine::renderer::submit(shader, m_quad->mesh(), transform);
 
+}
+
+void intro_screen::activate()
+{
+	s_active = true;
 }
 
 void intro_screen::deactivate()

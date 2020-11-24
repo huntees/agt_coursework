@@ -19,7 +19,7 @@ public:
 	void update_first_person_camera(engine::perspective_camera& camera);
 	void update_third_person_camera(engine::perspective_camera& camera);
 	void jump();
-	void hover();
+	bool hover();
 	void sprint(const bool& activateSprint);
 
 	void set_box(float width, float height, float depth, glm::vec3 position) { m_player_box.set_box(width, height, depth, position); }

@@ -11,6 +11,7 @@ public:
 
 	void on_update(const engine::timestep& time_step);
 	void on_render(engine::ref<engine::shader> shader);
+	void activate();
 	void deactivate();
 
 	static engine::ref<intro_screen> create(const std::string& path, float width, float height);

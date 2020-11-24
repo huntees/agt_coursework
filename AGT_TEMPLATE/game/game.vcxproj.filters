@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\example_layer.cpp" />
+    <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\intro_screen.cpp" />
+    <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\effects\particle.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\effects\jetpack_trail.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\example_layer.h" />
+    <ClInclude Include="src\intro_screen.h" />
+    <ClInclude Include="src\player.h" />
+    <ClInclude Include="src\effects\particle.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\effects\jetpack_trail.h">
+      <Filter>effects</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="effects">
+      <UniqueIdentifier>{431ccc99-785e-43b4-8d06-b29597bdd776}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

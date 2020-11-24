@@ -220,13 +220,15 @@ void player::jump() {
 
 }
 
-void player::hover() {
+bool player::hover() {
 	if (isHoverMode) {
 		isHoverMode = false;
 	}
 	else {
 		isHoverMode = true;
 	}
+
+	return isHoverMode;
 }
 
 void player::sprint(const bool& activateSprint) {

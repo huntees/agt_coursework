@@ -277,6 +277,10 @@ example_layer::example_layer()
 
 	//Load Intro Screen Texture
 	m_intro_screen = intro_screen::create("assets/textures/tempmenu.jpg", 1.6f, 0.9f);
+	m_intro_screen->deactivate();
+	m_HUD = intro_screen::create("assets/textures/tempHUD.png", 1.6f, 0.9f);
+
+	m_jetpack_trail.load_texture("assets/textures/effects/trail.png");
 }
 
 example_layer::~example_layer() {}
@@ -387,6 +391,8 @@ void example_layer::on_render()
 	cow_transform = glm::scale(cow_transform, m_cow->scale());
 	engine::renderer::submit(textured_lighting_shader, cow_transform, m_cow);
 
+	m_jetpack_trail.on_render(m_3d_camera, textured_lighting_shader);
+
 	float jeep_x_rotation = 90.f * (glm::pi<float>() / 180.f); //90 degrees multiplied by pi/180 giving radians
 
 	glm::mat4 jeep_transform(1.0f);
@@ -489,6 +495,8 @@ void example_layer::on_render()
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("lighting_on", false);
 
 	m_intro_screen->on_render(textured_lighting_shader);
+	m_HUD->on_render(textured_lighting_shader);
+
 
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("lighting_on", true);
 	engine::renderer::end_scene();
@@ -524,15 +532,15 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 
 	//timer to prevent cam switching too fast, obsolete now that I've switeched over to on_event controls, keeping it here though incase i need a timer
-	if (camSwitchTimer > 0.0f)
-	{
-		camSwitchTimer -= (float)time_step;
+	//if (camSwitchTimer > 0.0f)
+	//{
+	//	camSwitchTimer -= (float)time_step;
 
-		if (camSwitchTimer < 0.0f)
-		{
-			camSwitchDelayReady = true;
-		}
-	}
+	//	if (camSwitchTimer < 0.0f)
+	//	{
+	//		camSwitchDelayReady = true;
+	//	}
+	//}
 
 	check_bounce();
 
@@ -546,6 +554,35 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_material->set_diffuse(glm::vec3(1.f, 0.1f, 0.07f));
 	}
 
+	m_jetpack_trail.on_update(time_step);
+
+	if (jetpackHoverOn) {
+
+		jetpackTrailReady = false;
+		if (jetpackTrailTimer < 0.0f) {
+			jetpackTrailTimer = 0.03f;
+		}
+	}
+
+	if (engine::input::key_pressed(engine::key_codes::KEY_SPACE))
+	{
+		if (jetpackTrailReady) {
+
+			jetpackTrailReady = false;
+			jetpackTrailTimer = 0.03f;
+		}
+	}
+
+	if (jetpackTrailTimer > 0.0f)
+	{
+		jetpackTrailTimer -= (float)time_step;
+
+		if (jetpackTrailTimer < 0.0f)
+		{
+			jetpackTrailReady = true;
+			m_jetpack_trail.initialise(m_player.object()->position() + glm::vec3(0.f, -0.15f, 0.f), glm::vec3(0.f, 0.f, 0.f), 1, 1.f, 0.3f);
+		}
+	}
 }
 
 void example_layer::on_event(engine::event& event)
@@ -573,7 +610,7 @@ void example_layer::on_event(engine::event& event)
 			CamMode = FreeView;
 		}
 		if (e.key_code() == engine::key_codes::KEY_F) {
-			m_player.hover();
+			jetpackHoverOn = m_player.hover();
 		}
 		if (e.key_code() == engine::key_codes::KEY_LEFT_SHIFT)
 		{
@@ -583,7 +620,7 @@ void example_layer::on_event(engine::event& event)
 		{
 			m_intro_screen->deactivate();
 		}
-
+		
 
 	}
 
