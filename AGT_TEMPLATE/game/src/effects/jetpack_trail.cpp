@@ -108,6 +108,6 @@ void jetpack_trail::add_particle()
 {
 	particle particle;
 	glm::vec3 p = m_start + (float) m_particles.size()*m_width * m_direction;
-	particle.initialise(p, m_width, m_height, glm::vec3(0.f), glm::vec3(1.f), 15, 0.5f);
+	particle.initialise(p, m_width, m_height, glm::vec3(0.f), glm::vec3(0.f, 0.9f, 0.9f), 15, 0.5f);
 	m_particles.push_back(particle);
 }

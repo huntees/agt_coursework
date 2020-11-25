@@ -554,6 +554,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_material->set_diffuse(glm::vec3(1.f, 0.1f, 0.07f));
 	}
 
+
+	//jetpack particle logic
 	m_jetpack_trail.on_update(time_step);
 
 	if (jetpackHoverOn) {
@@ -569,7 +571,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 		if (jetpackTrailReady) {
 
 			jetpackTrailReady = false;
-			jetpackTrailTimer = 0.03f;
+			jetpackTrailTimer = 0.02f;
 		}
 	}
 
