@@ -68,7 +68,7 @@ example_layer::example_layer()
 
 
 	// Skybox texture from http://www.vwall.it/wp-content/plugins/canvasio3dpro/inc/resource/cubeMaps/
-	m_skybox = engine::skybox::create(50.f,
+	m_skybox = engine::skybox::create(80.f,
 		{ engine::texture_2d::create("assets/textures/skybox/posz.jpg", true),
 		  engine::texture_2d::create("assets/textures/skybox/posx.jpg", true),
 		  engine::texture_2d::create("assets/textures/skybox/negz.jpg", true),
@@ -104,7 +104,7 @@ example_layer::example_layer()
 
 	// Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
 	std::vector<engine::ref<engine::texture_2d>> terrain_textures = { engine::texture_2d::create("assets/textures/Slabs.jpg", false) };
-	engine::ref<engine::terrain> terrain_shape = engine::terrain::create(100.f, 0.5f, 100.f);
+	engine::ref<engine::terrain> terrain_shape = engine::terrain::create(100.f, 0.5f, 100.f, 150.f);
 	engine::game_object_properties terrain_props;
 	terrain_props.meshes = { terrain_shape->mesh() };
 	terrain_props.textures = terrain_textures;
@@ -114,13 +114,37 @@ example_layer::example_layer()
 	terrain_props.restitution = 0.92f;
 	m_terrain = engine::game_object::create(terrain_props);
 
+	//road
+	std::vector<engine::ref<engine::texture_2d>> road_textures = { engine::texture_2d::create("assets/textures/road.png", false) };
+	engine::ref<engine::terrain> road_shape = engine::terrain::create(8.f, 0.01f, 25.f, 1.f);
+	engine::game_object_properties road_props;
+	road_props.meshes = { road_shape->mesh() };
+	road_props.textures = road_textures;
+	road_props.position = { 3.5f, 0.50001f, -3.f };
+	road_props.is_static = true;
+	road_props.type = 0;
+	road_props.restitution = 0.92f;
+	m_road = engine::game_object::create(road_props);
+
+	//intersection
+	std::vector<engine::ref<engine::texture_2d>> intersection_textures = { engine::texture_2d::create("assets/textures/intersection.jpg", false) };
+	engine::ref<engine::terrain> intersection_shape = engine::terrain::create(8.f, 0.01f, 8.f, 1.f);
+	engine::game_object_properties intersection_props;
+	intersection_props.meshes = { intersection_shape->mesh() };
+	intersection_props.textures = intersection_textures;
+	intersection_props.position = { 3.5f, 0.50001f, 30.f };
+	intersection_props.is_static = true;
+	intersection_props.type = 0;
+	intersection_props.restitution = 0.92f;
+	m_intersection = engine::game_object::create(intersection_props);
+
 	// Load the cow model. Create a cow object. Set its properties
 	engine::ref <engine::model> cow_model = engine::model::create("assets/models/static/cow4.3ds");
 	engine::game_object_properties cow_props;
 	cow_props.meshes = cow_model->meshes();
 	cow_props.textures = cow_model->textures();
 	float cow_scale = 1.f / glm::max(cow_model->size().x, glm::max(cow_model->size().y, cow_model->size().z));
-	cow_props.position = { 9.3f, 0.8f, -0.2f };
+	cow_props.position = { 19.3f, 0.8f, -0.2f };
 	cow_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	cow_props.rotation_amount = glm::radians(90.f);
 	cow_props.scale = glm::vec3(cow_scale);
@@ -163,7 +187,7 @@ example_layer::example_layer()
 	engine::game_object_properties office_props;
 	office_props.meshes = office_model->meshes();
 	office_props.textures = office_model->textures();
-	office_props.position = { 25.f, 0.5f, 0.f };
+	office_props.position = { 35.f, 0.5f, 0.f };
 	m_office = engine::game_object::create(office_props);
 
 	//Load sanfran model
@@ -313,18 +337,35 @@ void example_layer::on_render()
 
 	engine::renderer::submit(textured_lighting_shader, m_terrain);
 
+	engine::renderer::submit(textured_lighting_shader, m_tetrahedron);
+
+	//-----------------------------------------------------------Road System--------------------------------------------------------------------------------
+	engine::renderer::submit(textured_lighting_shader, m_road);
+
+	engine::renderer::submit(textured_lighting_shader, m_intersection);
+
+	glm::mat4 roadTransform = glm::mat4(1.0f);
+	roadTransform = glm::translate(roadTransform, glm::vec3(-29.5f, 0.50001f, 30.f));
+	roadTransform = glm::rotate(roadTransform, m_hexagon->rotation_amount() + glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
+	engine::renderer::submit(textured_lighting_shader, roadTransform, m_road);
+
+	glm::mat4 roadTransform2 = glm::mat4(1.0f);
+	roadTransform2 = glm::translate(roadTransform2, glm::vec3(36.5f, 0.50001f, 30.f));
+	roadTransform2 = glm::rotate(roadTransform2, m_hexagon->rotation_amount() + glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
+	engine::renderer::submit(textured_lighting_shader, roadTransform2, m_road);
+
+	//-----------------------------------------------------------Road System End------------------------------------------------------------------------------
+
 	m_player.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_cow_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 
-	engine::renderer::submit(textured_lighting_shader, m_tetrahedron);
-
 	glm::mat4 benchTransform = glm::mat4(1.0f);
-	benchTransform = glm::translate(benchTransform, glm::vec3(9.8f, 0.9f, 0.f));
+	benchTransform = glm::translate(benchTransform, glm::vec3(19.8f, 0.9f, 0.f));
 	benchTransform = glm::scale(benchTransform, m_bench->scale());
 	engine::renderer::submit(textured_lighting_shader, benchTransform, m_bench);
 
 	glm::mat4 benchTransform2 = glm::mat4(1.0f);
-	benchTransform2 = glm::translate(benchTransform2, glm::vec3(15.8f, 0.9f, 0.f));
+	benchTransform2 = glm::translate(benchTransform2, glm::vec3(25.8f, 0.9f, 0.f));
 	benchTransform2 = glm::scale(benchTransform2, m_bench->scale());
 	engine::renderer::submit(textured_lighting_shader, benchTransform2, m_bench);
 
@@ -343,13 +384,13 @@ void example_layer::on_render()
 	}
 
 	glm::mat4 hexagontransform = glm::mat4(1.0f);
-	hexagontransform = glm::translate(hexagontransform, glm::vec3(13.8f, 0.51f, 5.f));
+	hexagontransform = glm::translate(hexagontransform, glm::vec3(15.8f, 0.51f, 5.f));
 	hexagontransform = glm::rotate(hexagontransform, m_hexagon->rotation_amount() + glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f));
 	hexagontransform = glm::scale(hexagontransform, m_hexagon->scale());
 	engine::renderer::submit(textured_lighting_shader, hexagontransform, m_hexagon);
 
 	glm::mat4 hexagontransform2 = glm::mat4(1.0f);
-	hexagontransform2 = glm::translate(hexagontransform2, glm::vec3(13.8f, 0.51f, 15.f));
+	hexagontransform2 = glm::translate(hexagontransform2, glm::vec3(15.8f, 0.51f, 15.f));
 	hexagontransform2 = glm::rotate(hexagontransform2, m_hexagon->rotation_amount() + glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f));
 	hexagontransform2 = glm::scale(hexagontransform2, m_hexagon->scale());
 	engine::renderer::submit(textured_lighting_shader, hexagontransform2, m_hexagon);
@@ -358,7 +399,7 @@ void example_layer::on_render()
 	for (int i = 0; i <= 3; ++i) {
 
 		glm::mat4 tree_transform(1.0f);
-		tree_transform = glm::translate(tree_transform, glm::vec3(9.5f + i * 3, 0.5, -1.0f));
+		tree_transform = glm::translate(tree_transform, glm::vec3(19.5f + i * 3, 0.5, -1.0f));
 		tree_transform = glm::rotate(tree_transform, m_tree->rotation_amount(), m_tree->rotation_axis());
 		tree_transform = glm::scale(tree_transform, m_tree->scale());
 		engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
@@ -402,13 +443,13 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, jeep_transform, m_jeep);
 
 	glm::mat4 pizza_transform(1.0f);
-	pizza_transform = glm::translate(pizza_transform, glm::vec3(10.2f, 0.92f, -0.2f));
+	pizza_transform = glm::translate(pizza_transform, glm::vec3(20.2f, 0.92f, -0.2f));
 	pizza_transform = glm::rotate(pizza_transform, m_pizza->rotation_amount() + glm::radians(120.f), glm::vec3(0.f, 1.f, 0.f));
 	pizza_transform = glm::scale(pizza_transform, m_pizza->scale());
 	engine::renderer::submit(textured_lighting_shader, pizza_transform, m_pizza);
 
 	glm::mat4 pizza_transform2(1.0f);
-	pizza_transform2 = glm::translate(pizza_transform2, glm::vec3(11.5f, 0.92f, -0.2f));
+	pizza_transform2 = glm::translate(pizza_transform2, glm::vec3(21.5f, 0.92f, -0.2f));
 	pizza_transform2 = glm::rotate(pizza_transform2, m_pizza->rotation_amount() + glm::radians(57.f), glm::vec3(0.f, 1.f, 0.f));
 	pizza_transform2 = glm::scale(pizza_transform2, m_pizza->scale());
 	engine::renderer::submit(textured_lighting_shader, pizza_transform2, m_pizza);
