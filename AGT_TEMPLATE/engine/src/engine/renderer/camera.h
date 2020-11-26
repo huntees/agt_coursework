@@ -119,7 +119,7 @@ namespace engine
         perspective_camera( 
             float width, float height,  
             float fov = 45.f,  
-            float near_z = 0.1f, float far_z = 140.f);
+            float near_z = 0.1f, float far_z = 180.f);
 
         void on_update(const timestep& timestep) override;
 
