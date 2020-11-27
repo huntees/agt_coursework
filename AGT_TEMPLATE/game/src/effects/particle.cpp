@@ -33,7 +33,7 @@ bool particle::initialise(glm::vec3 p, float width, float height, glm::vec3 star
 	// Give the particle some random velocity in the xz plane
 	float r1 = (rand() / (float) RAND_MAX) * 2 - 1;
 	float r2 = (rand() / (float) RAND_MAX) * 2 - 1;
-	m_velocity = glm::vec3(r1*0.1f, 0.0f, r2*0.1f);	
+	m_velocity = glm::vec3(r1*0.1f, -3.f, r2*0.1f);
 	glm::normalize(m_velocity);
 	m_velocity *= 0.1f; 
 

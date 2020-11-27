@@ -26,6 +26,9 @@ public:
 	bounding_box& getBox() { return m_player_box; };
 
 private:
+	enum State { Idle, Walking, Sprinting };
+	State playerState = Idle;
+	State lastAnimation = Idle;
 
 	engine::timestep player_time_step;
 

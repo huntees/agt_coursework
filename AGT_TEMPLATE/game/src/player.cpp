@@ -15,7 +15,7 @@ void player::initialise(engine::ref<engine::game_object> object)
 	m_object = object;
 	m_object->set_forward(glm::vec3(0.f, 0.f, -1.f));
 	m_object->set_position(glm::vec3(0.f, 0.5, 10.f));
-	m_object->animated_mesh()->set_default_animation(1);
+	m_object->animated_mesh()->set_default_animation(2);
 }
 
 void player::on_update(const engine::timestep& time_step)
@@ -50,6 +50,7 @@ void player::on_update(const engine::timestep& time_step)
 
 	if (engine::input::key_pressed(engine::key_codes::KEY_W) || engine::input::key_pressed(engine::key_codes::KEY_S) ||
 		engine::input::key_pressed(engine::key_codes::KEY_A) || engine::input::key_pressed(engine::key_codes::KEY_D)) {
+		playerState = Walking;
 		if (engine::input::key_pressed(engine::key_codes::KEY_W)) {
 			m_object->set_position(m_object->position() += player_front * m_speed * (float)time_step);
 			//m_object->set_velocity(m_object->forward() * m_speed);
@@ -69,6 +70,7 @@ void player::on_update(const engine::timestep& time_step)
 		}
 	}
 	else {
+		playerState = Idle;
 		m_object->set_velocity(glm::vec3(0.f, m_object->velocity().y, 0.f));
 	}
 
@@ -121,6 +123,15 @@ void player::on_update(const engine::timestep& time_step)
 			m_object->animated_mesh()->switch_root_movement(false);
 			m_object->animated_mesh()->switch_animation(m_object->animated_mesh() -> default_animation());
 		}
+	}
+
+ 	if (playerState == Walking && lastAnimation != Walking) {
+		m_object->animated_mesh()->switch_animation(1);
+		lastAnimation = Walking;
+	}
+	else if (playerState == Idle && lastAnimation != Idle) {
+		m_object->animated_mesh()->switch_animation(m_object->animated_mesh()->default_animation());
+		lastAnimation = Idle;
 	}
 
 	m_object->animated_mesh()->on_update(time_step * animation_speed);

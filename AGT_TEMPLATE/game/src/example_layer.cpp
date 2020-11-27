@@ -345,7 +345,7 @@ example_layer::example_layer()
 
 	m_text_manager = engine::text_manager::create();
 
-	m_skinned_mesh->switch_animation(1);
+	m_skinned_mesh->switch_animation(2);
 
 	//Load Intro Screen Texture
 	m_intro_screen = intro_screen::create("assets/textures/tempmenu.jpg", 1.6f, 0.9f);
