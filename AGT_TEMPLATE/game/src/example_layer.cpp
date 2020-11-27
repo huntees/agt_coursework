@@ -34,10 +34,20 @@ example_layer::example_layer()
 	auto text_shader = engine::renderer::shaders_library()->get("text_2D");
 	auto animated_mesh_shader = engine::renderer::shaders_library()->get("animated_mesh");
 
-	m_directionalLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_directionalLight.Color = glm::vec3(0.8f, 0.8f, 0.8f);
 	m_directionalLight.AmbientIntensity = 0.25f;
 	m_directionalLight.DiffuseIntensity = 0.6f;
 	m_directionalLight.Direction = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
+
+	m_red_spotLight.Color = glm::vec3(1.0f, 0.0f, 0.0f);
+	m_red_spotLight.AmbientIntensity = 0.8f; //0.25f
+	m_red_spotLight.DiffuseIntensity = 0.6f;
+	m_red_spotLight.Position = glm::vec3(9.47f, 1.8f, 11.94f);
+	m_red_spotLight.Direction = glm::normalize(glm::vec3(1.f, 0.f, 0.f));
+	m_red_spotLight.Cutoff = 0.5f;
+	m_red_spotLight.Attenuation.Constant = 1.0f;
+	m_red_spotLight.Attenuation.Linear = 0.4f;
+	m_red_spotLight.Attenuation.Exp = 0.01f;
 
 	// set color texture unit
 	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->bind();
@@ -65,6 +75,8 @@ example_layer::example_layer()
 			(float)engine::application::window().height()));
 	m_material = engine::material::create(1.0f, glm::vec3(1.0f, 0.1f, 0.07f),
 		glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
+
+	m_red_spotLight_material = engine::material::create(1.0f, m_red_spotLight.Color, m_red_spotLight.Color, m_red_spotLight.Color, 1.0f);
 
 
 	// Skybox texture from http://www.vwall.it/wp-content/plugins/canvasio3dpro/inc/resource/cubeMaps/
@@ -206,6 +218,16 @@ example_layer::example_layer()
 	skyscrapers_props.position = { -25.f, -3.5f, 33.f };
 	m_skyscrapers = engine::game_object::create(skyscrapers_props);
 
+	//Load policeCar model
+	engine::ref <engine::model> policeCar_model = engine::model::create("assets/models/static/policecar/policecar.obj");
+	engine::game_object_properties policeCar_props;
+	policeCar_props.meshes = policeCar_model->meshes();
+	policeCar_props.textures = policeCar_model->textures();
+	policeCar_props.position = { 9.f, 0.5f, 12.f };
+	policeCar_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	policeCar_props.rotation_amount = glm::radians(-45.f);
+	m_policeCar = engine::game_object::create(policeCar_props);
+
 	// Load the tree model. Create a tree object. Set its properties
 	engine::ref <engine::model> tree_model = engine::model::create("assets/models/static/elm.3ds");
 	engine::game_object_properties tree_props;
@@ -229,6 +251,7 @@ example_layer::example_layer()
 	sphere_props.mass = 0.1f;
 	sphere_props.rolling_friction = 0.1f;
 	m_ball = engine::game_object::create(sphere_props);
+	m_red_spotLight_ball = engine::game_object::create(sphere_props);
 
 	// Load tetrahedron
 	std::vector<glm::vec3> tetrahedron_vertices;
@@ -292,6 +315,7 @@ example_layer::example_layer()
 	m_game_objects.push_back(m_cow);
 	//m_game_objects.push_back(m_tree);
 	//m_game_objects.push_back(m_pickup);
+	m_game_objects.push_back(m_red_spotLight_ball);
 	m_game_objects.push_back(m_mannequin);
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
@@ -338,6 +362,12 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, m_terrain);
 
 	engine::renderer::submit(textured_lighting_shader, m_tetrahedron);
+
+
+	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gNumSpotLights", (int)num_spot_lights);
+	m_red_spotLight.submit(textured_lighting_shader, 0);
+
+
 
 	//-----------------------------------------------------------Road System--------------------------------------------------------------------------------
 
@@ -476,8 +506,6 @@ void example_layer::on_render()
 	cow_transform = glm::scale(cow_transform, m_cow->scale());
 	engine::renderer::submit(textured_lighting_shader, cow_transform, m_cow);
 
-	m_jetpack_trail.on_render(m_3d_camera, textured_lighting_shader);
-
 	float jeep_x_rotation = 90.f * (glm::pi<float>() / 180.f); //90 degrees multiplied by pi/180 giving radians
 
 	glm::mat4 jeep_transform(1.0f);
@@ -540,6 +568,14 @@ void example_layer::on_render()
 	skyscrapers_transform2 = glm::scale(skyscrapers_transform2, m_skyscrapers->scale());
 	engine::renderer::submit(textured_lighting_shader, skyscrapers_transform2, m_skyscrapers);
 
+	glm::mat4 policeCar_transform(1.0f);
+	policeCar_transform = glm::translate(policeCar_transform, m_policeCar->position());
+	policeCar_transform = glm::rotate(policeCar_transform, m_policeCar->rotation_amount(), m_policeCar->rotation_axis());
+	policeCar_transform = glm::scale(policeCar_transform, m_policeCar->scale());
+	engine::renderer::submit(textured_lighting_shader, policeCar_transform, m_policeCar);
+
+	m_jetpack_trail.on_render(m_3d_camera, textured_lighting_shader);
+
 	engine::renderer::end_scene();
 
 	// Set up material shader. (does not render textures, renders materials instead)
@@ -549,7 +585,24 @@ void example_layer::on_render()
 	m_material->submit(material_shader);
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
 
+	//might not be needed?
+	//std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gNumSpotLights", (int)num_spot_lights);
+	//m_red_spotLight.submit(material_shader, 0);
+
+
+
 	engine::renderer::submit(material_shader, m_ball);
+
+
+	//-------------------------------------------------------spotlight ball--------------------------------------------------------
+	//std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", false);
+
+	//m_red_spotLight_material->submit(material_shader);
+	//engine::renderer::submit(material_shader, m_red_spotLight_ball->meshes().at(0), glm::translate(glm::mat4(1.f), m_red_spotLight.Position));
+
+
+	//std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", true);
+	//-------------------------------------------------------spotlight ball--------------------------------------------------------
 
 	engine::renderer::end_scene();
 
@@ -613,6 +666,16 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 
 
+	if (spotLightRotation > 360.f) {
+		spotLightRotation = 0.f;
+	}
+
+	spotLightRotation += 200.f * time_step;
+
+
+	m_red_spotLight_ball->set_rotation_axis(glm::vec3(0.f, 1.f, 0.f));
+	m_red_spotLight_ball->set_rotation_amount(glm::radians(spotLightRotation));
+	m_red_spotLight.Direction = m_red_spotLight_ball->forward();
 
 
 

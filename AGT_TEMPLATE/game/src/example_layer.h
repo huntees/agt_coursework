@@ -35,13 +35,21 @@ private:
 	engine::ref<engine::game_object>	m_office{};
 	engine::ref<engine::game_object>	m_sanfran{};
 	engine::ref<engine::game_object>	m_skyscrapers{};
+	engine::ref<engine::game_object>	m_policeCar{};
 	engine::ref<engine::game_object>    m_hexagon{};
 	engine::ref<engine::game_object>    m_bench{};
 
 	engine::ref<engine::material>		m_material{};
 	engine::ref<engine::material>		m_tetrahedron_material{};
+	engine::ref<engine::material>		m_red_spotLight_material{};
 
 	engine::DirectionalLight            m_directionalLight;
+
+	engine::SpotLight m_red_spotLight;
+	uint32_t num_spot_lights = 1;
+
+	engine::ref<engine::game_object>	m_red_spotLight_ball{};
+	float spotLightRotation = 0.f;
 
 	std::vector<engine::ref<engine::game_object>>     m_game_objects{};
 
