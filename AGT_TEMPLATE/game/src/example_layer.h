@@ -4,6 +4,7 @@
 #include "intro_screen.h"
 #include "engine/entities/bounding_box_bullet.h"
 #include "effects/jetpack_trail.h"
+#include "weapons/missile.h"
 
 class example_layer : public engine::layer
 {
@@ -38,6 +39,9 @@ private:
 	engine::ref<engine::game_object>	m_policeCar{};
 	engine::ref<engine::game_object>    m_hexagon{};
 	engine::ref<engine::game_object>    m_bench{};
+	engine::ref<engine::game_object>    m_missile{};
+
+	missile missile;
 
 	engine::ref<engine::material>		m_material{};
 	engine::ref<engine::material>		m_tetrahedron_material{};

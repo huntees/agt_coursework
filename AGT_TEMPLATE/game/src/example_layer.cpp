@@ -126,6 +126,8 @@ example_layer::example_layer()
 	terrain_props.restitution = 0.92f;
 	m_terrain = engine::game_object::create(terrain_props);
 
+	//-------------------------------------------------------------World Props-----------------------------------------------------------------------------------
+
 	//road
 	std::vector<engine::ref<engine::texture_2d>> road_textures = { engine::texture_2d::create("assets/textures/road.png", false) };
 	engine::ref<engine::terrain> road_shape = engine::terrain::create(8.f, 0.02f, 25.f, 1.f);
@@ -239,6 +241,28 @@ example_layer::example_layer()
 	tree_props.scale = glm::vec3(tree_scale);
 	m_tree = engine::game_object::create(tree_props);
 
+	//-------------------------------------------------------------World Props End-----------------------------------------------------------------------------------
+
+	//-------------------------------------------------------------Weapon Props--------------------------------------------------------------------------------------
+	engine::ref <engine::model> missile_model = engine::model::create("assets/models/static/missile/missile.obj");
+	engine::game_object_properties missile_props;
+	missile_props.meshes = missile_model->meshes();
+	missile_props.textures = missile_model->textures();
+	missile_props.position = { 0.f, 0.5f, 0.f };
+	missile_props.bounding_shape = missile_model->size() / 2.0f;
+	missile_props.type = 0;
+	missile_props.bounding_shape = missile_model->size() / 2.f;
+	missile_props.friction = 0.0f;
+	missile_props.mass = 0.10f;
+	m_missile = engine::game_object::create(missile_props);
+	m_missile->set_offset(missile_model->offset());
+	missile.initialise(m_missile);
+	missile.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
+		missile_props.position - glm::vec3(0.f, m_missile->offset().y, 0.f));
+
+
+	//-------------------------------------------------------------Weapon Props End----------------------------------------------------------------------------------
+
 	// Load sphere
 	float radius = 0.5f;
 	engine::ref<engine::sphere> sphere_shape = engine::sphere::create(10, 20, radius);
@@ -317,6 +341,7 @@ example_layer::example_layer()
 	//m_game_objects.push_back(m_pickup);
 	m_game_objects.push_back(m_red_spotLight_ball);
 	m_game_objects.push_back(m_mannequin);
+	m_game_objects.push_back(m_missile);
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
 	m_text_manager = engine::text_manager::create();
@@ -389,7 +414,7 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, intersectionTransform3, m_intersection);
 
 
-	//------------------------------------------------------road------------------------------------------------------------------------------------------
+	//------------------------------------------------------vertical roads------------------------------------------------------------------------------------------
 	engine::renderer::submit(textured_lighting_shader, m_road);
 
 	glm::mat4 roadTransform = glm::mat4(1.0f);
@@ -432,6 +457,7 @@ void example_layer::on_render()
 
 	m_player.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_cow_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 
 	glm::mat4 benchTransform = glm::mat4(1.0f);
 	benchTransform = glm::translate(benchTransform, glm::vec3(19.8f, 0.9f, 0.f));
@@ -574,6 +600,11 @@ void example_layer::on_render()
 	policeCar_transform = glm::scale(policeCar_transform, m_policeCar->scale());
 	engine::renderer::submit(textured_lighting_shader, policeCar_transform, m_policeCar);
 
+
+
+
+	missile.on_render(textured_lighting_shader);
+
 	m_jetpack_trail.on_render(m_3d_camera, textured_lighting_shader);
 
 	engine::renderer::end_scene();
@@ -649,9 +680,13 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	m_player.on_update(time_step);
 
+	missile.on_update(time_step);
+
 	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
 		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
 	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
+	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),
+		missile.object()->rotation_amount(), missile.object()->rotation_axis());
 
 	if (CamMode == FirstPerson) {
 		m_player.update_first_person_camera(m_3d_camera);
@@ -770,6 +805,10 @@ void example_layer::on_event(engine::event& event)
 		{
 			m_intro_screen->deactivate();
 		}
+		if (e.key_code() == engine::key_codes::KEY_G)
+		{
+			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
+		}
 		
 
 	}
@@ -780,6 +819,13 @@ void example_layer::on_event(engine::event& event)
 		if (e.key_code() == engine::key_codes::KEY_LEFT_SHIFT)
 		{
 			m_player.sprint(false);
+		}
+	}
+
+	if (event.event_type() == engine::event_type_e::mouse_button_pressed)
+	{
+		if (engine::input::mouse_button_pressed(0)) {
+			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
 		}
 	}
 }
