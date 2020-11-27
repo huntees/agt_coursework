@@ -249,7 +249,6 @@ example_layer::example_layer()
 	missile_props.meshes = missile_model->meshes();
 	missile_props.textures = missile_model->textures();
 	missile_props.position = { 0.f, 0.5f, 0.f };
-	missile_props.bounding_shape = missile_model->size() / 2.0f;
 	missile_props.type = 0;
 	missile_props.bounding_shape = missile_model->size() / 2.f;
 	missile_props.friction = 0.0f;
@@ -724,6 +723,11 @@ void example_layer::on_update(const engine::timestep& time_step)
 	//		camSwitchDelayReady = true;
 	//	}
 	//}
+
+	if (m_missile->is_colliding()) {
+		missile.object()->set_velocity(glm::vec3(0.f));
+		missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+	}
 
 	check_bounce();
 
