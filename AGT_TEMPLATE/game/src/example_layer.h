@@ -41,6 +41,7 @@ private:
 	engine::ref<engine::game_object>	m_policeCar{};
 	engine::ref<engine::game_object>    m_hexagon{};
 	engine::ref<engine::game_object>    m_bench{};
+	engine::ref<engine::game_object>    m_lamppost{};
 	engine::ref<engine::game_object>    m_missile{};
 
 	missile missile;

@@ -319,6 +319,19 @@ example_layer::example_layer()
 	bench_props.meshes = { bench_shape->mesh() };
 	m_bench = engine::game_object::create(bench_props);
 
+	// Load lamppost
+	engine::ref<engine::lamppost> lamppost_shape = engine::lamppost::create();
+	engine::game_object_properties lamppost_props;
+	lamppost_props.position = { 0.f, 0.5f, 0.f };
+
+	std::vector<engine::ref<engine::texture_2d>> lamppost_textures =
+	{ engine::texture_2d::create("assets/textures/plastic.jpg", false) };
+	lamppost_props.textures = lamppost_textures;
+
+	lamppost_props.scale = glm::vec3(0.8f);
+	lamppost_props.meshes = { lamppost_shape->mesh() };
+	m_lamppost = engine::game_object::create(lamppost_props);
+
 	// Load hexagon
 	engine::ref<engine::hexagon> hexagon_shape = engine::hexagon::create();
 	engine::game_object_properties hexagon_props;
@@ -459,6 +472,11 @@ void example_layer::on_render()
 	m_player.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_cow_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+
+	glm::mat4 lamppostTransform = glm::mat4(1.0f);
+	lamppostTransform = glm::translate(lamppostTransform, glm::vec3(2.f, 0.5f, 5.f));
+	lamppostTransform = glm::scale(lamppostTransform, m_lamppost->scale());
+	engine::renderer::submit(textured_lighting_shader, lamppostTransform, m_lamppost);
 
 	glm::mat4 benchTransform = glm::mat4(1.0f);
 	benchTransform = glm::translate(benchTransform, glm::vec3(19.8f, 0.9f, 0.f));
