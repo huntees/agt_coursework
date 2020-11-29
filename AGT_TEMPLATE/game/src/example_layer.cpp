@@ -325,7 +325,7 @@ example_layer::example_layer()
 	lamppost_props.position = { 0.f, 0.5f, 0.f };
 
 	std::vector<engine::ref<engine::texture_2d>> lamppost_textures =
-	{ engine::texture_2d::create("assets/textures/plastic.jpg", false) };
+	{ engine::texture_2d::create("assets/textures/lamppost.jpg", false) };
 	lamppost_props.textures = lamppost_textures;
 
 	lamppost_props.scale = glm::vec3(0.8f);
