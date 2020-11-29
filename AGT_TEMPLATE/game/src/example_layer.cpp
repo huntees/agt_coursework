@@ -347,13 +347,14 @@ example_layer::example_layer()
 
 	m_skinned_mesh->switch_animation(2);
 
-	//Load Intro Screen Texture
+	//Load Intro Screen Texture and HUD
 	m_intro_screen = intro_screen::create("assets/textures/tempmenu.jpg", 1.6f, 0.9f);
 	m_intro_screen->deactivate();
 	m_HUD = intro_screen::create("assets/textures/tempHUD.png", 1.6f, 0.9f);
 
 	m_jetpack_trail.load_texture("assets/textures/effects/trail.png");
 	m_explosion = explosion::create("assets/textures/effects/Explosion.tga", 4, 5, 16);
+	m_cross_fade = cross_fade::create("assets/textures/effects/screencrack.png", 2.0f, 0.4f, 0.2f);
 }
 
 example_layer::~example_layer() {}
@@ -453,7 +454,7 @@ void example_layer::on_render()
 	roadHorizontalTransform4 = glm::rotate(roadHorizontalTransform4, m_road->rotation_amount() + glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
 	engine::renderer::submit(textured_lighting_shader, roadHorizontalTransform4, m_road);
 
-	//-----------------------------------------------------------Road System End------------------------------------------------------------------------------
+	//=========================================================Road System End============================================================================
 
 	m_player.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_cow_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
@@ -665,7 +666,10 @@ void example_layer::on_render()
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("lighting_on", false);
 
 	m_intro_screen->on_render(textured_lighting_shader);
+
 	m_HUD->on_render(textured_lighting_shader);
+
+	m_cross_fade->on_render(textured_lighting_shader);
 
 
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("lighting_on", true);
@@ -760,7 +764,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	m_jetpack_trail.on_update(time_step);
 
-
+	m_cross_fade->on_update(time_step);
 
 	//jetpack particle logic
 	if (jetpackHoverOn) {
@@ -827,12 +831,18 @@ void example_layer::on_event(engine::event& event)
 		{
 			m_intro_screen->deactivate();
 		}
+
+		//======================Remove these in final ver=======================
 		if (e.key_code() == engine::key_codes::KEY_G)
 		{
 			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
 			missile_active = true;
 		}
-		
+		if (e.key_code() == engine::key_codes::KEY_1)
+		{
+			m_cross_fade->activate();
+		}
+		//======================================================================
 
 	}
 
