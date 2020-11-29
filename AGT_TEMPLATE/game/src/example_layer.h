@@ -5,6 +5,7 @@
 #include "engine/entities/bounding_box_bullet.h"
 #include "effects/jetpack_trail.h"
 #include "weapons/missile.h"
+#include "effects/explosion.h"
 
 class example_layer : public engine::layer
 {
@@ -81,5 +82,10 @@ private:
 
 	bool playState = false;
 
+
+	//===============================================================Effects============================================================================
 	jetpack_trail m_jetpack_trail;
+
+	engine::ref<explosion>							m_explosion{};
+	bool missile_active = false;
 };

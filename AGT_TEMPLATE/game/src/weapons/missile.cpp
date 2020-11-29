@@ -21,7 +21,7 @@ void missile::fire(const engine::perspective_camera& camera, float force, glm::v
 	m_contact_time = 0.0f;
 
 	// Set the ball to the current camera position
-	m_object->set_position(playerPos + glm::vec3(0.f, 0.42f, 0.f) + (camera.front_vector() * 1.1f));
+	m_object->set_position(playerPos + glm::vec3(0.f, 0.42f, 0.f) + (camera.front_vector() * 1.2f));
 	//m_object->set_velocity(25.0f * camera.front_vector());
 	m_object->set_acceleration(3.0f * force * camera.front_vector());
 

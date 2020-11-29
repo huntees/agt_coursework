@@ -126,7 +126,7 @@ example_layer::example_layer()
 	terrain_props.restitution = 0.92f;
 	m_terrain = engine::game_object::create(terrain_props);
 
-	//-------------------------------------------------------------World Props-----------------------------------------------------------------------------------
+	//===============================================================World Props=========================================================================
 
 	//road
 	std::vector<engine::ref<engine::texture_2d>> road_textures = { engine::texture_2d::create("assets/textures/road.png", false) };
@@ -241,9 +241,9 @@ example_layer::example_layer()
 	tree_props.scale = glm::vec3(tree_scale);
 	m_tree = engine::game_object::create(tree_props);
 
-	//-------------------------------------------------------------World Props End-----------------------------------------------------------------------------------
+	//===============================================================World Props End=========================================================================
 
-	//-------------------------------------------------------------Weapon Props--------------------------------------------------------------------------------------
+	//===============================================================Weapon Props============================================================================
 	engine::ref <engine::model> missile_model = engine::model::create("assets/models/static/missile/missile.obj");
 	engine::game_object_properties missile_props;
 	missile_props.meshes = missile_model->meshes();
@@ -260,7 +260,7 @@ example_layer::example_layer()
 		missile_props.position - glm::vec3(0.f, m_missile->offset().y, 0.f));
 
 
-	//-------------------------------------------------------------Weapon Props End----------------------------------------------------------------------------------
+	//===============================================================Weapon Props End==========================================================================
 
 	// Load sphere
 	float radius = 0.5f;
@@ -353,6 +353,7 @@ example_layer::example_layer()
 	m_HUD = intro_screen::create("assets/textures/tempHUD.png", 1.6f, 0.9f);
 
 	m_jetpack_trail.load_texture("assets/textures/effects/trail.png");
+	m_explosion = explosion::create("assets/textures/effects/Explosion.tga", 4, 5, 16);
 }
 
 example_layer::~example_layer() {}
@@ -368,7 +369,7 @@ void example_layer::on_render()
 	const auto textured_lighting_shader = engine::renderer::shaders_library()->get("mesh_lighting");
 
 
-	//----------------------------------------------------3D Cam-------------------------------------------------------------------------
+	//===============================================================3D Cam============================================================================
 	engine::renderer::begin_scene(m_3d_camera, textured_lighting_shader);
 
 	// Set up some of the scene's parameters in the shader
@@ -393,7 +394,7 @@ void example_layer::on_render()
 
 
 
-	//-----------------------------------------------------------Road System--------------------------------------------------------------------------------
+	//===============================================================Road System============================================================================
 
 	engine::renderer::submit(textured_lighting_shader, m_intersection);
 
@@ -413,7 +414,7 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, intersectionTransform3, m_intersection);
 
 
-	//------------------------------------------------------vertical roads------------------------------------------------------------------------------------------
+	//===============================================================Vertical Roads============================================================================
 	engine::renderer::submit(textured_lighting_shader, m_road);
 
 	glm::mat4 roadTransform = glm::mat4(1.0f);
@@ -431,7 +432,7 @@ void example_layer::on_render()
 	roadTransform3 = glm::rotate(roadTransform3, m_road->rotation_amount(), m_road->rotation_axis());
 	engine::renderer::submit(textured_lighting_shader, roadTransform3, m_road);
 
-	//--------------------------------------------------horizontal roads-----------------------------------------------------------------------------------
+	//===============================================================Horizontal Roads============================================================================
 	glm::mat4 roadHorizontalTransform = glm::mat4(1.0f);
 	roadHorizontalTransform = glm::translate(roadHorizontalTransform, glm::vec3(-29.5f, 0.50001f, 30.f));
 	roadHorizontalTransform = glm::rotate(roadHorizontalTransform, m_road->rotation_amount() + glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
@@ -599,10 +600,11 @@ void example_layer::on_render()
 	policeCar_transform = glm::scale(policeCar_transform, m_policeCar->scale());
 	engine::renderer::submit(textured_lighting_shader, policeCar_transform, m_policeCar);
 
-
-
-
 	missile.on_render(textured_lighting_shader);
+
+
+	//================================================================Effects Render=======================================================================
+	m_explosion->on_render(m_3d_camera, textured_lighting_shader);
 
 	m_jetpack_trail.on_render(m_3d_camera, textured_lighting_shader);
 
@@ -645,13 +647,13 @@ void example_layer::on_render()
 	engine::renderer::submit(animated_mesh_shader, m_player.object());
 
 	engine::renderer::end_scene();
-	//----------------------------------------------------3D Cam End--------------------------------------------------------------------------
+	//===============================================================3D Cam End============================================================================
 
 	// Render text
 	const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
 	m_text_manager->render_text(text_shader, "Orange Text", 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
 
-	//----------------------------------------------------2D Cam-------------------------------------------------------------------------------
+	//===============================================================2D Cam============================================================================
 
 	//old code for turning lighting on and off
 	//const auto hud_lighting_shader = engine::renderer::shaders_library()->get("mesh_lighting");
@@ -668,7 +670,7 @@ void example_layer::on_render()
 
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("lighting_on", true);
 	engine::renderer::end_scene();
-	//----------------------------------------------------2D Cam End--------------------------------------------------------------------------
+	//===============================================================2D Cam End============================================================================
 }
 
 void example_layer::on_update(const engine::timestep& time_step)
@@ -677,6 +679,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
 
+
+	//===============================================================Objects Update============================================================================
 	m_player.on_update(time_step);
 
 	missile.on_update(time_step);
@@ -687,6 +691,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),
 		missile.object()->rotation_amount(), missile.object()->rotation_axis());
 
+
+	//Camera Switching Logic
 	if (CamMode == FirstPerson) {
 		m_player.update_first_person_camera(m_3d_camera);
 	}
@@ -724,12 +730,18 @@ void example_layer::on_update(const engine::timestep& time_step)
 	//	}
 	//}
 
-	if (m_missile->is_colliding()) {
+	//===============================================================Collision Update============================================================================
+
+	//checks whether missile is colliding and whether the missile is active i.e if the missile has already exploded
+	if (m_missile->is_colliding() && missile_active) {
 		missile.object()->set_velocity(glm::vec3(0.f));
 		missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
+		missile_active = false;
 	}
 
 	check_bounce();
+
 
 	if (m_ball->is_colliding() && m_ball->collision_objects().size() > 1)
 	{
@@ -742,9 +754,15 @@ void example_layer::on_update(const engine::timestep& time_step)
 	}
 
 
-	//jetpack particle logic
+	//===============================================================Effects Update============================================================================
+
+	m_explosion->on_update(time_step);
+
 	m_jetpack_trail.on_update(time_step);
 
+
+
+	//jetpack particle logic
 	if (jetpackHoverOn) {
 
 		jetpackTrailReady = false;
@@ -812,6 +830,7 @@ void example_layer::on_event(engine::event& event)
 		if (e.key_code() == engine::key_codes::KEY_G)
 		{
 			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
+			missile_active = true;
 		}
 		
 
@@ -830,6 +849,7 @@ void example_layer::on_event(engine::event& event)
 	{
 		if (engine::input::mouse_button_pressed(0)) {
 			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
+			missile_active = true;
 		}
 	}
 }

@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\effects\explosion.h" />
     <ClInclude Include="src\effects\particle.h" />
     <ClInclude Include="src\effects\jetpack_trail.h" />
     <ClInclude Include="src\example_layer.h" />
@@ -139,6 +140,7 @@
     <ClInclude Include="src\weapons\missile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\effects\explosion.cpp" />
     <ClCompile Include="src\effects\particle.cpp" />
     <ClCompile Include="src\effects\jetpack_trail.cpp" />
     <ClCompile Include="src\example_layer.cpp" />

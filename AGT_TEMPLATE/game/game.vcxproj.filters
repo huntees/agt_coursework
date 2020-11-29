@@ -14,6 +14,9 @@
     <ClCompile Include="src\weapons\missile.cpp">
       <Filter>weapons</Filter>
     </ClCompile>
+    <ClCompile Include="src\effects\explosion.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\example_layer.h" />
@@ -27,6 +30,9 @@
     </ClInclude>
     <ClInclude Include="src\weapons\missile.h">
       <Filter>weapons</Filter>
+    </ClInclude>
+    <ClInclude Include="src\effects\explosion.h">
+      <Filter>effects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
