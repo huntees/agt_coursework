@@ -34,10 +34,18 @@ example_layer::example_layer()
 	auto text_shader = engine::renderer::shaders_library()->get("text_2D");
 	auto animated_mesh_shader = engine::renderer::shaders_library()->get("animated_mesh");
 
-	m_directionalLight.Color = glm::vec3(0.8f, 0.8f, 0.8f);
+	m_directionalLight.Color = glm::vec3(0.1f, 0.1f, 0.1f);
 	m_directionalLight.AmbientIntensity = 0.25f;
 	m_directionalLight.DiffuseIntensity = 0.6f;
 	m_directionalLight.Direction = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
+
+	m_white_pointLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_white_pointLight.AmbientIntensity = 0.3f;
+	m_white_pointLight.DiffuseIntensity = 0.6f;
+	m_white_pointLight.Position = glm::vec3(10.f, 4.4f, 8.13f);
+	m_white_pointLight.Attenuation.Constant = 1.0f;
+	m_white_pointLight.Attenuation.Linear = 0.4f;
+	m_white_pointLight.Attenuation.Exp = 0.01f;
 
 	m_red_spotLight.Color = glm::vec3(1.0f, 0.0f, 0.0f);
 	m_red_spotLight.AmbientIntensity = 0.8f; //0.25f
@@ -77,6 +85,8 @@ example_layer::example_layer()
 		glm::vec3(1.0f, 0.1f, 0.07f), glm::vec3(0.5f, 0.5f, 0.5f), 1.0f);
 
 	m_red_spotLight_material = engine::material::create(1.0f, m_red_spotLight.Color, m_red_spotLight.Color, m_red_spotLight.Color, 1.0f);
+
+	m_white_pointLight_material = engine::material::create(1.0f, m_white_pointLight.Color, m_white_pointLight.Color, m_white_pointLight.Color, 1.0f);
 
 
 	// Skybox texture from http://www.vwall.it/wp-content/plugins/canvasio3dpro/inc/resource/cubeMaps/
@@ -322,7 +332,7 @@ example_layer::example_layer()
 	// Load lamppost
 	engine::ref<engine::lamppost> lamppost_shape = engine::lamppost::create();
 	engine::game_object_properties lamppost_props;
-	lamppost_props.position = { 0.f, 0.5f, 0.f };
+	lamppost_props.position = { 11.25f, 0.5f, 8.f };
 
 	std::vector<engine::ref<engine::texture_2d>> lamppost_textures =
 	{ engine::texture_2d::create("assets/textures/lamppost.jpg", false) };
@@ -406,6 +416,9 @@ void example_layer::on_render()
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gNumSpotLights", (int)num_spot_lights);
 	m_red_spotLight.submit(textured_lighting_shader, 0);
 
+	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gNumPointLights", (int)num_point_lights);
+	m_white_pointLight.submit(textured_lighting_shader, 0);
+
 
 
 	//===============================================================Road System============================================================================
@@ -474,7 +487,8 @@ void example_layer::on_render()
 	missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 
 	glm::mat4 lamppostTransform = glm::mat4(1.0f);
-	lamppostTransform = glm::translate(lamppostTransform, glm::vec3(2.f, 0.5f, 5.f));
+	lamppostTransform = glm::translate(lamppostTransform, m_lamppost->position());
+	lamppostTransform = glm::rotate(lamppostTransform, m_lamppost->rotation_amount() + glm::radians(-90.f), m_lamppost->rotation_axis());
 	lamppostTransform = glm::scale(lamppostTransform, m_lamppost->scale());
 	engine::renderer::submit(textured_lighting_shader, lamppostTransform, m_lamppost);
 
@@ -645,15 +659,20 @@ void example_layer::on_render()
 	engine::renderer::submit(material_shader, m_ball);
 
 
-	//-------------------------------------------------------spotlight ball--------------------------------------------------------
-	//std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", false);
+	//-------------------------------------------------------light ball--------------------------------------------------------
+	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", false);
 
 	//m_red_spotLight_material->submit(material_shader);
 	//engine::renderer::submit(material_shader, m_red_spotLight_ball->meshes().at(0), glm::translate(glm::mat4(1.f), m_red_spotLight.Position));
 
+	m_white_pointLight_material->submit(material_shader);
+	glm::mat4 pointLight_transform(1.0f);
+	pointLight_transform = glm::translate(pointLight_transform, m_white_pointLight.Position);
+	pointLight_transform = glm::scale(pointLight_transform, glm::vec3(0.2f));
+	engine::renderer::submit(material_shader, m_ball->meshes().at(0), pointLight_transform);
 
-	//std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", true);
-	//-------------------------------------------------------spotlight ball--------------------------------------------------------
+	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", true);
+	//-------------------------------------------------------light ball--------------------------------------------------------
 
 	engine::renderer::end_scene();
 

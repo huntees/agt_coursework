@@ -49,6 +49,7 @@ private:
 	engine::ref<engine::material>		m_material{};
 	engine::ref<engine::material>		m_tetrahedron_material{};
 	engine::ref<engine::material>		m_red_spotLight_material{};
+	engine::ref<engine::material>		m_white_pointLight_material{};
 
 	engine::DirectionalLight            m_directionalLight;
 
@@ -57,6 +58,9 @@ private:
 
 	engine::ref<engine::game_object>	m_red_spotLight_ball{};
 	float spotLightRotation = 0.f;
+
+	engine::PointLight m_white_pointLight;
+	uint32_t num_point_lights = 1;
 
 	std::vector<engine::ref<engine::game_object>>     m_game_objects{};
 
