@@ -62,6 +62,8 @@ private:
 	engine::PointLight m_white_pointLight;
 	uint32_t num_point_lights = 1;
 
+	engine::ref<engine::game_object>    m_pointLight_object{};
+
 	std::vector<engine::ref<engine::game_object>>     m_game_objects{};
 
 	engine::ref<engine::bullet_manager> m_physics_manager{};

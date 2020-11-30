@@ -42,7 +42,7 @@ example_layer::example_layer()
 	m_white_pointLight.Color = glm::vec3(1.0f, 1.0f, 1.0f);
 	m_white_pointLight.AmbientIntensity = 0.3f;
 	m_white_pointLight.DiffuseIntensity = 0.6f;
-	m_white_pointLight.Position = glm::vec3(10.f, 4.4f, 8.13f);
+	m_white_pointLight.Position = glm::vec3(10.1f, 4.5f, 8.12f);
 	m_white_pointLight.Attenuation.Constant = 1.0f;
 	m_white_pointLight.Attenuation.Linear = 0.4f;
 	m_white_pointLight.Attenuation.Exp = 0.01f;
@@ -161,6 +161,12 @@ example_layer::example_layer()
 	intersection_props.type = 0;
 	intersection_props.restitution = 0.92f;
 	m_intersection = engine::game_object::create(intersection_props);
+
+	//pointLight_object
+	engine::ref<engine::terrain> pointLight_object_shape = engine::terrain::create(0.3f, 0.05f, 0.1f, 1.f);
+	engine::game_object_properties pointLight_object_props;
+	pointLight_object_props.meshes = { pointLight_object_shape->mesh() };
+	m_pointLight_object = engine::game_object::create(pointLight_object_props);
 
 	// Load the cow model. Create a cow object. Set its properties
 	engine::ref <engine::model> cow_model = engine::model::create("assets/models/static/cow4.3ds");
@@ -666,10 +672,11 @@ void example_layer::on_render()
 	//engine::renderer::submit(material_shader, m_red_spotLight_ball->meshes().at(0), glm::translate(glm::mat4(1.f), m_red_spotLight.Position));
 
 	m_white_pointLight_material->submit(material_shader);
-	glm::mat4 pointLight_transform(1.0f);
-	pointLight_transform = glm::translate(pointLight_transform, m_white_pointLight.Position);
-	pointLight_transform = glm::scale(pointLight_transform, glm::vec3(0.2f));
-	engine::renderer::submit(material_shader, m_ball->meshes().at(0), pointLight_transform);
+	//glm::mat4 pointLight_transform(1.0f);
+	//pointLight_transform = glm::translate(pointLight_transform, m_white_pointLight.Position);
+	//pointLight_transform = glm::scale(pointLight_transform, glm::vec3(0.2f));
+	//engine::renderer::submit(material_shader, m_ball->meshes().at(0), pointLight_transform);
+	engine::renderer::submit(material_shader, glm::translate(glm::mat4(1.f), m_white_pointLight.Position), m_pointLight_object);
 
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", true);
 	//-------------------------------------------------------light ball--------------------------------------------------------
