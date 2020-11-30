@@ -2,11 +2,11 @@
 #include <engine.h>
 #include "engine/entities/bounding_box_bullet.h"
 
-class missile
+class projectile
 {
 public:
-	missile();
-	~missile();
+	projectile();
+	~projectile();
 
 	void initialise(engine::ref<engine::game_object> object);
 	void fire(const engine::perspective_camera& camera, float force, glm::vec3 playerPos);
@@ -17,8 +17,8 @@ public:
 
 	engine::ref<engine::game_object> object() const { return m_object; }
 
-	void set_box(float width, float height, float depth, glm::vec3 position) { m_missile_box.set_box(width, height, depth, position); }
-	bounding_box& getBox() { return m_missile_box; };
+	void set_box(float width, float height, float depth, glm::vec3 position) { m_projectile_box.set_box(width, height, depth, position); }
+	bounding_box& getBox() { return m_projectile_box; };
 
 private:
 	engine::ref<engine::game_object> m_object;
@@ -38,5 +38,5 @@ private:
 	bool collision_detection(float y_plane);
 	void collision_response(float y_plane);
 
-	bounding_box m_missile_box;
+	bounding_box m_projectile_box;
 };

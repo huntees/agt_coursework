@@ -34,7 +34,7 @@ example_layer::example_layer()
 	auto text_shader = engine::renderer::shaders_library()->get("text_2D");
 	auto animated_mesh_shader = engine::renderer::shaders_library()->get("animated_mesh");
 
-	m_directionalLight.Color = glm::vec3(0.1f, 0.1f, 0.1f);
+	m_directionalLight.Color = glm::vec3(0.8f, 0.8f, 0.8f);
 	m_directionalLight.AmbientIntensity = 0.25f;
 	m_directionalLight.DiffuseIntensity = 0.6f;
 	m_directionalLight.Direction = glm::normalize(glm::vec3(1.0f, -1.0f, 0.0f));
@@ -162,6 +162,19 @@ example_layer::example_layer()
 	intersection_props.restitution = 0.92f;
 	m_intersection = engine::game_object::create(intersection_props);
 
+	//weapon holder
+	std::vector<engine::ref<engine::texture_2d>> weapon_holder_textures = { engine::texture_2d::create("assets/textures/intersection.jpg", false) };
+	engine::ref<engine::terrain> weapon_holder_shape = engine::terrain::create(3.f, 0.02f, 3.f, 1.f);
+	engine::game_object_properties weapon_holder_props;
+	weapon_holder_props.meshes = { weapon_holder_shape->mesh() };
+	weapon_holder_props.textures = weapon_holder_textures;
+	weapon_holder_props.position = { 0.f, -4.f, 0.f };
+	weapon_holder_props.is_static = true;
+	weapon_holder_props.type = 0;
+	weapon_holder_props.bounding_shape = glm::vec3(3.f, 0.02f, 3.f);
+	weapon_holder_props.restitution = 0.f;
+	m_weapon_holder = engine::game_object::create(weapon_holder_props);
+
 	//pointLight_object
 	engine::ref<engine::terrain> pointLight_object_shape = engine::terrain::create(0.3f, 0.05f, 0.1f, 1.f);
 	engine::game_object_properties pointLight_object_props;
@@ -275,6 +288,20 @@ example_layer::example_layer()
 	missile.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
 		missile_props.position - glm::vec3(0.f, m_missile->offset().y, 0.f));
 
+	// Load bouncynade
+	float bouncynade_radius = 0.15f;
+	engine::ref<engine::sphere> bouncynade_shape = engine::sphere::create(5, 10, bouncynade_radius);
+	engine::game_object_properties bouncynade_props;
+	bouncynade_props.position = { 0.f, 5.f, -5.f };
+	bouncynade_props.meshes = { bouncynade_shape->mesh() };
+	bouncynade_props.type = 1;
+	bouncynade_props.bounding_shape = glm::vec3(bouncynade_radius);
+	bouncynade_props.restitution = 0.8f;
+	bouncynade_props.mass = 0.2f;
+	bouncynade_props.rolling_friction = 0.1f;
+	m_bouncynade = engine::game_object::create(bouncynade_props);
+	bouncynade.initialise(m_bouncynade);
+
 
 	//===============================================================Weapon Props End==========================================================================
 
@@ -363,6 +390,7 @@ example_layer::example_layer()
 
 
 	m_game_objects.push_back(m_terrain);
+	m_game_objects.push_back(m_weapon_holder);
 	m_game_objects.push_back(m_ball);
 	m_game_objects.push_back(m_cow);
 	//m_game_objects.push_back(m_tree);
@@ -370,6 +398,7 @@ example_layer::example_layer()
 	m_game_objects.push_back(m_red_spotLight_ball);
 	m_game_objects.push_back(m_mannequin);
 	m_game_objects.push_back(m_missile);
+	m_game_objects.push_back(m_bouncynade);
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
 	m_text_manager = engine::text_manager::create();
@@ -415,6 +444,8 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, m_skybox, skybox_tranform);
 
 	engine::renderer::submit(textured_lighting_shader, m_terrain);
+
+	engine::renderer::submit(textured_lighting_shader, m_weapon_holder);
 
 	engine::renderer::submit(textured_lighting_shader, m_tetrahedron);
 
@@ -640,6 +671,7 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, policeCar_transform, m_policeCar);
 
 	missile.on_render(textured_lighting_shader);
+	bouncynade.on_render(textured_lighting_shader);
 
 
 	//================================================================Effects Render=======================================================================
@@ -733,6 +765,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	missile.on_update(time_step);
 
+	bouncynade.on_update(time_step);
+
 	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
 		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
 	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
@@ -785,7 +819,24 @@ void example_layer::on_update(const engine::timestep& time_step)
 		missile.object()->set_velocity(glm::vec3(0.f));
 		missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
 		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
+		missile.object()->set_position(glm::vec3(0.f, -3.f, 1.f));
 		missile_active = false;
+	}
+
+	if (m_bouncynade->is_colliding() && bouncynade_active) {
+		bouncynade_armtime = 3.f;
+		bouncynade_active = false;
+	}
+
+	if (bouncynade_armtime > 0.0f)
+	{
+		bouncynade_armtime -= (float)time_step;
+
+		if (bouncynade_armtime < 0.0f)
+		{
+			m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
+			bouncynade.object()->set_position(glm::vec3(0.f,-3.f,0.f));
+		}
 	}
 
 	check_bounce();
@@ -881,6 +932,11 @@ void example_layer::on_event(engine::event& event)
 		{
 			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
 			missile_active = true;
+		}
+		if (e.key_code() == engine::key_codes::KEY_H)
+		{
+			bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
+			bouncynade_active = true;
 		}
 		if (e.key_code() == engine::key_codes::KEY_1)
 		{

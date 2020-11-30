@@ -138,7 +138,7 @@
     <ClInclude Include="src\example_layer.h" />
     <ClInclude Include="src\intro_screen.h" />
     <ClInclude Include="src\player.h" />
-    <ClInclude Include="src\weapons\missile.h" />
+    <ClInclude Include="src\weapons\projectile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\effects\cross_fade.cpp" />
@@ -149,7 +149,7 @@
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\intro_screen.cpp" />
     <ClCompile Include="src\player.cpp" />
-    <ClCompile Include="src\weapons\missile.cpp" />
+    <ClCompile Include="src\weapons\projectile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\engine\engine.vcxproj">

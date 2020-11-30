@@ -4,7 +4,7 @@
 #include "intro_screen.h"
 #include "engine/entities/bounding_box_bullet.h"
 #include "effects/jetpack_trail.h"
-#include "weapons/missile.h"
+#include "weapons/projectile.h"
 #include "effects/explosion.h"
 #include "effects/cross_fade.h"
 
@@ -27,6 +27,7 @@ private:
 	engine::ref<engine::game_object>	m_terrain{};
 	engine::ref<engine::game_object>	m_road{};
 	engine::ref<engine::game_object>	m_intersection{};
+	engine::ref<engine::game_object>	m_weapon_holder{};
 	engine::ref<engine::game_object>	m_cow{};
 	engine::ref<engine::game_object>	m_tree{};
 	engine::ref<engine::game_object>	m_ball{};
@@ -43,8 +44,10 @@ private:
 	engine::ref<engine::game_object>    m_bench{};
 	engine::ref<engine::game_object>    m_lamppost{};
 	engine::ref<engine::game_object>    m_missile{};
+	engine::ref<engine::game_object>    m_bouncynade{};
 
-	missile missile;
+	projectile missile;
+	projectile bouncynade;
 
 	engine::ref<engine::material>		m_material{};
 	engine::ref<engine::material>		m_tetrahedron_material{};
@@ -98,4 +101,6 @@ private:
 
 	engine::ref<explosion>							m_explosion{};
 	bool missile_active = false;
+	bool bouncynade_active = false;
+	float bouncynade_armtime = -1.f;
 };

@@ -11,14 +11,14 @@
     <ClCompile Include="src\effects\jetpack_trail.cpp">
       <Filter>effects</Filter>
     </ClCompile>
-    <ClCompile Include="src\weapons\missile.cpp">
-      <Filter>weapons</Filter>
-    </ClCompile>
     <ClCompile Include="src\effects\explosion.cpp">
       <Filter>effects</Filter>
     </ClCompile>
     <ClCompile Include="src\effects\cross_fade.cpp">
       <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\weapons\projectile.cpp">
+      <Filter>weapons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -31,14 +31,14 @@
     <ClInclude Include="src\effects\jetpack_trail.h">
       <Filter>effects</Filter>
     </ClInclude>
-    <ClInclude Include="src\weapons\missile.h">
-      <Filter>weapons</Filter>
-    </ClInclude>
     <ClInclude Include="src\effects\explosion.h">
       <Filter>effects</Filter>
     </ClInclude>
     <ClInclude Include="src\effects\cross_fade.h">
       <Filter>effects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\weapons\projectile.h">
+      <Filter>weapons</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

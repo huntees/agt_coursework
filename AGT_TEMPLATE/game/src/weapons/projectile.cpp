@@ -1,18 +1,18 @@
 #include "pch.h"
-#include "missile.h"
+#include "projectile.h"
 
-missile::missile()
+projectile::projectile()
 {}
 
-missile::~missile()
+projectile::~projectile()
 {}
 
-void missile::initialise(engine::ref<engine::game_object> object)
+void projectile::initialise(engine::ref<engine::game_object> object)
 {
 	m_object = object;
 }
 
-void missile::fire(const engine::perspective_camera& camera, float force, glm::vec3 playerPos)
+void projectile::fire(const engine::perspective_camera& camera, float force, glm::vec3 playerPos)
 {
 	m_object->set_velocity(glm::vec3(0.f));
 	m_object->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
@@ -33,7 +33,7 @@ void missile::fire(const engine::perspective_camera& camera, float force, glm::v
 	m_object->set_rotation_amount(m_phi);
 }
 
-void missile::on_update(const engine::timestep& time_step)
+void projectile::on_update(const engine::timestep& time_step)
 {
 	// Update physical quanitities
 	m_last_position = m_object->position();
@@ -62,11 +62,11 @@ void missile::on_update(const engine::timestep& time_step)
 	//	collision_response(y_plane);
 	//}
 
-	m_missile_box.on_update(object()->position() - glm::vec3(0.f, object()->offset().y,
+	m_projectile_box.on_update(object()->position() - glm::vec3(0.f, object()->offset().y,
 		0.f) * object()->scale(), object()->rotation_amount(), object()->rotation_axis());
 }
 
-void missile::on_render(const engine::ref<engine::shader>& shader)
+void projectile::on_render(const engine::ref<engine::shader>& shader)
 {
 	glm::mat4 transform(1.0f);
 	transform = glm::translate(transform, m_object->position());
@@ -76,7 +76,7 @@ void missile::on_render(const engine::ref<engine::shader>& shader)
 	engine::renderer::submit(shader, transform, m_object);
 }
 
-bool missile::collision_detection(float y_plane)
+bool projectile::collision_detection(float y_plane)
 {
 	// Check for collision with the ground by looking at the y value of the ball's position
 	if (m_object->position().y - m_object->bounding_shape().y < y_plane && m_object->velocity().y < 0) {
@@ -85,7 +85,7 @@ bool missile::collision_detection(float y_plane)
 	return false;
 }
 
-void missile::collision_response(float y_plane)
+void projectile::collision_response(float y_plane)
 {
 	float convergenceThreshold = 0.5f;
 	if (glm::length(m_object->velocity()) > convergenceThreshold) {
