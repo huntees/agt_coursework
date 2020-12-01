@@ -5,16 +5,24 @@ enemy::enemy() {}
 
 enemy::~enemy() {}
 
-void enemy::initialise(engine::ref<engine::game_object> object, glm::vec3 position, glm::vec3 forward)
+void enemy::initialise(engine::ref<engine::game_object> object, glm::vec3 position, glm::vec3 forward, bool canFly)
 {
 	m_object = object;
 	m_object->set_forward(forward);
 	m_object->set_position(position);
+	can_fly = canFly;
 }
 
 void enemy::on_update(const engine::timestep& time_step, const glm::vec3& player_position)
 {
 	float distance_to_player = glm::distance(m_object->position(), player_position);
+
+	if (can_fly) {
+		//m_object->set_acceleration(glm::vec3(m_object->acceleration().x, 9.8f, m_object->acceleration().z));
+		//m_object->set_velocity(glm::vec3(m_object->velocity().x, 0.f, m_object->velocity().z));
+		m_object->set_velocity(glm::vec3(0.f));
+		m_object->set_acceleration(glm::vec3(0.f));
+	}
 
 	// check which state is the enemy in, then execute the matching behaviour
 	if (m_state == state::idle)

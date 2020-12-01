@@ -15,8 +15,7 @@ class enemy
 		~enemy();
 
 		// set the parameters for the enemy
-		void initialise(engine::ref<engine::game_object> object, glm::vec3 position,
-			glm::vec3 forward);
+		void initialise(engine::ref<engine::game_object> object, glm::vec3 position, glm::vec3 forward, bool can_fly);
 
 		// update the enemy
 		void on_update(const engine::timestep& time_step, const glm::vec3& player_position);
@@ -29,6 +28,8 @@ class enemy
 		void chase_player(const engine::timestep& time_step, const glm::vec3& player_position);
 		// game object bound to the enemy
 		engine::ref<engine::game_object> object() const { return m_object; }
+
+
 	private:
 		// enemy's speed
 		float m_speed{ 0.5f };
@@ -46,4 +47,6 @@ class enemy
 
 		//current state of the enemy's state machine
 		state m_state = state::idle;
+
+		bool can_fly = false;
 };

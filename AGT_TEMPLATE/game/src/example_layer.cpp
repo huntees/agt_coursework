@@ -213,7 +213,7 @@ example_layer::example_layer()
 	m_droid->set_offset(droid_model->offset());
 	m_droid_box.set_box(droid_props.bounding_shape.x * 2.f * droid_props.scale.x, droid_props.bounding_shape.y * 2.f * droid_props.scale.x, droid_props.bounding_shape.z * 2.f
 		* droid_props.scale.x, droid_props.position - glm::vec3(0.f, m_droid->offset().y, 0.f) * m_droid->scale());
-	m_enemy_droid.initialise(m_droid, droid_props.position, glm::vec3(1.f, 0.f, 0.f));
+	m_enemy_droid.initialise(m_droid, droid_props.position, glm::vec3(1.f, 0.f, 0.f), false);
 
 
 	//load mech model
@@ -230,23 +230,23 @@ example_layer::example_layer()
 	m_mech->set_offset(mech_model->offset());
 	m_mech_box.set_box(mech_props.bounding_shape.x * 2.f * mech_props.scale.x, mech_props.bounding_shape.y * 2.f * mech_props.scale.x, mech_props.bounding_shape.z * 2.f
 		* mech_props.scale.x, mech_props.position - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale());
-	m_enemy_mech.initialise(m_mech, mech_props.position, glm::vec3(1.f, 0.f, 0.f));
+	m_enemy_mech.initialise(m_mech, mech_props.position, glm::vec3(1.f, 0.f, 0.f), false);
 
 	//load drone model
 	engine::ref <engine::model> drone_model = engine::model::create("assets/models/static/drone/drone.obj");
 	engine::game_object_properties drone_props;
 	drone_props.meshes = drone_model->meshes();
 	drone_props.textures = drone_model->textures();
-	drone_props.position = glm::vec3(-4.f, 0.5f, 0.f);
+	drone_props.position = glm::vec3(-4.f, 2.f, 0.f);
 	drone_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	drone_props.scale = drone_model->size();
-	drone_props.bounding_shape = drone_model->size() / 2.f;
+	drone_props.bounding_shape = drone_model->size() / 2.5f;
 	drone_props.type = 0;
 	m_drone = engine::game_object::create(drone_props);
 	m_drone->set_offset(drone_model->offset());
 	m_drone_box.set_box(drone_props.bounding_shape.x * 2.f * drone_props.scale.x, drone_props.bounding_shape.y * 2.f * drone_props.scale.x, drone_props.bounding_shape.z * 2.f
 		* drone_props.scale.x, drone_props.position - glm::vec3(0.f, m_drone->offset().y, 0.f) * m_drone->scale());
-	m_enemy_drone.initialise(m_drone, drone_props.position, glm::vec3(1.f, 0.f, 0.f));
+	m_enemy_drone.initialise(m_drone, drone_props.position, glm::vec3(1.f, 0.f, 0.f), true);
 
 	// Load the jeep model.
 	engine::ref <engine::model> jeep_model = engine::model::create("assets/models/static/jeep1/jeep1.obj");
@@ -847,7 +847,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 	m_enemy_mech.on_update(time_step, m_player.object()->position());
 	m_mech_box.on_update(m_mech->position() - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale(), m_mech->rotation_amount(), m_mech->rotation_axis());
 
-	m_enemy_drone.on_update(time_step, m_player.object()->position());
+	m_enemy_drone.on_update(time_step, m_player.object()->position() + glm::vec3(0.f, 0.5f, 0.f));
 	m_drone_box.on_update(m_drone->position() - glm::vec3(0.f, m_drone->offset().y, 0.f) * m_drone->scale(), m_drone->rotation_amount(), m_drone->rotation_axis());
 
 	missile.on_update(time_step);
@@ -895,6 +895,31 @@ void example_layer::on_update(const engine::timestep& time_step)
 	//}
 
 	//===============================================================Collision Update============================================================================
+	if (m_drone_box.collision(m_player.getBox())) {
+
+		//m_enemy_drone.object()->set_velocity(glm::vec3(0.f));
+		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
+
+		if (!player_immunity) {
+			player_immunity_timer = 2.f;
+		}
+	}
+
+	if (player_immunity_timer > 0.0f)
+	{
+		if (!player_immunity) {
+			m_cross_fade->activate();
+			player_immunity = true;
+		}
+
+		player_immunity_timer -= (float)time_step;
+
+		if (player_immunity_timer < 0.0f)
+		{
+			player_immunity = false;
+		}
+	}
+
 
 	//checks whether missile is colliding and whether the missile is active i.e if the missile has already exploded
 	if (m_missile->is_colliding() && missile_active) {

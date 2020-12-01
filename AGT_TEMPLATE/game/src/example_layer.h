@@ -61,6 +61,9 @@ private:
 	bounding_box m_mech_box;
 	bounding_box m_drone_box;
 
+	bool player_immunity = false;
+	float player_immunity_timer = -1.f;
+
 	bounding_box m_cow_box;
 
 	engine::ref<engine::material>		m_material{};

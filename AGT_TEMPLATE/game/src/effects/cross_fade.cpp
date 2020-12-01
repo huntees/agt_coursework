@@ -51,14 +51,14 @@ void cross_fade::activate()
 	m_transparency = 1.0f;
 	m_timer = 0.0f;
 
-	//randomises the position of the screen crack
+	//randomises the position of the screen crack but makes sure its close to center to allow player to see it
 	do {
 		random_x = (rand() / (float)RAND_MAX) * 2 - 1;
-	} while (random_x > 1.4f || random_x < -1.4f);
+	} while (random_x > 0.8f || random_x < -0.8f);
 
 	do {
 		random_y = (rand() / (float)RAND_MAX) * 2 - 1;
-	} while (random_y > 0.7f || random_y < -0.7f);
+	} while (random_y > 0.5f || random_y < -0.5f);
 	
 }
 
