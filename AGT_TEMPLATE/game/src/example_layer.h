@@ -7,6 +7,7 @@
 #include "weapons/projectile.h"
 #include "effects/explosion.h"
 #include "effects/cross_fade.h"
+#include "enemy/enemy.h"
 
 class example_layer : public engine::layer
 {
@@ -20,6 +21,8 @@ public:
 
 private:
 	player m_player{};
+
+	enemy m_enemy{};
 
 	void check_bounce();
 

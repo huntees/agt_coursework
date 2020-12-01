@@ -187,17 +187,18 @@ example_layer::example_layer()
 	cow_props.meshes = cow_model->meshes();
 	cow_props.textures = cow_model->textures();
 	float cow_scale = 1.f / glm::max(cow_model->size().x, glm::max(cow_model->size().y, cow_model->size().z));
-	cow_props.position = { 19.3f, 0.8f, -0.2f };
+	cow_props.position = { 0.f, 1.f, 0.f };
 	cow_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
-	cow_props.rotation_amount = glm::radians(90.f);
+	//cow_props.rotation_amount = glm::radians(90.f);
 	cow_props.scale = glm::vec3(cow_scale);
 	cow_props.bounding_shape = cow_model->size() / 2.f;
 	cow_props.type = 0;
-	cow_props.is_static = true;
+	//cow_props.is_static = true;
 	m_cow = engine::game_object::create(cow_props);
 	m_cow->set_offset(cow_model->offset());
 	m_cow_box.set_box(cow_props.bounding_shape.x * 2.f * cow_scale, cow_props.bounding_shape.y * 2.f * cow_scale, cow_props.bounding_shape.z * 2.f
-		* cow_scale, cow_props.position - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale());
+		* cow_scale, cow_props.position - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale());
+	m_enemy.initialise(m_cow, cow_props.position, glm::vec3(1.f, 0.f, 0.f));
 
 	// Load the jeep model.
 	engine::ref <engine::model> jeep_model = engine::model::create("assets/models/static/jeep1/jeep1.obj");
@@ -765,17 +766,17 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	//===============================================================Objects Update============================================================================
 	m_player.on_update(time_step);
-
-	missile.on_update(time_step);
-
-	bouncynade.on_update(time_step);
-
 	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
 		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
+
+	m_enemy.on_update(time_step, m_player.object()->position());
 	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
+
+	missile.on_update(time_step);
 	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),
 		missile.object()->rotation_amount(), missile.object()->rotation_axis());
 
+	bouncynade.on_update(time_step);
 
 	//Camera Switching Logic
 	if (CamMode == FirstPerson) {

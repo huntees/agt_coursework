@@ -135,6 +135,7 @@
     <ClInclude Include="src\effects\explosion.h" />
     <ClInclude Include="src\effects\particle.h" />
     <ClInclude Include="src\effects\jetpack_trail.h" />
+    <ClInclude Include="src\enemy\enemy.h" />
     <ClInclude Include="src\example_layer.h" />
     <ClInclude Include="src\intro_screen.h" />
     <ClInclude Include="src\player.h" />
@@ -145,6 +146,7 @@
     <ClCompile Include="src\effects\explosion.cpp" />
     <ClCompile Include="src\effects\particle.cpp" />
     <ClCompile Include="src\effects\jetpack_trail.cpp" />
+    <ClCompile Include="src\enemy\enemy.cpp" />
     <ClCompile Include="src\example_layer.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\intro_screen.cpp" />

@@ -20,6 +20,9 @@
     <ClCompile Include="src\weapons\projectile.cpp">
       <Filter>weapons</Filter>
     </ClCompile>
+    <ClCompile Include="src\enemy\enemy.cpp">
+      <Filter>enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\example_layer.h" />
@@ -40,6 +43,9 @@
     <ClInclude Include="src\weapons\projectile.h">
       <Filter>weapons</Filter>
     </ClInclude>
+    <ClInclude Include="src\enemy\enemy.h">
+      <Filter>enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="effects">
@@ -47,6 +53,9 @@
     </Filter>
     <Filter Include="weapons">
       <UniqueIdentifier>{da6d5cd8-2e8d-43bc-9588-ac6e0094f555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="enemy">
+      <UniqueIdentifier>{d933b9b8-742a-4188-aaa7-5fd15cc1a7cb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
