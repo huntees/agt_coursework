@@ -277,7 +277,7 @@ example_layer::example_layer()
 	engine::game_object_properties missile_props;
 	missile_props.meshes = missile_model->meshes();
 	missile_props.textures = missile_model->textures();
-	missile_props.position = { 0.f, 0.5f, 0.f };
+	missile_props.position = { 0.f, -3.f, 1.f };
 	missile_props.type = 0;
 	missile_props.bounding_shape = missile_model->size() / 2.f;
 	missile_props.friction = 0.0f;
@@ -292,7 +292,7 @@ example_layer::example_layer()
 	float bouncynade_radius = 0.15f;
 	engine::ref<engine::sphere> bouncynade_shape = engine::sphere::create(5, 10, bouncynade_radius);
 	engine::game_object_properties bouncynade_props;
-	bouncynade_props.position = { 0.f, 5.f, -5.f };
+	bouncynade_props.position = { 0.f, -3.f, 0.f };
 	bouncynade_props.meshes = { bouncynade_shape->mesh() };
 	bouncynade_props.type = 1;
 	bouncynade_props.bounding_shape = glm::vec3(bouncynade_radius);
@@ -673,12 +673,6 @@ void example_layer::on_render()
 	missile.on_render(textured_lighting_shader);
 	bouncynade.on_render(textured_lighting_shader);
 
-
-	//================================================================Effects Render=======================================================================
-	m_explosion->on_render(m_3d_camera, textured_lighting_shader);
-
-	m_jetpack_trail.on_render(m_3d_camera, textured_lighting_shader);
-
 	engine::renderer::end_scene();
 
 	// Set up material shader. (does not render textures, renders materials instead)
@@ -725,6 +719,15 @@ void example_layer::on_render()
 
 	engine::renderer::end_scene();
 	//===============================================================3D Cam End============================================================================
+
+	//================================================================Effects Render=======================================================================
+	engine::renderer::begin_scene(m_3d_camera, textured_lighting_shader);
+
+	m_explosion->on_render(m_3d_camera, textured_lighting_shader);
+
+	m_jetpack_trail.on_render(m_3d_camera, textured_lighting_shader);
+
+	engine::renderer::end_scene();
 
 	// Render text
 	const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
