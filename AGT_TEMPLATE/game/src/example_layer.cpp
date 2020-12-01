@@ -187,7 +187,7 @@ example_layer::example_layer()
 	cow_props.meshes = cow_model->meshes();
 	cow_props.textures = cow_model->textures();
 	float cow_scale = 1.f / glm::max(cow_model->size().x, glm::max(cow_model->size().y, cow_model->size().z));
-	cow_props.position = { 0.f, 1.f, 0.f };
+	cow_props.position = { 19.3f, 0.8f, -0.2f };
 	cow_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	//cow_props.rotation_amount = glm::radians(90.f);
 	cow_props.scale = glm::vec3(cow_scale);
@@ -198,7 +198,55 @@ example_layer::example_layer()
 	m_cow->set_offset(cow_model->offset());
 	m_cow_box.set_box(cow_props.bounding_shape.x * 2.f * cow_scale, cow_props.bounding_shape.y * 2.f * cow_scale, cow_props.bounding_shape.z * 2.f
 		* cow_scale, cow_props.position - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale());
-	m_enemy.initialise(m_cow, cow_props.position, glm::vec3(1.f, 0.f, 0.f));
+
+	//load droid model
+	engine::ref <engine::model> droid_model = engine::model::create("assets/models/static/droid/droid.obj");
+	engine::game_object_properties droid_props;
+	droid_props.meshes = droid_model->meshes();
+	droid_props.textures = droid_model->textures();
+	droid_props.position = glm::vec3(0.f, 0.5f, 0.f);
+	droid_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	droid_props.scale = glm::vec3(1.f / glm::max(droid_model->size().x, glm::max(droid_model->size().y, droid_model->size().z)));
+	droid_props.bounding_shape = droid_model->size() / 2.f;
+	droid_props.type = 0;
+	m_droid = engine::game_object::create(droid_props);
+	m_droid->set_offset(droid_model->offset());
+	m_droid_box.set_box(droid_props.bounding_shape.x * 2.f * droid_props.scale.x, droid_props.bounding_shape.y * 2.f * droid_props.scale.x, droid_props.bounding_shape.z * 2.f
+		* droid_props.scale.x, droid_props.position - glm::vec3(0.f, m_droid->offset().y, 0.f) * m_droid->scale());
+	m_enemy_droid.initialise(m_droid, droid_props.position, glm::vec3(1.f, 0.f, 0.f));
+
+
+	//load mech model
+	engine::ref <engine::model> mech_model = engine::model::create("assets/models/static/mech/mech.obj");
+	engine::game_object_properties mech_props;
+	mech_props.meshes = mech_model->meshes();
+	mech_props.textures = mech_model->textures();
+	mech_props.position = glm::vec3(4.f, 0.5f, 0.f);
+	mech_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	mech_props.scale = mech_model->size();
+	mech_props.bounding_shape = mech_model->size() / 2.f;
+	mech_props.type = 0;
+	m_mech = engine::game_object::create(mech_props);
+	m_mech->set_offset(mech_model->offset());
+	m_mech_box.set_box(mech_props.bounding_shape.x * 2.f * mech_props.scale.x, mech_props.bounding_shape.y * 2.f * mech_props.scale.x, mech_props.bounding_shape.z * 2.f
+		* mech_props.scale.x, mech_props.position - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale());
+	m_enemy_mech.initialise(m_mech, mech_props.position, glm::vec3(1.f, 0.f, 0.f));
+
+	//load drone model
+	engine::ref <engine::model> drone_model = engine::model::create("assets/models/static/drone/drone.obj");
+	engine::game_object_properties drone_props;
+	drone_props.meshes = drone_model->meshes();
+	drone_props.textures = drone_model->textures();
+	drone_props.position = glm::vec3(-4.f, 0.5f, 0.f);
+	drone_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	drone_props.scale = drone_model->size();
+	drone_props.bounding_shape = drone_model->size() / 2.f;
+	drone_props.type = 0;
+	m_drone = engine::game_object::create(drone_props);
+	m_drone->set_offset(drone_model->offset());
+	m_drone_box.set_box(drone_props.bounding_shape.x * 2.f * drone_props.scale.x, drone_props.bounding_shape.y * 2.f * drone_props.scale.x, drone_props.bounding_shape.z * 2.f
+		* drone_props.scale.x, drone_props.position - glm::vec3(0.f, m_drone->offset().y, 0.f) * m_drone->scale());
+	m_enemy_drone.initialise(m_drone, drone_props.position, glm::vec3(1.f, 0.f, 0.f));
 
 	// Load the jeep model.
 	engine::ref <engine::model> jeep_model = engine::model::create("assets/models/static/jeep1/jeep1.obj");
@@ -398,6 +446,9 @@ example_layer::example_layer()
 	//m_game_objects.push_back(m_pickup);
 	m_game_objects.push_back(m_red_spotLight_ball);
 	m_game_objects.push_back(m_mannequin);
+	m_game_objects.push_back(m_droid);
+	m_game_objects.push_back(m_mech);
+	m_game_objects.push_back(m_drone);
 	m_game_objects.push_back(m_missile);
 	m_game_objects.push_back(m_bouncynade);
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
@@ -522,6 +573,9 @@ void example_layer::on_render()
 
 	m_player.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_cow_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	m_droid_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	m_mech_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	m_drone_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 
 	glm::mat4 lamppostTransform = glm::mat4(1.0f);
@@ -596,6 +650,24 @@ void example_layer::on_render()
 	//tree_transform = glm::rotate(tree_transform, m_tree->rotation_amount(), m_tree->rotation_axis());
 	//tree_transform = glm::scale(tree_transform, m_tree->scale());
 	//engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
+
+	glm::mat4 droid_transform(1.0f);
+	droid_transform = glm::translate(droid_transform, m_droid->position() - m_droid->offset() * m_droid->scale());
+	droid_transform = glm::rotate(droid_transform, m_droid->rotation_amount(), m_droid->rotation_axis());
+	droid_transform = glm::scale(droid_transform, m_droid->scale());
+	engine::renderer::submit(textured_lighting_shader, droid_transform, m_droid);
+
+	glm::mat4 mech_transform(1.0f);
+	mech_transform = glm::translate(mech_transform, m_mech->position() - m_mech->offset() * m_mech->scale());
+	mech_transform = glm::rotate(mech_transform, m_mech->rotation_amount(), m_mech->rotation_axis());
+	mech_transform = glm::scale(mech_transform, m_mech->scale());
+	engine::renderer::submit(textured_lighting_shader, mech_transform, m_mech);
+
+	glm::mat4 drone_transform(1.0f);
+	drone_transform = glm::translate(drone_transform, m_drone->position() - m_drone->offset() * m_drone->scale());
+	drone_transform = glm::rotate(drone_transform, m_drone->rotation_amount(), m_drone->rotation_axis());
+	drone_transform = glm::scale(drone_transform, m_drone->scale());
+	engine::renderer::submit(textured_lighting_shader, drone_transform, m_drone);
 
 	glm::mat4 cow_transform(1.0f);
 	cow_transform = glm::translate(cow_transform, m_cow->position() - m_cow->offset() * m_cow -> scale());
@@ -769,8 +841,14 @@ void example_layer::on_update(const engine::timestep& time_step)
 	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
 		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
 
-	m_enemy.on_update(time_step, m_player.object()->position());
-	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
+	m_enemy_droid.on_update(time_step, m_player.object()->position());
+	m_droid_box.on_update(m_droid->position() - glm::vec3(0.f, m_droid->offset().y, 0.f) * m_droid->scale(), m_droid->rotation_amount(), m_droid->rotation_axis());
+
+	m_enemy_mech.on_update(time_step, m_player.object()->position());
+	m_mech_box.on_update(m_mech->position() - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale(), m_mech->rotation_amount(), m_mech->rotation_axis());
+
+	m_enemy_drone.on_update(time_step, m_player.object()->position());
+	m_drone_box.on_update(m_drone->position() - glm::vec3(0.f, m_drone->offset().y, 0.f) * m_drone->scale(), m_drone->rotation_amount(), m_drone->rotation_axis());
 
 	missile.on_update(time_step);
 	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),

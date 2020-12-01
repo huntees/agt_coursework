@@ -22,7 +22,9 @@ public:
 private:
 	player m_player{};
 
-	enemy m_enemy{};
+	enemy m_enemy_droid{};
+	enemy m_enemy_mech{};
+	enemy m_enemy_drone{};
 
 	void check_bounce();
 
@@ -35,6 +37,9 @@ private:
 	engine::ref<engine::game_object>	m_tree{};
 	engine::ref<engine::game_object>	m_ball{};
 	engine::ref<engine::game_object>	m_mannequin{};
+	engine::ref<engine::game_object>	m_droid{};
+	engine::ref<engine::game_object>	m_drone{};
+	engine::ref<engine::game_object>	m_mech{};
 	engine::ref<engine::game_object>    m_tetrahedron{};
 	engine::ref<engine::game_object>	m_jeep{};
 	engine::ref<engine::game_object>	m_pizza{};
@@ -51,6 +56,12 @@ private:
 
 	projectile missile;
 	projectile bouncynade;
+
+	bounding_box m_droid_box;
+	bounding_box m_mech_box;
+	bounding_box m_drone_box;
+
+	bounding_box m_cow_box;
 
 	engine::ref<engine::material>		m_material{};
 	engine::ref<engine::material>		m_tetrahedron_material{};
@@ -79,10 +90,6 @@ private:
 
 	engine::orthographic_camera       m_2d_camera;
 	engine::perspective_camera        m_3d_camera;
-
-	bounding_box m_cow_box;
-
-
 
 	engine::ref<intro_screen>	m_intro_screen{};
 	engine::ref<intro_screen>	m_HUD{};
