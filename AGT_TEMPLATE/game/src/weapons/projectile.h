@@ -1,7 +1,9 @@
 #pragma once
+#include "../enemy/enemy_shooter.h"
 #include <engine.h>
 #include "engine/entities/bounding_box_bullet.h"
 
+class enemy_shooter;
 class projectile
 {
 public:
@@ -10,6 +12,7 @@ public:
 
 	void initialise(engine::ref<engine::game_object> object);
 	void fire(const engine::perspective_camera& camera, float force, glm::vec3 playerPos);
+	void enemy_fire(enemy_shooter& enemy, float force);
 	void on_update(const engine::timestep& time_step);
 	void on_render(const engine::ref<engine::shader>& shader);
 

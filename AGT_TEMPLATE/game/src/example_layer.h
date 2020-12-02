@@ -8,6 +8,7 @@
 #include "effects/explosion.h"
 #include "effects/cross_fade.h"
 #include "enemy/enemy.h"
+#include "enemy/enemy_shooter.h"
 
 class example_layer : public engine::layer
 {
@@ -23,7 +24,7 @@ private:
 	player m_player{};
 
 	enemy m_enemy_droid{};
-	enemy m_enemy_mech{};
+	enemy_shooter m_enemy_mech{};
 	enemy m_enemy_drone{};
 
 	void check_bounce();
@@ -52,9 +53,13 @@ private:
 	engine::ref<engine::game_object>    m_bench{};
 	engine::ref<engine::game_object>    m_lamppost{};
 	engine::ref<engine::game_object>    m_missile{};
+	engine::ref<engine::game_object>    m_enemy_missile{};
+	engine::ref<engine::game_object>    m_enemy_missile2{};
 	engine::ref<engine::game_object>    m_bouncynade{};
 
 	projectile missile;
+	projectile enemy_missile;
+	projectile enemy_missile2;
 	projectile bouncynade;
 
 	bounding_box m_droid_box;
@@ -114,6 +119,8 @@ private:
 
 	engine::ref<explosion>							m_explosion{};
 	bool missile_active = false;
-	bool bouncynade_active = false;
+	bool enemy_missile_active = false;
+	bool enemy_missile2_active = false;
+	bool bouncynade_armed = true;
 	float bouncynade_armtime = -1.f;
 };

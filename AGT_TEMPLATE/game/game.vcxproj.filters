@@ -23,6 +23,9 @@
     <ClCompile Include="src\enemy\enemy.cpp">
       <Filter>enemy</Filter>
     </ClCompile>
+    <ClCompile Include="src\enemy\enemy_shooter.cpp">
+      <Filter>enemy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\example_layer.h" />
@@ -44,6 +47,9 @@
       <Filter>weapons</Filter>
     </ClInclude>
     <ClInclude Include="src\enemy\enemy.h">
+      <Filter>enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="src\enemy\enemy_shooter.h">
       <Filter>enemy</Filter>
     </ClInclude>
   </ItemGroup>

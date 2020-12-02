@@ -153,7 +153,7 @@ void player::update_first_person_camera(engine::perspective_camera& camera) {
 	float A = 0.45f;
 	float B = 0.1f;
 
-	glm::vec3 cam_pos = m_object->position() + glm::normalize(m_object->forward()) * B;;
+	glm::vec3 cam_pos = m_object->position() + glm::normalize(m_object->forward()) * B;
 	cam_pos.y += A;
 
 	camera.set_view_matrix(cam_pos, mousepos, mousepos);

@@ -20,7 +20,7 @@ void projectile::fire(const engine::perspective_camera& camera, float force, glm
 	m_object->set_angular_velocity(glm::vec3(0.f));
 	m_contact_time = 0.0f;
 
-	// Set the ball to the current camera position
+	// Set the projectile to the current camera position
 	m_object->set_position(playerPos + glm::vec3(0.f, 0.42f, 0.f) + (camera.front_vector() * 1.2f));
 	//m_object->set_velocity(25.0f * camera.front_vector());
 	m_object->set_acceleration(3.0f * force * camera.front_vector());
@@ -28,6 +28,27 @@ void projectile::fire(const engine::perspective_camera& camera, float force, glm
 	// Determine rotation angles of camera (from Lab 4)
 	m_theta = engine::PI / 2.f - acos(camera.front_vector().y);
 	m_phi = atan2(camera.front_vector().x, camera.front_vector().z);
+
+	m_object->set_rotation_axis(glm::vec3(0.f, 1.f, 0.f));
+	m_object->set_rotation_amount(m_phi);
+}
+
+void projectile::enemy_fire(enemy_shooter& enemy, float force)
+{
+	m_object->set_velocity(glm::vec3(0.f));
+	m_object->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+	m_object->set_torque(glm::vec3(0.f));
+	m_object->set_angular_velocity(glm::vec3(0.f));
+	m_contact_time = 0.0f;
+
+	// Set the projectile to the current enemy position
+	m_object->set_position(enemy.object()->position() + glm::vec3(0.f, 0.42f, 0.f) + (enemy.object()->forward() * 1.45f));
+	//m_object->set_velocity(25.0f * camera.front_vector());
+	m_object->set_acceleration(3.0f * force * enemy.object()->forward());
+
+	// Determine rotation angles of camera (from Lab 4)
+	//m_theta = engine::PI / 2.f - acos(camera.front_vector().y);
+	m_phi = atan2(enemy.object()->forward().x, enemy.object()->forward().z);
 
 	m_object->set_rotation_axis(glm::vec3(0.f, 1.f, 0.f));
 	m_object->set_rotation_amount(m_phi);

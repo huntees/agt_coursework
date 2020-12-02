@@ -136,6 +136,46 @@ example_layer::example_layer()
 	terrain_props.restitution = 0.92f;
 	m_terrain = engine::game_object::create(terrain_props);
 
+	//===============================================================Weapon Props============================================================================
+	engine::ref <engine::model> missile_model = engine::model::create("assets/models/static/missile/missile.obj");
+	engine::game_object_properties missile_props;
+	missile_props.meshes = missile_model->meshes();
+	missile_props.textures = missile_model->textures();
+	missile_props.position = { 0.f, -3.f, 1.f };
+	missile_props.type = 0;
+	missile_props.bounding_shape = missile_model->size() / 2.f;
+	missile_props.friction = 0.0f;
+	missile_props.mass = 0.10f;
+	m_missile = engine::game_object::create(missile_props);
+	m_missile->set_offset(missile_model->offset());
+	missile.initialise(m_missile);
+	missile.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
+		missile_props.position - glm::vec3(0.f, m_missile->offset().y, 0.f));
+
+	missile_props.position = { 2.f, -3.f, 2.f };
+	m_enemy_missile = engine::game_object::create(missile_props);
+	m_enemy_missile->set_offset(missile_model->offset());
+	enemy_missile.initialise(m_enemy_missile);
+	enemy_missile.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
+		missile_props.position - glm::vec3(0.f, m_enemy_missile->offset().y, 0.f));
+
+	// Load bouncynade
+	float bouncynade_radius = 0.15f;
+	engine::ref<engine::sphere> bouncynade_shape = engine::sphere::create(5, 10, bouncynade_radius);
+	engine::game_object_properties bouncynade_props;
+	bouncynade_props.position = { 0.f, -3.f, 0.f };
+	bouncynade_props.meshes = { bouncynade_shape->mesh() };
+	bouncynade_props.type = 1;
+	bouncynade_props.bounding_shape = glm::vec3(bouncynade_radius);
+	bouncynade_props.restitution = 0.8f;
+	bouncynade_props.mass = 0.2f;
+	bouncynade_props.rolling_friction = 0.1f;
+	m_bouncynade = engine::game_object::create(bouncynade_props);
+	bouncynade.initialise(m_bouncynade);
+
+
+	//===============================================================Weapon Props End==========================================================================
+
 	//===============================================================World Props=========================================================================
 
 	//road
@@ -164,14 +204,14 @@ example_layer::example_layer()
 
 	//weapon holder
 	std::vector<engine::ref<engine::texture_2d>> weapon_holder_textures = { engine::texture_2d::create("assets/textures/intersection.jpg", false) };
-	engine::ref<engine::terrain> weapon_holder_shape = engine::terrain::create(3.f, 0.02f, 3.f, 1.f);
+	engine::ref<engine::terrain> weapon_holder_shape = engine::terrain::create(5.f, 0.1f, 5.f, 1.f);
 	engine::game_object_properties weapon_holder_props;
 	weapon_holder_props.meshes = { weapon_holder_shape->mesh() };
 	weapon_holder_props.textures = weapon_holder_textures;
 	weapon_holder_props.position = { 0.f, -4.f, 0.f };
 	weapon_holder_props.is_static = true;
 	weapon_holder_props.type = 0;
-	weapon_holder_props.bounding_shape = glm::vec3(3.f, 0.02f, 3.f);
+	weapon_holder_props.bounding_shape = glm::vec3(5.f, 0.1f, 5.f);
 	weapon_holder_props.restitution = 0.f;
 	m_weapon_holder = engine::game_object::create(weapon_holder_props);
 
@@ -189,11 +229,11 @@ example_layer::example_layer()
 	float cow_scale = 1.f / glm::max(cow_model->size().x, glm::max(cow_model->size().y, cow_model->size().z));
 	cow_props.position = { 19.3f, 0.8f, -0.2f };
 	cow_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
-	//cow_props.rotation_amount = glm::radians(90.f);
+	cow_props.rotation_amount = glm::radians(90.f);
 	cow_props.scale = glm::vec3(cow_scale);
 	cow_props.bounding_shape = cow_model->size() / 2.f;
 	cow_props.type = 0;
-	//cow_props.is_static = true;
+	cow_props.is_static = true;
 	m_cow = engine::game_object::create(cow_props);
 	m_cow->set_offset(cow_model->offset());
 	m_cow_box.set_box(cow_props.bounding_shape.x * 2.f * cow_scale, cow_props.bounding_shape.y * 2.f * cow_scale, cow_props.bounding_shape.z * 2.f
@@ -224,13 +264,13 @@ example_layer::example_layer()
 	mech_props.position = glm::vec3(4.f, 0.5f, 0.f);
 	mech_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	mech_props.scale = mech_model->size();
-	mech_props.bounding_shape = mech_model->size() / 2.f;
+	mech_props.bounding_shape = glm::vec3(mech_model->size().x / 3.5f, mech_model->size().y / 2.f, mech_model->size().z / 3.5f);
 	mech_props.type = 0;
 	m_mech = engine::game_object::create(mech_props);
 	m_mech->set_offset(mech_model->offset());
-	m_mech_box.set_box(mech_props.bounding_shape.x * 2.f * mech_props.scale.x, mech_props.bounding_shape.y * 2.f * mech_props.scale.x, mech_props.bounding_shape.z * 2.f
+	m_mech_box.set_box(mech_props.bounding_shape.x * 2.5f * mech_props.scale.x, mech_props.bounding_shape.y * 2.f * mech_props.scale.x, mech_props.bounding_shape.z * 2.5f
 		* mech_props.scale.x, mech_props.position - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale());
-	m_enemy_mech.initialise(m_mech, mech_props.position, glm::vec3(1.f, 0.f, 0.f), false);
+	m_enemy_mech.initialise(m_mech, mech_props.position, glm::vec3(1.f, 0.f, 0.f), false, enemy_missile);
 
 	//load drone model
 	engine::ref <engine::model> drone_model = engine::model::create("assets/models/static/drone/drone.obj");
@@ -320,39 +360,6 @@ example_layer::example_layer()
 	m_tree = engine::game_object::create(tree_props);
 
 	//===============================================================World Props End=========================================================================
-
-	//===============================================================Weapon Props============================================================================
-	engine::ref <engine::model> missile_model = engine::model::create("assets/models/static/missile/missile.obj");
-	engine::game_object_properties missile_props;
-	missile_props.meshes = missile_model->meshes();
-	missile_props.textures = missile_model->textures();
-	missile_props.position = { 0.f, -3.f, 1.f };
-	missile_props.type = 0;
-	missile_props.bounding_shape = missile_model->size() / 2.f;
-	missile_props.friction = 0.0f;
-	missile_props.mass = 0.10f;
-	m_missile = engine::game_object::create(missile_props);
-	m_missile->set_offset(missile_model->offset());
-	missile.initialise(m_missile);
-	missile.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
-		missile_props.position - glm::vec3(0.f, m_missile->offset().y, 0.f));
-
-	// Load bouncynade
-	float bouncynade_radius = 0.15f;
-	engine::ref<engine::sphere> bouncynade_shape = engine::sphere::create(5, 10, bouncynade_radius);
-	engine::game_object_properties bouncynade_props;
-	bouncynade_props.position = { 0.f, -3.f, 0.f };
-	bouncynade_props.meshes = { bouncynade_shape->mesh() };
-	bouncynade_props.type = 1;
-	bouncynade_props.bounding_shape = glm::vec3(bouncynade_radius);
-	bouncynade_props.restitution = 0.8f;
-	bouncynade_props.mass = 0.2f;
-	bouncynade_props.rolling_friction = 0.1f;
-	m_bouncynade = engine::game_object::create(bouncynade_props);
-	bouncynade.initialise(m_bouncynade);
-
-
-	//===============================================================Weapon Props End==========================================================================
 
 	// Load sphere
 	float radius = 0.5f;
@@ -450,6 +457,7 @@ example_layer::example_layer()
 	m_game_objects.push_back(m_mech);
 	m_game_objects.push_back(m_drone);
 	m_game_objects.push_back(m_missile);
+	m_game_objects.push_back(m_enemy_missile);
 	m_game_objects.push_back(m_bouncynade);
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
@@ -577,6 +585,7 @@ void example_layer::on_render()
 	m_mech_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_drone_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	enemy_missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 
 	glm::mat4 lamppostTransform = glm::mat4(1.0f);
 	lamppostTransform = glm::translate(lamppostTransform, m_lamppost->position());
@@ -744,6 +753,7 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, policeCar_transform, m_policeCar);
 
 	missile.on_render(textured_lighting_shader);
+	enemy_missile.on_render(textured_lighting_shader);
 	bouncynade.on_render(textured_lighting_shader);
 
 	engine::renderer::end_scene();
@@ -788,6 +798,7 @@ void example_layer::on_render()
 
 	glm::mat4 aniTransform = glm::mat4(1.0f);
 
+	//renders player
 	engine::renderer::submit(animated_mesh_shader, m_player.object());
 
 	engine::renderer::end_scene();
@@ -837,6 +848,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 
 	//===============================================================Objects Update============================================================================
+	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
+
 	m_player.on_update(time_step);
 	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
 		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
@@ -853,6 +866,10 @@ void example_layer::on_update(const engine::timestep& time_step)
 	missile.on_update(time_step);
 	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),
 		missile.object()->rotation_amount(), missile.object()->rotation_axis());
+
+	enemy_missile.on_update(time_step);
+	enemy_missile.getBox().on_update(enemy_missile.object()->position() - glm::vec3(0.f, enemy_missile.object()->offset().y, 0.f) * enemy_missile.object()->scale(),
+		enemy_missile.object()->rotation_amount(), enemy_missile.object()->rotation_axis());
 
 	bouncynade.on_update(time_step);
 
@@ -930,12 +947,23 @@ void example_layer::on_update(const engine::timestep& time_step)
 		missile_active = false;
 	}
 
-	if (m_bouncynade->is_colliding() && bouncynade_active) {
-		bouncynade_armtime = 3.f;
-		bouncynade_active = false;
+	if (m_enemy_missile->is_colliding() && enemy_missile_active) {
+		enemy_missile.object()->set_velocity(glm::vec3(0.f));
+		enemy_missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+		m_explosion->activate(enemy_missile.object()->position(), 4.f, 4.f);
+		enemy_missile.object()->set_position(glm::vec3(2.f, -3.f, 2.f));
+		enemy_missile_active = false;
 	}
 
-	if (bouncynade_armtime > 0.0f)
+	if (m_bouncynade->is_colliding() && !bouncynade_armed) {
+		bouncynade_armtime = 3.f;
+
+		//sets to false otherwise it will arm at 3.f every frame
+		bouncynade_armed = true;
+	}
+
+	//check whether it is armed and counting down
+	if (bouncynade_armtime > 0.0f && bouncynade_armed)
 	{
 		bouncynade_armtime -= (float)time_step;
 
@@ -1043,11 +1071,16 @@ void example_layer::on_event(engine::event& event)
 		if (e.key_code() == engine::key_codes::KEY_H)
 		{
 			bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
-			bouncynade_active = true;
+			bouncynade_armed = false;
 		}
 		if (e.key_code() == engine::key_codes::KEY_1)
 		{
 			m_cross_fade->activate();
+		}
+		if (e.key_code() == engine::key_codes::KEY_0)
+		{
+			enemy_missile.enemy_fire(m_enemy_mech, 180.0f);
+			enemy_missile_active = true;
 		}
 		//======================================================================
 
