@@ -32,7 +32,7 @@ class enemy
 
 	private:
 		// enemy's speed
-		float m_speed{ 0.5f };
+		float m_speed{ 1.f };
 
 		// timer controlling the direction switch and the reset value for this timer
 		float m_default_time{ 4.f };

@@ -159,6 +159,13 @@ example_layer::example_layer()
 	enemy_missile.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
 		missile_props.position - glm::vec3(0.f, m_enemy_missile->offset().y, 0.f));
 
+	missile_props.position = { 3.f, -3.f, 3.f };
+	m_enemy_missile2 = engine::game_object::create(missile_props);
+	m_enemy_missile2->set_offset(missile_model->offset());
+	enemy_missile2.initialise(m_enemy_missile2);
+	enemy_missile2.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
+		missile_props.position - glm::vec3(0.f, m_enemy_missile->offset().y, 0.f));
+
 	// Load bouncynade
 	float bouncynade_radius = 0.15f;
 	engine::ref<engine::sphere> bouncynade_shape = engine::sphere::create(5, 10, bouncynade_radius);
@@ -253,7 +260,7 @@ example_layer::example_layer()
 	m_droid->set_offset(droid_model->offset());
 	m_droid_box.set_box(droid_props.bounding_shape.x * 2.f * droid_props.scale.x, droid_props.bounding_shape.y * 2.f * droid_props.scale.x, droid_props.bounding_shape.z * 2.f
 		* droid_props.scale.x, droid_props.position - glm::vec3(0.f, m_droid->offset().y, 0.f) * m_droid->scale());
-	m_enemy_droid.initialise(m_droid, droid_props.position, glm::vec3(1.f, 0.f, 0.f), false);
+	m_enemy_droid.initialise(m_droid, droid_props.position, glm::vec3(1.f, 0.f, 0.f), false, false);
 
 
 	//load mech model
@@ -261,7 +268,7 @@ example_layer::example_layer()
 	engine::game_object_properties mech_props;
 	mech_props.meshes = mech_model->meshes();
 	mech_props.textures = mech_model->textures();
-	mech_props.position = glm::vec3(4.f, 0.5f, 0.f);
+	mech_props.position = glm::vec3(4.f, 0.5f, 40.f);
 	mech_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	mech_props.scale = mech_model->size();
 	mech_props.bounding_shape = glm::vec3(mech_model->size().x / 3.5f, mech_model->size().y / 2.f, mech_model->size().z / 3.5f);
@@ -270,7 +277,7 @@ example_layer::example_layer()
 	m_mech->set_offset(mech_model->offset());
 	m_mech_box.set_box(mech_props.bounding_shape.x * 2.5f * mech_props.scale.x, mech_props.bounding_shape.y * 2.f * mech_props.scale.x, mech_props.bounding_shape.z * 2.5f
 		* mech_props.scale.x, mech_props.position - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale());
-	m_enemy_mech.initialise(m_mech, mech_props.position, glm::vec3(1.f, 0.f, 0.f), false, enemy_missile);
+	m_enemy_mech.initialise(m_mech, mech_props.position, glm::vec3(1.f, 0.f, 0.f), false, true);
 
 	//load drone model
 	engine::ref <engine::model> drone_model = engine::model::create("assets/models/static/drone/drone.obj");
@@ -458,6 +465,7 @@ example_layer::example_layer()
 	m_game_objects.push_back(m_drone);
 	m_game_objects.push_back(m_missile);
 	m_game_objects.push_back(m_enemy_missile);
+	m_game_objects.push_back(m_enemy_missile2);
 	m_game_objects.push_back(m_bouncynade);
 	m_physics_manager = engine::bullet_manager::create(m_game_objects);
 
@@ -586,6 +594,7 @@ void example_layer::on_render()
 	m_drone_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	enemy_missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	enemy_missile2.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 
 	glm::mat4 lamppostTransform = glm::mat4(1.0f);
 	lamppostTransform = glm::translate(lamppostTransform, m_lamppost->position());
@@ -754,6 +763,7 @@ void example_layer::on_render()
 
 	missile.on_render(textured_lighting_shader);
 	enemy_missile.on_render(textured_lighting_shader);
+	enemy_missile2.on_render(textured_lighting_shader);
 	bouncynade.on_render(textured_lighting_shader);
 
 	engine::renderer::end_scene();
@@ -848,17 +858,14 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 
 	//===============================================================Objects Update============================================================================
+
+	//After a few hours of testing (yes genuinely a few hours just on boxes), there seems to be some issue with box.collision(otherBox) method
+	//where certain collision isnt picked up during certain rotation angle.
 	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
 
 	m_player.on_update(time_step);
 	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
 		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
-
-	m_enemy_droid.on_update(time_step, m_player.object()->position());
-	m_droid_box.on_update(m_droid->position() - glm::vec3(0.f, m_droid->offset().y, 0.f) * m_droid->scale(), m_droid->rotation_amount(), m_droid->rotation_axis());
-
-	m_enemy_mech.on_update(time_step, m_player.object()->position());
-	m_mech_box.on_update(m_mech->position() - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale(), m_mech->rotation_amount(), m_mech->rotation_axis());
 
 	m_enemy_drone.on_update(time_step, m_player.object()->position() + glm::vec3(0.f, 0.5f, 0.f));
 	m_drone_box.on_update(m_drone->position() - glm::vec3(0.f, m_drone->offset().y, 0.f) * m_drone->scale(), m_drone->rotation_amount(), m_drone->rotation_axis());
@@ -870,6 +877,10 @@ void example_layer::on_update(const engine::timestep& time_step)
 	enemy_missile.on_update(time_step);
 	enemy_missile.getBox().on_update(enemy_missile.object()->position() - glm::vec3(0.f, enemy_missile.object()->offset().y, 0.f) * enemy_missile.object()->scale(),
 		enemy_missile.object()->rotation_amount(), enemy_missile.object()->rotation_axis());
+
+	enemy_missile2.on_update(time_step);
+	enemy_missile2.getBox().on_update(enemy_missile2.object()->position() - glm::vec3(0.f, enemy_missile2.object()->offset().y, 0.f) * enemy_missile2.object()->scale(),
+		enemy_missile2.object()->rotation_amount(), enemy_missile2.object()->rotation_axis());
 
 	bouncynade.on_update(time_step);
 
@@ -900,59 +911,18 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 
 
-	//timer to prevent cam switching too fast, obsolete now that I've switeched over to on_event controls, keeping it here though incase i need a timer
-	//if (camSwitchTimer > 0.0f)
-	//{
-	//	camSwitchTimer -= (float)time_step;
-
-	//	if (camSwitchTimer < 0.0f)
-	//	{
-	//		camSwitchDelayReady = true;
-	//	}
-	//}
-
 	//===============================================================Collision Update============================================================================
-	if (m_drone_box.collision(m_player.getBox())) {
 
-		//m_enemy_drone.object()->set_velocity(glm::vec3(0.f));
-		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
-
-		if (!player_immunity) {
-			player_immunity_timer = 2.f;
-		}
-	}
-
-	if (player_immunity_timer > 0.0f)
-	{
-		if (!player_immunity) {
-			m_cross_fade->activate();
-			player_immunity = true;
-		}
-
-		player_immunity_timer -= (float)time_step;
-
-		if (player_immunity_timer < 0.0f)
-		{
-			player_immunity = false;
-		}
-	}
-
-
+	//==============================================================Player Weapons===============================================================================
 	//checks whether missile is colliding and whether the missile is active i.e if the missile has already exploded
-	if (m_missile->is_colliding() && missile_active) {
+	if (m_missile->is_colliding() && missile.is_active()) {
+
+		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
+
 		missile.object()->set_velocity(glm::vec3(0.f));
 		missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
 		missile.object()->set_position(glm::vec3(0.f, -3.f, 1.f));
-		missile_active = false;
-	}
-
-	if (m_enemy_missile->is_colliding() && enemy_missile_active) {
-		enemy_missile.object()->set_velocity(glm::vec3(0.f));
-		enemy_missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		m_explosion->activate(enemy_missile.object()->position(), 4.f, 4.f);
-		enemy_missile.object()->set_position(glm::vec3(2.f, -3.f, 2.f));
-		enemy_missile_active = false;
+		missile.set_active(false);
 	}
 
 	if (m_bouncynade->is_colliding() && !bouncynade_armed) {
@@ -971,6 +941,72 @@ void example_layer::on_update(const engine::timestep& time_step)
 		{
 			m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
 			bouncynade.object()->set_position(glm::vec3(0.f,-3.f,0.f));
+		}
+	}
+
+	//==============================================================Enemy Attacks===============================================================================
+	if (m_drone_box.collision(m_player.getBox())) {
+
+		//m_enemy_drone.object()->set_velocity(glm::vec3(0.f));
+		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
+
+		if (!player_immunity) {
+			player_immunity_timer = immune_time;
+		}
+	}
+
+	if (m_mech_box.collision(m_player.getBox())) {
+
+		m_enemy_drone.object()->set_velocity(glm::vec3(0.f));
+		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
+
+		if (!player_immunity) {
+			player_immunity_timer = immune_time;
+		}
+	}
+
+	if (m_enemy_missile->is_colliding() && enemy_missile.is_active()) {
+
+		m_explosion->activate(enemy_missile.object()->position(), 4.f, 4.f);
+		if (enemy_missile.getBox().collision(m_player.getBox())) {
+			if (!player_immunity) {
+				player_immunity_timer = immune_time;
+			}
+		}
+
+		enemy_missile.object()->set_velocity(glm::vec3(0.f));
+		enemy_missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+		enemy_missile.object()->set_position(glm::vec3(2.f, -3.f, 2.f));
+		enemy_missile.set_active(false);
+	}
+
+	if (m_enemy_missile2->is_colliding() && enemy_missile2.is_active()) {
+
+		m_explosion->activate(enemy_missile2.object()->position(), 4.f, 4.f);
+		if (enemy_missile2.getBox().collision(m_player.getBox())) {
+			if (!player_immunity) {
+				player_immunity_timer = immune_time;
+			}
+		}
+
+		enemy_missile2.object()->set_velocity(glm::vec3(0.f));
+		enemy_missile2.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+		enemy_missile2.object()->set_position(glm::vec3(2.f, -3.f, 2.f));
+		enemy_missile2.set_active(false);
+	}
+
+	if (player_immunity_timer > 0.0f)
+	{
+		if (!player_immunity) {
+			m_cross_fade->activate();
+			player_immunity = true;
+		}
+
+		player_immunity_timer -= (float)time_step;
+
+		if (player_immunity_timer < 0.0f)
+		{
+			player_immunity = false;
 		}
 	}
 
@@ -1024,6 +1060,13 @@ void example_layer::on_update(const engine::timestep& time_step)
 			m_jetpack_trail.initialise(m_player.object()->position() + glm::vec3(0.f, -0.15f, 0.f), glm::vec3(0.f, 0.f, 0.f), 1, 1.f, 0.3f);
 		}
 	}
+
+	//putting shooter enemies down here, otherwise an issue with some update ordering causing explosion to appear infront of the shooter
+	m_enemy_mech.on_update(time_step, m_player.object()->position(), enemy_missile);
+	m_mech_box.on_update(m_mech->position() - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale(), m_mech->rotation_amount(), m_mech->rotation_axis());
+
+	m_enemy_droid.on_update(time_step, m_player.object()->position(), enemy_missile2);
+	m_droid_box.on_update(m_droid->position() - glm::vec3(0.f, m_droid->offset().y, 0.f) * m_droid->scale(), m_droid->rotation_amount(), m_droid->rotation_axis());
 }
 
 void example_layer::on_event(engine::event& event)
@@ -1066,7 +1109,7 @@ void example_layer::on_event(engine::event& event)
 		if (e.key_code() == engine::key_codes::KEY_G)
 		{
 			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
-			missile_active = true;
+			missile.set_active(true);
 		}
 		if (e.key_code() == engine::key_codes::KEY_H)
 		{
@@ -1079,8 +1122,8 @@ void example_layer::on_event(engine::event& event)
 		}
 		if (e.key_code() == engine::key_codes::KEY_0)
 		{
-			enemy_missile.enemy_fire(m_enemy_mech, 180.0f);
-			enemy_missile_active = true;
+			enemy_missile2.enemy_fire(m_enemy_droid, 180.0f);
+			enemy_missile2.set_active(true);
 		}
 		//======================================================================
 
@@ -1099,7 +1142,7 @@ void example_layer::on_event(engine::event& event)
 	{
 		if (engine::input::mouse_button_pressed(0)) {
 			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
-			missile_active = true;
+			missile.set_active(true);
 		}
 	}
 }

@@ -12,7 +12,7 @@ public:
 
 	void initialise(engine::ref<engine::game_object> object);
 	void fire(const engine::perspective_camera& camera, float force, glm::vec3 playerPos);
-	void enemy_fire(enemy_shooter& enemy, float force);
+	void enemy_fire(const enemy_shooter& enemy, float force);
 	void on_update(const engine::timestep& time_step);
 	void on_render(const engine::ref<engine::shader>& shader);
 
@@ -22,6 +22,9 @@ public:
 
 	void set_box(float width, float height, float depth, glm::vec3 position) { m_projectile_box.set_box(width, height, depth, position); }
 	bounding_box& getBox() { return m_projectile_box; };
+
+	void set_active(bool active) { projectile_is_active = active; }
+	bool is_active() const { return projectile_is_active; }
 
 private:
 	engine::ref<engine::game_object> m_object;
@@ -42,4 +45,6 @@ private:
 	void collision_response(float y_plane);
 
 	bounding_box m_projectile_box;
+
+	bool projectile_is_active = false;
 };

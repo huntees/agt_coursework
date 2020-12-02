@@ -23,7 +23,7 @@ public:
 private:
 	player m_player{};
 
-	enemy m_enemy_droid{};
+	enemy_shooter m_enemy_droid{};
 	enemy_shooter m_enemy_mech{};
 	enemy m_enemy_drone{};
 
@@ -66,6 +66,7 @@ private:
 	bounding_box m_mech_box;
 	bounding_box m_drone_box;
 
+	const float immune_time = 2.f;
 	bool player_immunity = false;
 	float player_immunity_timer = -1.f;
 
@@ -118,9 +119,9 @@ private:
 	engine::ref<cross_fade>							m_cross_fade{};
 
 	engine::ref<explosion>							m_explosion{};
-	bool missile_active = false;
-	bool enemy_missile_active = false;
-	bool enemy_missile2_active = false;
+	//bool missile_active = false;
+	//bool enemy_missile_active = false;
+	//bool enemy_missile2_active = false;
 	bool bouncynade_armed = true;
 	float bouncynade_armtime = -1.f;
 };
