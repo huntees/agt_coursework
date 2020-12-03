@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="src\example_layer.cpp" />
     <ClCompile Include="src\game.cpp" />
-    <ClCompile Include="src\intro_screen.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\effects\particle.cpp">
       <Filter>effects</Filter>
@@ -26,10 +25,10 @@
     <ClCompile Include="src\enemy\enemy_shooter.cpp">
       <Filter>enemy</Filter>
     </ClCompile>
+    <ClCompile Include="src\screen_render.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\example_layer.h" />
-    <ClInclude Include="src\intro_screen.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\effects\particle.h">
       <Filter>effects</Filter>
@@ -52,6 +51,7 @@
     <ClInclude Include="src\enemy\enemy_shooter.h">
       <Filter>enemy</Filter>
     </ClInclude>
+    <ClInclude Include="src\screen_render.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="effects">

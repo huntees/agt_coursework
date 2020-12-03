@@ -37,7 +37,7 @@ void cross_fade::on_render(engine::ref<engine::shader> shader)
 
 	glm::mat4 transform(1.0f);
 	//z is on 0.2f so it doesnt overlap with HUD
-	transform = glm::translate(transform, glm::vec3(random_x, random_y, 0.2f));
+	transform = glm::translate(transform, glm::vec3(random_x, random_y, 0.1f));
 
 	std::dynamic_pointer_cast<engine::gl_shader>(shader)->set_uniform("transparency", m_transparency);
 	m_texture->bind();

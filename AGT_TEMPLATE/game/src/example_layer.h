@@ -1,7 +1,7 @@
 #pragma once
 #include <engine.h>
 #include "player.h"
-#include "intro_screen.h"
+#include "screen_render.h"
 #include "engine/entities/bounding_box_bullet.h"
 #include "effects/jetpack_trail.h"
 #include "weapons/projectile.h"
@@ -60,9 +60,13 @@ private:
 	engine::ref<engine::game_object>    m_bouncynade{};
 
 	projectile missile;
+	projectile bouncynade;
+
+	enum class WeaponState { Slot1, Slot2, Slot3 };
+	WeaponState WeaponSlot = WeaponState::Slot1;
+
 	projectile enemy_missile;
 	projectile enemy_missile2;
-	projectile bouncynade;
 
 	bounding_box m_droid_box;
 	bounding_box m_mech_box;
@@ -103,11 +107,16 @@ private:
 	engine::orthographic_camera       m_2d_camera;
 	engine::perspective_camera        m_3d_camera;
 
-	engine::ref<intro_screen>	m_intro_screen{};
-	engine::ref<intro_screen>	m_HUD{};
+	engine::ref<screen_render>	m_intro_screen{};
+	engine::ref<screen_render>	m_HUD{};
+	engine::ref<screen_render>	m_HUD_range_finder{};
+	engine::ref<screen_render>	m_HUD_jetpack{};
+	engine::ref<screen_render>	m_HUD_missile{};
+	engine::ref<screen_render>	m_HUD_bouncynade{};
+	float range_finder_height = 0.f;
 
-	enum CamState { FirstPerson, ThirdPerson, FreeView };
-	CamState CamMode = FirstPerson;
+	enum class CamState { FirstPerson, ThirdPerson, FreeView };
+	CamState CamMode = CamState::FirstPerson;
 
 	bool jetpackTrailReady = true;
 	float jetpackTrailTimer;

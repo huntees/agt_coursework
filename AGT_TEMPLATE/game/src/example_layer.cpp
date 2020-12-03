@@ -491,9 +491,14 @@ example_layer::example_layer()
 	m_skinned_mesh->switch_animation(2);
 
 	//Load Intro Screen Texture and HUD
-	m_intro_screen = intro_screen::create("assets/textures/tempmenu.jpg", 1.6f, 0.9f);
+	m_intro_screen = screen_render::create("assets/textures/tempmenu.jpg", 1.6f, 0.9f);
 	m_intro_screen->deactivate();
-	m_HUD = intro_screen::create("assets/textures/tempHUD.png", 1.6f, 0.9f);
+
+	m_HUD = screen_render::create("assets/textures/HUD/tempHUD.png", 1.6f, 0.9f);
+	m_HUD_range_finder = screen_render::create("assets/textures/HUD/range_finder.png", 1.6f, 0.9f);
+	m_HUD_jetpack = screen_render::create("assets/textures/HUD/jetpack.png", 0.12f, 0.12f);
+	m_HUD_missile = screen_render::create("assets/textures/HUD/missile.png", 0.12f, 0.12f);
+	m_HUD_bouncynade = screen_render::create("assets/textures/HUD/bouncynade.png", 0.12f, 0.12f);
 
 	m_jetpack_trail.load_texture("assets/textures/effects/trail.png");
 	m_explosion = explosion::create("assets/textures/effects/Explosion.tga", 4, 5, 16);
@@ -850,6 +855,7 @@ void example_layer::on_render()
 	// Render text
 	const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
 	m_text_manager->render_text(text_shader, "Orange Text", 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+	m_text_manager->render_text(text_shader, std::to_string(m_player.get_health_point()), (float)engine::application::window().width() * 0.1f, (float)engine::application::window().height() * 0.106f, 1.3f, glm::vec4(0.74f, 0.71f, 0.71f, 1.f)); //1.0 scale for 720p
 
 	//===============================================================2D Cam============================================================================
 
@@ -862,12 +868,32 @@ void example_layer::on_render()
 
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("lighting_on", false);
 
-	m_intro_screen->on_render(textured_lighting_shader);
+	m_intro_screen->on_render(textured_lighting_shader, 0.f, 0.f, 0.f);
 
-	m_HUD->on_render(textured_lighting_shader);
+	m_HUD->on_render(textured_lighting_shader, 0.f, 0.f, 0.01f);
+
+	//Moves range indicator up and down based on player height
+	range_finder_height = (m_player.object()->position().y - 1.f) * 0.015f;
+	if (range_finder_height > 1.19f) {
+		range_finder_height = 1.18f;
+	}
+	m_HUD_range_finder->on_render(textured_lighting_shader, 0.f, range_finder_height, 0.02f);
+
+	//Renders jetpack icon if hover is on
+	if (jetpackHoverOn){
+		m_HUD_jetpack->on_render(textured_lighting_shader, 1.3f, -0.4f, 0.03f);
+	}
+
+	//Renders which weapon is currently selected
+	if (WeaponSlot == WeaponState::Slot1) {
+		m_HUD_missile->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.03f);
+	}
+	else if (WeaponSlot == WeaponState::Slot2) {
+		m_HUD_bouncynade->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.03f);
+	}
+	
 
 	m_cross_fade->on_render(textured_lighting_shader);
-
 
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("lighting_on", true);
 	engine::renderer::end_scene();
@@ -912,13 +938,13 @@ void example_layer::on_update(const engine::timestep& time_step)
 	bouncynade.on_update(time_step);
 
 	//Camera Switching Logic
-	if (CamMode == FirstPerson) {
+	if (CamMode == CamState::FirstPerson) {
 		m_player.update_first_person_camera(m_3d_camera);
 	}
-	else if (CamMode == ThirdPerson) {
+	else if (CamMode == CamState::ThirdPerson) {
 		m_player.update_third_person_camera(m_3d_camera);
 	}
-	else if (CamMode == FreeView) {
+	else if (CamMode == CamState::FreeView) {
 		m_3d_camera.on_update(time_step);
 	}
 
@@ -1115,19 +1141,19 @@ void example_layer::on_event(engine::event& event)
 			engine::render_command::toggle_wireframe();
 		}
 		if (e.key_code() == engine::key_codes::KEY_C) {
-			if (CamMode != FirstPerson) {
+			if (CamMode != CamState::FirstPerson) {
 
-				CamMode = FirstPerson;
+				CamMode = CamState::FirstPerson;
 				m_3d_camera.reset_camera();
 			}
-			else if (CamMode != ThirdPerson) {
+			else if (CamMode != CamState::ThirdPerson) {
 
-				CamMode = ThirdPerson;
+				CamMode = CamState::ThirdPerson;
 				m_3d_camera.reset_camera();
 			}
 		}
 		if (e.key_code() == engine::key_codes::KEY_T) {
-			CamMode = FreeView;
+			CamMode = CamState::FreeView;
 		}
 		if (e.key_code() == engine::key_codes::KEY_F) {
 			jetpackHoverOn = m_player.hover();
@@ -1140,19 +1166,33 @@ void example_layer::on_event(engine::event& event)
 		{
 			m_intro_screen->deactivate();
 		}
+		if (e.key_code() == engine::key_codes::KEY_1)
+		{
+			WeaponSlot = WeaponState::Slot1;
+		}
+		if (e.key_code() == engine::key_codes::KEY_2)
+		{
+			WeaponSlot = WeaponState::Slot2;
+		}
 
 		//======================Remove these in final ver=======================
 		if (e.key_code() == engine::key_codes::KEY_G)
 		{
-			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
-			missile.set_active(true);
+			if (WeaponSlot == WeaponState::Slot1) {
+				missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
+				missile.set_active(true);
+			}
+			else if (WeaponSlot == WeaponState::Slot2) {
+				bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
+				bouncynade_armed = false;
+			}
 		}
 		if (e.key_code() == engine::key_codes::KEY_H)
 		{
 			bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
 			bouncynade_armed = false;
 		}
-		if (e.key_code() == engine::key_codes::KEY_1)
+		if (e.key_code() == engine::key_codes::KEY_9)
 		{
 			m_cross_fade->activate();
 		}
@@ -1176,9 +1216,13 @@ void example_layer::on_event(engine::event& event)
 
 	if (event.event_type() == engine::event_type_e::mouse_button_pressed)
 	{
-		if (engine::input::mouse_button_pressed(0)) {
+		if (WeaponSlot == WeaponState::Slot1) {
 			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
 			missile.set_active(true);
+		}
+		else if (WeaponSlot == WeaponState::Slot2) {
+			bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
+			bouncynade_armed = false;
 		}
 	}
 }

@@ -138,7 +138,7 @@
     <ClInclude Include="src\enemy\enemy.h" />
     <ClInclude Include="src\enemy\enemy_shooter.h" />
     <ClInclude Include="src\example_layer.h" />
-    <ClInclude Include="src\intro_screen.h" />
+    <ClInclude Include="src\screen_render.h" />
     <ClInclude Include="src\player.h" />
     <ClInclude Include="src\weapons\projectile.h" />
   </ItemGroup>
@@ -151,7 +151,7 @@
     <ClCompile Include="src\enemy\enemy_shooter.cpp" />
     <ClCompile Include="src\example_layer.cpp" />
     <ClCompile Include="src\game.cpp" />
-    <ClCompile Include="src\intro_screen.cpp" />
+    <ClCompile Include="src\screen_render.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\weapons\projectile.cpp" />
   </ItemGroup>

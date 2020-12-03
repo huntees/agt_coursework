@@ -22,10 +22,20 @@ public:
 	bool hover();
 	void sprint(const bool& activateSprint);
 
+	void set_health_point(int hp) { health_point = hp; }
+	int get_health_point() { return health_point; }
+
+
+
 	void set_box(float width, float height, float depth, glm::vec3 position) { m_player_box.set_box(width, height, depth, position); }
 	bounding_box& getBox() { return m_player_box; };
 
 private:
+
+	int health_point = 100;
+
+
+
 	enum State { Idle, Walking, Sprinting };
 	State playerState = Idle;
 	State lastAnimation = Idle;
