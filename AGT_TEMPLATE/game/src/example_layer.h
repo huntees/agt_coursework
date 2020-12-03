@@ -26,6 +26,7 @@ private:
 	enemy_shooter m_enemy_droid{};
 	enemy_shooter m_enemy_mech{};
 	enemy m_enemy_drone{};
+	enemy m_enemy_bb8{};
 
 	void check_bounce();
 
@@ -40,6 +41,7 @@ private:
 	engine::ref<engine::game_object>	m_mannequin{};
 	engine::ref<engine::game_object>	m_droid{};
 	engine::ref<engine::game_object>	m_drone{};
+	engine::ref<engine::game_object>	m_bb8{};
 	engine::ref<engine::game_object>	m_mech{};
 	engine::ref<engine::game_object>    m_tetrahedron{};
 	engine::ref<engine::game_object>	m_jeep{};
@@ -65,6 +67,7 @@ private:
 	bounding_box m_droid_box;
 	bounding_box m_mech_box;
 	bounding_box m_drone_box;
+	bounding_box m_bb8_box;
 
 	const float immune_time = 2.f;
 	bool player_immunity = false;

@@ -293,7 +293,23 @@ example_layer::example_layer()
 	m_drone->set_offset(drone_model->offset());
 	m_drone_box.set_box(drone_props.bounding_shape.x * 2.f * drone_props.scale.x, drone_props.bounding_shape.y * 2.f * drone_props.scale.x, drone_props.bounding_shape.z * 2.f
 		* drone_props.scale.x, drone_props.position - glm::vec3(0.f, m_drone->offset().y, 0.f) * m_drone->scale());
-	m_enemy_drone.initialise(m_drone, drone_props.position, glm::vec3(1.f, 0.f, 0.f), true);
+	m_enemy_drone.initialise(m_drone, drone_props.position, glm::vec3(1.f, 0.f, 0.f), true);
+
+	//load bb8 model
+	engine::ref <engine::model> bb8_model = engine::model::create("assets/models/static/bb8/bb8.obj");
+	engine::game_object_properties bb8_props;
+	bb8_props.meshes = bb8_model->meshes();
+	bb8_props.textures = bb8_model->textures();
+	bb8_props.position = glm::vec3(4.f, 0.8f, 0.f);
+	bb8_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	bb8_props.scale = (glm::vec3(1.f / glm::max(bb8_model->size().x, glm::max(bb8_model->size().y, bb8_model->size().z)))) * 0.8f;
+	bb8_props.bounding_shape = bb8_model->size() / 2.f;
+	bb8_props.type = 0;
+	m_bb8 = engine::game_object::create(bb8_props);
+	m_bb8->set_offset(bb8_model->offset());
+	m_bb8_box.set_box(bb8_props.bounding_shape.x * 2.f * bb8_props.scale.x, bb8_props.bounding_shape.y * 2.f * bb8_props.scale.x, bb8_props.bounding_shape.z * 2.f 
+		* bb8_props.scale.x, bb8_props.position - glm::vec3(0.f, m_bb8->offset().y, 0.f) * m_bb8->scale());
+	m_enemy_bb8.initialise(m_bb8, bb8_props.position, glm::vec3(1.f, 0.f, 0.f), false);
 
 	// Load the jeep model.
 	engine::ref <engine::model> jeep_model = engine::model::create("assets/models/static/jeep1/jeep1.obj");
@@ -463,6 +479,7 @@ example_layer::example_layer()
 	m_game_objects.push_back(m_droid);
 	m_game_objects.push_back(m_mech);
 	m_game_objects.push_back(m_drone);
+	m_game_objects.push_back(m_bb8);
 	m_game_objects.push_back(m_missile);
 	m_game_objects.push_back(m_enemy_missile);
 	m_game_objects.push_back(m_enemy_missile2);
@@ -592,6 +609,7 @@ void example_layer::on_render()
 	m_droid_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_mech_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_drone_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	m_bb8_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	enemy_missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	enemy_missile2.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
@@ -686,6 +704,12 @@ void example_layer::on_render()
 	drone_transform = glm::rotate(drone_transform, m_drone->rotation_amount(), m_drone->rotation_axis());
 	drone_transform = glm::scale(drone_transform, m_drone->scale());
 	engine::renderer::submit(textured_lighting_shader, drone_transform, m_drone);
+
+	glm::mat4 bb8_transform(1.0f);
+	bb8_transform = glm::translate(bb8_transform, m_bb8->position() - m_bb8->offset() * m_bb8->scale());
+	bb8_transform = glm::rotate(bb8_transform, m_bb8->rotation_amount(), m_bb8->rotation_axis());
+	bb8_transform = glm::scale(bb8_transform, m_bb8->scale());
+	engine::renderer::submit(textured_lighting_shader, bb8_transform, m_bb8);
 
 	glm::mat4 cow_transform(1.0f);
 	cow_transform = glm::translate(cow_transform, m_cow->position() - m_cow->offset() * m_cow -> scale());
@@ -870,6 +894,9 @@ void example_layer::on_update(const engine::timestep& time_step)
 	m_enemy_drone.on_update(time_step, m_player.object()->position() + glm::vec3(0.f, 0.5f, 0.f));
 	m_drone_box.on_update(m_drone->position() - glm::vec3(0.f, m_drone->offset().y, 0.f) * m_drone->scale(), m_drone->rotation_amount(), m_drone->rotation_axis());
 
+	m_enemy_bb8.on_update(time_step, m_player.object()->position());
+	m_bb8_box.on_update(m_bb8->position() - glm::vec3(0.f, m_bb8->offset().y, 0.f) * m_bb8->scale(), m_bb8->rotation_amount(), m_bb8->rotation_axis());
+
 	missile.on_update(time_step);
 	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),
 		missile.object()->rotation_amount(), missile.object()->rotation_axis());
@@ -955,9 +982,18 @@ void example_layer::on_update(const engine::timestep& time_step)
 		}
 	}
 
+	if (m_bb8_box.collision(m_player.getBox())) {
+
+		m_enemy_bb8.object()->set_velocity(glm::vec3(0.f));
+
+		if (!player_immunity) {
+			player_immunity_timer = immune_time;
+		}
+	}
+
 	if (m_mech_box.collision(m_player.getBox())) {
 
-		m_enemy_drone.object()->set_velocity(glm::vec3(0.f));
+		m_enemy_mech.object()->set_velocity(glm::vec3(0.f));
 		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
 
 		if (!player_immunity) {
