@@ -151,4 +151,6 @@ private:
 	//bool enemy_missile2_active = false;
 	bool bouncynade_armed = true;
 	float bouncynade_armtime = -1.f;
+
+	bool night_time = false;
 };

@@ -549,6 +549,9 @@ void example_layer::on_render()
 	//===============================================================3D Cam============================================================================
 	engine::renderer::begin_scene(m_3d_camera, textured_lighting_shader);
 
+	//For changing time of day midgame
+	m_directionalLight.submit(textured_lighting_shader);
+
 	// Set up some of the scene's parameters in the shader
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
 
@@ -844,6 +847,10 @@ void example_layer::on_render()
 	engine::renderer::begin_scene(m_3d_camera, material_shader);
 
 	m_material->submit(material_shader);
+
+	//For changing time of day midgame
+	m_directionalLight.submit(material_shader);
+
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
 
 	//might not be needed?
@@ -881,6 +888,9 @@ void example_layer::on_render()
 
 	//renders player
 	engine::renderer::submit(animated_mesh_shader, m_player.object());
+
+	//For changing time of day midgame
+	m_directionalLight.submit(animated_mesh_shader);
 
 	engine::renderer::end_scene();
 	//===============================================================3D Cam End============================================================================
@@ -1023,25 +1033,29 @@ void example_layer::on_update(const engine::timestep& time_step)
 	if (m_missile->is_colliding() && missile.is_active()) {
 
 		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
-		if (missile.getBox().collision(m_drone_box)) {
-			m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - missile_damage);
-			std::cout << m_enemy_drone.get_health_point() << '\n';
-		}
-		else if (missile.getBox().collision(m_bb8_box)) {
-			m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - missile_damage);
-			std::cout << m_enemy_bb8.get_health_point() << '\n';
-		}
-		else if (missile.getBox().collision(m_droid_box)) {
-			m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - missile_damage);
-			std::cout << m_enemy_droid.get_health_point() << '\n';
-		}
-		else if (missile.getBox().collision(m_mech_box)) {
-			m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - missile_damage);
-			std::cout << m_enemy_mech.get_health_point() << '\n';
+		for (int i = 0; i < m_missile->collision_objects().size(); i++) {
+
+			if (m_missile->collision_objects().at(i) == m_enemy_drone.object()) {
+				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - missile_damage);
+				std::cout << m_enemy_drone.get_health_point() << '\n';
+			}
+			else if (m_missile->collision_objects().at(i) == m_enemy_bb8.object()) {
+				m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - missile_damage);
+				std::cout << m_enemy_bb8.get_health_point() << '\n';
+			}
+			else if (m_missile->collision_objects().at(i) == m_enemy_droid.object()) {
+				m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - missile_damage);
+				std::cout << m_enemy_droid.get_health_point() << '\n';
+			}
+			else if (m_missile->collision_objects().at(i) == m_enemy_mech.object()) {
+				m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - missile_damage);
+				std::cout << m_enemy_mech.get_health_point() << '\n';
+			}
+
 		}
 
 		missile.object()->set_velocity(glm::vec3(0.f));
-		missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+	    missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
 		missile.object()->set_position(glm::vec3(-9.f, -9.f, 9.f));
 		missile.set_active(false);
 	}
@@ -1086,7 +1100,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 	}
 
 	if (m_shield_box.collision(m_player.getBox())) {
-		player_immunity_timer = 5.f;
+		player_immunity_timer = 6.f;
 		m_shield->set_position(glm::vec3(-4.f, -9.f, 9.f));
 		shield_timer = shield_respawn_time;
 	}
@@ -1103,34 +1117,48 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	//==============================================================Enemy Attacks===============================================================================
 	//Drone melee check
-	if (m_drone_box.collision(m_player.getBox())) {
+	if (m_drone->is_colliding()) {
+		for (int i = 0; i < m_drone->collision_objects().size(); i++) {
 
+			//check for player collision and whether player can take damage **same for all other cases from this point**
+			if (m_drone->collision_objects().at(i) == m_player.object()) {
+				if (!player_immunity) {
+					damage_player(3);
+				}
+			}
+		}
 		//m_enemy_drone.object()->set_velocity(glm::vec3(0.f));
 		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
-
-		if (!player_immunity) {
-			damage_player(3);
-		}
 	}
 
 	//BB8 melee check
-	if (m_bb8_box.collision(m_player.getBox())) {
+	if (m_bb8->is_colliding() && m_bb8->collision_objects().size() > 1) {
 
-		m_enemy_bb8.object()->set_velocity(glm::vec3(0.f));
+		for (int i = 0; i < m_bb8->collision_objects().size(); i++) {
 
-		if (!player_immunity) {
-			damage_player(5);
+			if (m_bb8->collision_objects().at(i) == m_player.object()) {
+				if (!player_immunity) {
+					damage_player(5);
+				}
+
+				//reset velocity on collision
+				m_enemy_bb8.object()->set_velocity(glm::vec3(0.f));
+			}
 		}
+
 	}
 
 	//Mech melee check
-	if (m_mech_box.collision(m_player.getBox())) {
+	if (m_mech->is_colliding() && m_mech->collision_objects().size() > 1) {
 
-		m_enemy_mech.object()->set_velocity(glm::vec3(0.f));
-		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
+		for (int i = 0; i < m_mech->collision_objects().size(); i++) {
+			if (m_mech->collision_objects().at(i) == m_player.object()) {
+				if (!player_immunity) {
+					damage_player(30);
+				}
 
-		if (!player_immunity) {
-			damage_player(30);
+				m_enemy_mech.object()->set_velocity(glm::vec3(0.f));
+			}
 		}
 	}
 
@@ -1138,9 +1166,11 @@ void example_layer::on_update(const engine::timestep& time_step)
 	if (m_enemy_missile->is_colliding() && enemy_missile.is_active()) {
 
 		//m_explosion->activate(enemy_missile.object()->position(), 4.f, 4.f);
-		if (enemy_missile.getBox().collision(m_player.getBox())) {
-			if (!player_immunity) {
-				damage_player(10);
+		for (int i = 0; i < m_enemy_missile->collision_objects().size(); i++) {
+			if (m_enemy_missile->collision_objects().at(i) == m_player.object()) {
+				if (!player_immunity) {
+					damage_player(10);
+				}
 			}
 		}
 
@@ -1154,9 +1184,11 @@ void example_layer::on_update(const engine::timestep& time_step)
 	if (m_enemy_missile2->is_colliding() && enemy_missile2.is_active()) {
 
 		//m_explosion->activate(enemy_missile2.object()->position(), 4.f, 4.f);
-		if (enemy_missile2.getBox().collision(m_player.getBox())) {
-			if (!player_immunity) {
-				damage_player(5);
+		for (int i = 0; i < m_enemy_missile2->collision_objects().size(); i++) {
+			if (m_enemy_missile2->collision_objects().at(i) == m_player.object()) {
+				if (!player_immunity) {
+					damage_player(5);
+				}
 			}
 		}
 
@@ -1329,6 +1361,17 @@ void example_layer::on_event(engine::event& event)
 		{
 			enemy_missile2.enemy_fire(m_enemy_droid, 180.0f);
 			enemy_missile2.set_active(true);
+		}
+		if (e.key_code() == engine::key_codes::KEY_N)
+		{
+			if (!night_time) {
+				m_directionalLight.Color = glm::vec3(0.2f, 0.2f, 0.2f);
+				night_time = true;
+			}
+			else {
+				m_directionalLight.Color = glm::vec3(0.8f, 0.8f, 0.8f);
+				night_time = false;
+			}
 		}
 		//======================================================================
 
