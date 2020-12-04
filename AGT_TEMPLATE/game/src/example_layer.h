@@ -66,6 +66,8 @@ private:
 	const int missile_damage = 10;
 	projectile bouncynade;
 	const int bouncynade_damage = 30;
+	bounding_box m_bouncynade_box;
+	bounding_box m_bouncynade_box2;
 
 	float heartRotation = 0.f;
 	float heart_timer = 0.f;

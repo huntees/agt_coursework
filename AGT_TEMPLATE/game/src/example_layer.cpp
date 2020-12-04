@@ -210,6 +210,8 @@ example_layer::example_layer()
 	bouncynade_props.rolling_friction = 0.1f;
 	m_bouncynade = engine::game_object::create(bouncynade_props);
 	bouncynade.initialise(m_bouncynade);
+	m_bouncynade_box.set_box(bouncynade_radius * 20.f, bouncynade_radius * 20.f, bouncynade_radius * 20.f, bouncynade_props.position);
+	m_bouncynade_box2.set_box(bouncynade_radius * 20.f, bouncynade_radius * 20.f, bouncynade_radius * 20.f, bouncynade_props.position);
 
 
 	//===============================================================Weapon Props End==========================================================================
@@ -676,6 +678,7 @@ void example_layer::on_render()
 	m_drone_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_bb8_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	m_bouncynade_box2.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	enemy_missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	enemy_missile2.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 
@@ -1014,6 +1017,9 @@ void example_layer::on_update(const engine::timestep& time_step)
 	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),
 		missile.object()->rotation_amount(), missile.object()->rotation_axis());
 
+	m_bouncynade_box.on_update(m_bouncynade->position() - glm::vec3(1.5f, 0.f, 1.5f), 0.f, m_bouncynade->rotation_axis());
+	m_bouncynade_box2.on_update(m_bouncynade->position(), 0.f, m_bouncynade->rotation_axis());
+
 	enemy_missile.on_update(time_step);
 	enemy_missile.getBox().on_update(enemy_missile.object()->position() - glm::vec3(0.f, enemy_missile.object()->offset().y, 0.f) * enemy_missile.object()->scale(),
 		enemy_missile.object()->rotation_amount(), enemy_missile.object()->rotation_axis());
@@ -1111,8 +1117,29 @@ void example_layer::on_update(const engine::timestep& time_step)
 		if (bouncynade_armtime < 0.0f)
 		{
 			m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
-			bouncynade.object()->set_position(glm::vec3(-8.f, -9.f, 9.f));
+			if (m_bouncynade_box.collision(m_drone_box)) {
+				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - bouncynade_damage);
+				std::cout << "drone " << m_enemy_drone.get_health_point() << '\n';
+			}
+			if (m_bouncynade_box.collision(m_bb8_box)) {
+				m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - bouncynade_damage);
+				std::cout << "bb8 " << m_enemy_bb8.get_health_point() << '\n';
+			}
+			if (m_bouncynade_box.collision(m_droid_box)) {
+				m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - bouncynade_damage);
+				std::cout << "droid " << m_enemy_droid.get_health_point() << '\n';
+			}
+			if (m_bouncynade_box.collision(m_mech_box)) {
+				m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - bouncynade_damage);
+				std::cout << "mech " << m_enemy_mech.get_health_point() << '\n';
+			}
+			
+			//bouncynade.object()->set_position(glm::vec3(-8.f, -9.f, 9.f));
 		}
+	}
+
+	if (missile.getBox().collision(m_bouncynade_box)) {
+		printf("hit");
 	}
 
 	if (m_heart_box.collision(m_player.getBox()) && m_player.get_health_point() < 100) {
