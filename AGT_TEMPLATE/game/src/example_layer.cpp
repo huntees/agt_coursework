@@ -47,6 +47,24 @@ example_layer::example_layer()
 	m_white_pointLight.Attenuation.Linear = 0.4f;
 	m_white_pointLight.Attenuation.Exp = 0.01f;
 
+	m_white_pointLight2.Color = glm::vec3(1.0f, 1.0f, 1.0f);
+	m_white_pointLight2.AmbientIntensity = 0.3f;
+	m_white_pointLight2.DiffuseIntensity = 0.6f;
+	m_white_pointLight2.Position = glm::vec3(-3.1f, 4.5f, 7.88f);
+	m_white_pointLight2.Attenuation.Constant = 1.0f;
+	m_white_pointLight2.Attenuation.Linear = 0.4f;
+	m_white_pointLight2.Attenuation.Exp = 0.01f;
+
+	m_jetpack_spotLight.Color = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_jetpack_spotLight.AmbientIntensity = 0.6f;
+	m_jetpack_spotLight.DiffuseIntensity = 0.6f;
+	m_jetpack_spotLight.Position = glm::vec3(0.f, 0.f, 0.f);
+	m_jetpack_spotLight.Direction = glm::normalize(glm::vec3(0.f, -1.f, 0.f));
+	m_jetpack_spotLight.Cutoff = 0.6f;
+	m_jetpack_spotLight.Attenuation.Constant = 1.0f;
+	m_jetpack_spotLight.Attenuation.Linear = 0.4f;
+	m_jetpack_spotLight.Attenuation.Exp = 0.01f;
+
 	m_red_spotLight.Color = glm::vec3(1.0f, 0.0f, 0.0f);
 	m_red_spotLight.AmbientIntensity = 0.8f; //0.25f
 	m_red_spotLight.DiffuseIntensity = 0.6f;
@@ -474,13 +492,17 @@ example_layer::example_layer()
 	engine::game_object_properties lamppost_props;
 	lamppost_props.position = { 11.25f, 0.5f, 8.f };
 
-	std::vector<engine::ref<engine::texture_2d>> lamppost_textures =
-	{ engine::texture_2d::create("assets/textures/lamppost.jpg", false) };
+	std::vector<engine::ref<engine::texture_2d>> lamppost_textures = { engine::texture_2d::create("assets/textures/lamppost.jpg", false) };
 	lamppost_props.textures = lamppost_textures;
-
+	lamppost_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	lamppost_props.scale = glm::vec3(0.8f);
 	lamppost_props.meshes = { lamppost_shape->mesh() };
+	lamppost_props.bounding_shape = glm::vec3(0.2f, 5.1f, 0.2f);
+	lamppost_props.is_static = true;
 	m_lamppost = engine::game_object::create(lamppost_props);
+
+	lamppost_props.position = { -4.25f, 0.5f, 8.f };
+	m_lamppost2 = engine::game_object::create(lamppost_props);
 
 	// Load hexagon
 	engine::ref<engine::hexagon> hexagon_shape = engine::hexagon::create();
@@ -502,6 +524,8 @@ example_layer::example_layer()
 	m_game_objects.push_back(m_cow);
 	//m_game_objects.push_back(m_tree);
 	//m_game_objects.push_back(m_pickup);
+	m_game_objects.push_back(m_lamppost);
+	m_game_objects.push_back(m_lamppost2);
 	m_game_objects.push_back(m_red_spotLight_ball);
 	m_game_objects.push_back(m_mannequin);
 	m_game_objects.push_back(m_droid);
@@ -573,9 +597,12 @@ void example_layer::on_render()
 
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gNumSpotLights", (int)num_spot_lights);
 	m_red_spotLight.submit(textured_lighting_shader, 0);
+	m_jetpack_spotLight.submit(textured_lighting_shader, 1);
 
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gNumPointLights", (int)num_point_lights);
 	m_white_pointLight.submit(textured_lighting_shader, 0);
+	m_white_pointLight2.submit(textured_lighting_shader, 1);
+	
 
 
 
@@ -657,6 +684,12 @@ void example_layer::on_render()
 	lamppostTransform = glm::rotate(lamppostTransform, m_lamppost->rotation_amount() + glm::radians(-90.f), m_lamppost->rotation_axis());
 	lamppostTransform = glm::scale(lamppostTransform, m_lamppost->scale());
 	engine::renderer::submit(textured_lighting_shader, lamppostTransform, m_lamppost);
+
+	glm::mat4 lamppost2Transform = glm::mat4(1.0f);
+	lamppost2Transform = glm::translate(lamppost2Transform, m_lamppost2->position());
+	lamppost2Transform = glm::rotate(lamppost2Transform, m_lamppost2->rotation_amount() + glm::radians(90.f), m_lamppost2->rotation_axis());
+	lamppost2Transform = glm::scale(lamppost2Transform, m_lamppost2->scale());
+	engine::renderer::submit(textured_lighting_shader, lamppost2Transform, m_lamppost2);
 
 	glm::mat4 benchTransform = glm::mat4(1.0f);
 	benchTransform = glm::translate(benchTransform, glm::vec3(19.8f, 0.9f, 0.f));
@@ -874,6 +907,7 @@ void example_layer::on_render()
 	//pointLight_transform = glm::scale(pointLight_transform, glm::vec3(0.2f));
 	//engine::renderer::submit(material_shader, m_ball->meshes().at(0), pointLight_transform);
 	engine::renderer::submit(material_shader, glm::translate(glm::mat4(1.f), m_white_pointLight.Position), m_pointLight_object);
+	engine::renderer::submit(material_shader, glm::translate(glm::mat4(1.f), m_white_pointLight2.Position), m_pointLight_object);
 
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", true);
 	//-------------------------------------------------------light ball--------------------------------------------------------
@@ -1024,6 +1058,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 	m_red_spotLight_ball->set_rotation_amount(glm::radians(spotLightRotation));
 	m_red_spotLight.Direction = m_red_spotLight_ball->forward();
 
+	//update jetpack light position to player
+	m_jetpack_spotLight.Position = m_player.object()->position() + glm::vec3(0.f, -0.15, 0.f);
 
 
 	//===============================================================Collision Update============================================================================
@@ -1234,22 +1270,33 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	m_cross_fade->on_update(time_step);
 
-	//jetpack particle logic
+	//jetpack light and particle logic
 	if (jetpackHoverOn) {
 
 		jetpackTrailReady = false;
+		m_jetpack_spotLight.Color = glm::vec3(1.f, 0.68f, 0.26f);
 		if (jetpackTrailTimer < 0.0f) {
 			jetpackTrailTimer = 0.03f;
 		}
 	}
+	else {
+		m_jetpack_spotLight.Color = glm::vec3(0.f, 0.f, 0.f);
+	}
 
 	if (engine::input::key_pressed(engine::key_codes::KEY_SPACE))
 	{
+		if (!jetpackHoverOn) {
+			m_jetpack_spotLight.Color = glm::vec3(1.f, 0.68f, 0.26f);
+		}
+		
 		if (jetpackTrailReady) {
 
 			jetpackTrailReady = false;
 			jetpackTrailTimer = 0.02f;
 		}
+	}
+	else if(!jetpackHoverOn){
+		m_jetpack_spotLight.Color = glm::vec3(0.f, 0.f, 0.f);
 	}
 
 	if (jetpackTrailTimer > 0.0f)
@@ -1359,8 +1406,7 @@ void example_layer::on_event(engine::event& event)
 		}
 		if (e.key_code() == engine::key_codes::KEY_0)
 		{
-			enemy_missile2.enemy_fire(m_enemy_droid, 180.0f);
-			enemy_missile2.set_active(true);
+			m_jetpack_spotLight.DiffuseIntensity *= 0.1f;
 		}
 		if (e.key_code() == engine::key_codes::KEY_N)
 		{

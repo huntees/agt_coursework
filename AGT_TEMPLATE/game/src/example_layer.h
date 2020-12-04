@@ -56,6 +56,7 @@ private:
 	engine::ref<engine::game_object>    m_hexagon{};
 	engine::ref<engine::game_object>    m_bench{};
 	engine::ref<engine::game_object>    m_lamppost{};
+	engine::ref<engine::game_object>    m_lamppost2{};
 	engine::ref<engine::game_object>    m_missile{};
 	engine::ref<engine::game_object>    m_enemy_missile{};
 	engine::ref<engine::game_object>    m_enemy_missile2{};
@@ -101,13 +102,15 @@ private:
 	engine::DirectionalLight            m_directionalLight;
 
 	engine::SpotLight m_red_spotLight;
-	uint32_t num_spot_lights = 1;
+	engine::SpotLight m_jetpack_spotLight;
+	uint32_t num_spot_lights = 2;
 
 	engine::ref<engine::game_object>	m_red_spotLight_ball{};
 	float spotLightRotation = 0.f;
 
 	engine::PointLight m_white_pointLight;
-	uint32_t num_point_lights = 1;
+	engine::PointLight m_white_pointLight2;
+	uint32_t num_point_lights = 2;
 
 	engine::ref<engine::game_object>    m_pointLight_object{};
 
