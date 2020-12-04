@@ -889,9 +889,14 @@ void example_layer::on_render()
 
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
 
-	//might not be needed?
-	//std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gNumSpotLights", (int)num_spot_lights);
-	//m_red_spotLight.submit(material_shader, 0);
+
+	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gNumSpotLights", (int)num_spot_lights);
+	m_red_spotLight.submit(material_shader, 0);
+	m_jetpack_spotLight.submit(material_shader, 1);
+
+	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gNumPointLights", (int)num_point_lights);
+	m_white_pointLight.submit(material_shader, 0);
+	m_white_pointLight2.submit(material_shader, 1);
 
 
 
@@ -928,6 +933,14 @@ void example_layer::on_render()
 
 	//For changing time of day midgame
 	m_directionalLight.submit(animated_mesh_shader);
+
+	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("gNumSpotLights", (int)num_spot_lights);
+	m_red_spotLight.submit(animated_mesh_shader, 0);
+	m_jetpack_spotLight.submit(animated_mesh_shader, 1);
+
+	std::dynamic_pointer_cast<engine::gl_shader>(animated_mesh_shader)->set_uniform("gNumPointLights", (int)num_point_lights);
+	m_white_pointLight.submit(animated_mesh_shader, 0);
+	m_white_pointLight2.submit(animated_mesh_shader, 1);
 
 	engine::renderer::end_scene();
 	//===============================================================3D Cam End============================================================================
@@ -1134,12 +1147,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 				std::cout << "mech " << m_enemy_mech.get_health_point() << '\n';
 			}
 			
-			//bouncynade.object()->set_position(glm::vec3(-8.f, -9.f, 9.f));
+			bouncynade.object()->set_position(glm::vec3(-8.f, -9.f, 9.f));
 		}
-	}
-
-	if (missile.getBox().collision(m_bouncynade_box)) {
-		printf("hit");
 	}
 
 	if (m_heart_box.collision(m_player.getBox()) && m_player.get_health_point() < 100) {
