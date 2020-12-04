@@ -43,6 +43,8 @@ private:
 	engine::ref<engine::game_object>	m_drone{};
 	engine::ref<engine::game_object>	m_bb8{};
 	engine::ref<engine::game_object>	m_mech{};
+	engine::ref<engine::game_object>	m_heart{};
+	engine::ref<engine::game_object>	m_shield{};
 	engine::ref<engine::game_object>    m_tetrahedron{};
 	engine::ref<engine::game_object>	m_jeep{};
 	engine::ref<engine::game_object>	m_pizza{};
@@ -64,6 +66,14 @@ private:
 	projectile bouncynade;
 	const int bouncynade_damage = 30;
 
+	float heartRotation = 0.f;
+	float heart_timer = 0.f;
+	float heart_respawn_time = 5.f;
+
+	float shieldRotation = 40.f;
+	float shield_timer = 0.f;
+	float shield_respawn_time = 10.f;
+
 	enum class WeaponState { Slot1, Slot2, Slot3 };
 	WeaponState WeaponSlot = WeaponState::Slot1;
 
@@ -74,6 +84,8 @@ private:
 	bounding_box m_mech_box;
 	bounding_box m_drone_box;
 	bounding_box m_bb8_box;
+	bounding_box m_heart_box;
+	bounding_box m_shield_box;
 
 	const float immune_time = 2.f;
 	bool player_immunity = false;

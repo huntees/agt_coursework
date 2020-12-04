@@ -309,7 +309,35 @@ example_layer::example_layer()
 	m_bb8->set_offset(bb8_model->offset());
 	m_bb8_box.set_box(bb8_props.bounding_shape.x * 3.2f * bb8_props.scale.x, bb8_props.bounding_shape.y * 2.f * bb8_props.scale.x, bb8_props.bounding_shape.z * 2.5f 
 		* bb8_props.scale.x, bb8_props.position - glm::vec3(0.f, m_bb8->offset().y, 0.f) * m_bb8->scale());
-	m_enemy_bb8.initialise(m_bb8, bb8_props.position, glm::vec3(1.f, 0.f, 0.f), false);
+	m_enemy_bb8.initialise(m_bb8, bb8_props.position, glm::vec3(1.f, 0.f, 0.f), false);
+
+	//load heart model
+	engine::ref <engine::model> heart_model = engine::model::create("assets/models/static/heart/heart.obj");
+	engine::game_object_properties heart_props;
+	heart_props.meshes = heart_model->meshes();
+	heart_props.textures = heart_model->textures();
+	heart_props.position = glm::vec3(20.f, 1.f, 15.f);
+	heart_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	heart_props.bounding_shape = glm::vec3(heart_model->size().x / 2.f, heart_model->size().y / 2.f, heart_model->size().z / 2.f);
+	heart_props.type = 0;
+	m_heart = engine::game_object::create(heart_props);
+	m_heart->set_offset(heart_model->offset());
+	m_heart_box.set_box(heart_props.bounding_shape.x * 2.f, heart_props.bounding_shape.y * 2.f, heart_props.bounding_shape.z * 2.f,
+		heart_props.position - glm::vec3(0.f, m_heart->offset().y, 0.f) * m_heart->scale());
+
+	//load shield model
+	engine::ref <engine::model> shield_model = engine::model::create("assets/models/static/shield/shield.obj");
+	engine::game_object_properties shield_props;
+	shield_props.meshes = shield_model->meshes();
+	shield_props.textures = shield_model->textures();
+	shield_props.position = glm::vec3(20.f, 1.f, 7.f);
+	shield_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	shield_props.bounding_shape = glm::vec3(shield_model->size().x / 2.f, shield_model->size().y / 2.f, shield_model->size().z / 2.f);
+	shield_props.type = 0;
+	m_shield = engine::game_object::create(shield_props);
+	m_shield->set_offset(shield_model->offset());
+	m_shield_box.set_box(shield_props.bounding_shape.x * 2.f, shield_props.bounding_shape.y * 2.f, shield_props.bounding_shape.z * 2.f,
+		shield_props.position - glm::vec3(0.f, m_shield->offset().y, 0.f) * m_shield->scale());
 
 	// Load the jeep model.
 	engine::ref <engine::model> jeep_model = engine::model::create("assets/models/static/jeep1/jeep1.obj");
@@ -612,6 +640,8 @@ void example_layer::on_render()
 	m_player.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_cow_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_droid_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	m_heart_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	m_shield_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_mech_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_drone_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_bb8_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
@@ -715,6 +745,18 @@ void example_layer::on_render()
 	bb8_transform = glm::rotate(bb8_transform, m_bb8->rotation_amount(), m_bb8->rotation_axis());
 	bb8_transform = glm::scale(bb8_transform, m_bb8->scale());
 	engine::renderer::submit(textured_lighting_shader, bb8_transform, m_bb8);
+
+	glm::mat4 heart_transform(1.0f);
+	heart_transform = glm::translate(heart_transform, m_heart->position() - m_heart->offset() * m_heart->scale());
+	heart_transform = glm::rotate(heart_transform, m_heart->rotation_amount(), m_heart->rotation_axis());
+	heart_transform = glm::scale(heart_transform, m_heart->scale());
+	engine::renderer::submit(textured_lighting_shader, heart_transform, m_heart);
+
+	glm::mat4 shield_transform(1.0f);
+	shield_transform = glm::translate(shield_transform, m_shield->position() - m_shield->offset() * m_shield->scale());
+	shield_transform = glm::rotate(shield_transform, m_shield->rotation_amount(), m_shield->rotation_axis());
+	shield_transform = glm::scale(shield_transform, m_shield->scale());
+	engine::renderer::submit(textured_lighting_shader, shield_transform, m_shield);
 
 	glm::mat4 cow_transform(1.0f);
 	cow_transform = glm::translate(cow_transform, m_cow->position() - m_cow->offset() * m_cow -> scale());
@@ -911,6 +953,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	//After about 9 hours of testing (yes genuinely 9 hours just on boxes), boxes are rendered wrongly opposed to where they actually are
 	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
+	m_heart_box.on_update(m_heart->position() - glm::vec3(0.f, m_heart->offset().y, 0.f), m_heart->rotation_amount(), m_heart->rotation_axis());
+	m_shield_box.on_update(m_shield->position() - glm::vec3(0.f, m_shield->offset().y, 0.f), m_shield->rotation_amount(), m_shield->rotation_axis());
 
 	m_player.on_update(time_step);
 	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
@@ -947,7 +991,17 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_3d_camera.on_update(time_step);
 	}
 
+	if (heartRotation > 360.f) {
+		heartRotation = 0.f;
+	}
+	heartRotation += 20.f * time_step;
+	m_heart->set_rotation_amount(glm::radians(heartRotation));
 
+	if (shieldRotation > 360.f) {
+		shieldRotation = 0.f;
+	}
+	shieldRotation += 20.f * time_step;
+	m_shield->set_rotation_amount(glm::radians(shieldRotation));
 
 
 	if (spotLightRotation > 360.f) {
@@ -955,7 +1009,6 @@ void example_layer::on_update(const engine::timestep& time_step)
 	}
 
 	spotLightRotation += 200.f * time_step;
-
 
 	m_red_spotLight_ball->set_rotation_axis(glm::vec3(0.f, 1.f, 0.f));
 	m_red_spotLight_ball->set_rotation_amount(glm::radians(spotLightRotation));
@@ -965,7 +1018,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	//===============================================================Collision Update============================================================================
 
-	//==============================================================Player Weapons===============================================================================
+	//==============================================================Player Stuff=================================================================================
 	//checks whether missile is colliding and whether the missile is active i.e if the missile has already exploded
 	if (m_missile->is_colliding() && missile.is_active()) {
 
@@ -1009,6 +1062,42 @@ void example_layer::on_update(const engine::timestep& time_step)
 		{
 			m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
 			bouncynade.object()->set_position(glm::vec3(-8.f, -9.f, 9.f));
+		}
+	}
+
+	if (m_heart_box.collision(m_player.getBox()) && m_player.get_health_point() < 100) {
+
+		m_player.set_health_point(m_player.get_health_point() + 10);
+		if (m_player.get_health_point() > 100) {
+			m_player.set_health_point(100);
+		}
+		m_heart->set_position(glm::vec3(-4.f, -9.f, 9.f));
+		heart_timer = heart_respawn_time;
+	}
+
+	if (heart_timer > 0.0f)
+	{
+		heart_timer -= (float)time_step;
+
+		if (heart_timer < 0.0f)
+		{
+			m_heart->set_position(glm::vec3(20.f, 1.f, 15.f));
+		}
+	}
+
+	if (m_shield_box.collision(m_player.getBox())) {
+		player_immunity_timer = 5.f;
+		m_shield->set_position(glm::vec3(-4.f, -9.f, 9.f));
+		shield_timer = shield_respawn_time;
+	}
+
+	if (shield_timer > 0.0f)
+	{
+		shield_timer -= (float)time_step;
+
+		if (shield_timer < 0.0f)
+		{
+			m_shield->set_position(glm::vec3(20.f, 1.f, 7.f));
 		}
 	}
 
