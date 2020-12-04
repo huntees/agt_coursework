@@ -956,7 +956,7 @@ void example_layer::on_render()
 
 	// Render text
 	const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
-	m_text_manager->render_text(text_shader, "Orange Text", 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
+	m_text_manager->render_text(text_shader, std::to_string(wave_number), 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
 	m_text_manager->render_text(text_shader, std::to_string(m_player.get_health_point()), (float)engine::application::window().width() * 0.1f, (float)engine::application::window().height() * 0.106f, 1.3f, glm::vec4(0.74f, 0.71f, 0.71f, 1.f)); //1.0 scale for 720p
 
 	//===============================================================2D Cam============================================================================
@@ -1353,25 +1353,58 @@ void example_layer::on_update(const engine::timestep& time_step)
 	m_enemy_droid.on_update(time_step, m_player.object()->position(), enemy_missile2);
 	m_droid_box.on_update(m_droid->position() - glm::vec3(0.8f, m_droid->offset().y, 0.8f) * m_droid->scale(), m_droid->rotation_amount(), m_droid->rotation_axis());
 
-	if (m_enemy_drone.get_health_point() <= 0) {
+	if (m_enemy_drone.get_health_point() <= 0 && m_enemy_drone.is_alive()) {
+		
+		enemy_count--;
+		m_enemy_drone.set_alive(false);
 		m_enemy_drone.object()->set_position(glm::vec3(0.f, -9.f, 0.f));
 		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
-		m_enemy_drone.reset_health();
 	}
-	if (m_enemy_bb8.get_health_point() <= 0) {
+	if (m_enemy_bb8.get_health_point() <= 0 && m_enemy_bb8.is_alive()) {
+		
+		enemy_count--;
+		m_enemy_bb8.set_alive(false);
 		m_enemy_bb8.object()->set_position(glm::vec3(2.f, -9.f, 0.f));
 		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
-		m_enemy_bb8.reset_health();
+		
 	}
-	if (m_enemy_droid.get_health_point() <= 0) {
+	if (m_enemy_droid.get_health_point() <= 0 && m_enemy_droid.is_alive()) {
+
+		enemy_count--;
+		m_enemy_droid.set_alive(false);
 		m_enemy_droid.object()->set_position(glm::vec3(4.f, -9.f, 0.f));
 		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
-		m_enemy_droid.reset_health();
+		
 	}
-	if (m_enemy_mech.get_health_point() <= 0) {
+	if (m_enemy_mech.get_health_point() <= 0 && m_enemy_mech.is_alive()) {
+		
+		enemy_count--;
+		m_enemy_mech.set_alive(false);
 		m_enemy_mech.object()->set_position(glm::vec3(5.f, -9.f, 0.f));
 		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
-		m_enemy_mech.reset_health();
+		
+	}
+
+	if (enemy_count <= 0 && !resting_period) {
+
+		wave_number++;
+		resting_period = true;
+		enemy_respawn_timer = 5.f;
+	}
+
+	if (enemy_respawn_timer > 0.0f)
+	{
+		enemy_respawn_timer -= (float)time_step;
+
+		if (enemy_respawn_timer < 0.0f)
+		{
+			enemy_count = 4;
+			m_enemy_droid.respawn(wave_number, glm::vec3(7.f, 0.5f, 0.f));
+			m_enemy_mech.respawn(wave_number, glm::vec3(4.f, 0.5f, 40.f));
+			m_enemy_drone.respawn(wave_number, glm::vec3(-4.f, 2.f, 0.f));
+			m_enemy_bb8.respawn(wave_number, glm::vec3(4.f, 0.8f, 0.f));
+			resting_period = false;
+		}
 	}
 }
 

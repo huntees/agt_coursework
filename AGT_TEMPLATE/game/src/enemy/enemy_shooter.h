@@ -40,13 +40,28 @@ public:
 
 	int get_health_point() { return health_point; }
 
-	void reset_health() { if (is_tank) { health_point = tank_hp; } else { health_point = regular_hp; } }
+	void reset_health() { if (is_tank) { health_point = tank_hp * wave; } else { health_point = regular_hp * wave; } }
+
+	void set_alive(bool b) { alive = b; }
+
+	bool is_alive() { return alive; }
+
+	void respawn(int& wave_number, glm::vec3& pos) {
+		wave = wave_number;
+		alive = true;
+		reset_health();
+		m_object->set_position(pos);
+	}
 
 	// game object bound to the enemy_shooter
 	engine::ref<engine::game_object> object() const { return m_object; }
 
 
 private:
+	bool alive = true;
+
+	int wave = 1;
+
 	bool is_tank = false;
 
 	const int tank_hp = 200;

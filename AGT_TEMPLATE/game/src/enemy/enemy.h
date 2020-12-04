@@ -31,13 +31,27 @@ class enemy
 
 		int get_health_point() { return health_point; }
 
-		void reset_health() { if (can_fly) { health_point = flying_hp; } else { health_point = regular_hp; } }
+		void reset_health() { if (can_fly) { health_point = flying_hp * wave; } else { health_point = regular_hp * wave; } }
+
+		void set_alive(bool b) { alive = b; }
+
+		bool is_alive() { return alive; }
+
+		void respawn(int& wave_number, glm::vec3& pos) {
+			wave = wave_number;
+			alive = true;
+			reset_health();
+			m_object->set_position(pos);
+		}
 
 		// game object bound to the enemy
 		engine::ref<engine::game_object> object() const { return m_object; }
 
 
 	private:
+		bool alive = true;
+
+		int wave = 1;
 
 		const int flying_hp = 30;
 		const int regular_hp = 40;

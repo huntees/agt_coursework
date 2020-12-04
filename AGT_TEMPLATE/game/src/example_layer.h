@@ -28,6 +28,12 @@ private:
 	enemy m_enemy_drone{};
 	enemy m_enemy_bb8{};
 
+	int enemy_count = 4;
+	float enemy_respawn_timer = -1.f;
+
+	int wave_number = 1;
+	bool resting_period = false;
+
 	void check_bounce();
 
 	engine::ref<engine::skybox>			m_skybox{};
