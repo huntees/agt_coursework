@@ -26,11 +26,24 @@ class enemy
 		void face_player(const engine::timestep& time_step, const glm::vec3& player_position);
 
 		void chase_player(const engine::timestep& time_step, const glm::vec3& player_position);
+
+		void set_health_point(int hp) { health_point = hp; }
+
+		int get_health_point() { return health_point; }
+
+		void reset_health() { if (can_fly) { health_point = flying_hp; } else { health_point = regular_hp; } }
+
 		// game object bound to the enemy
 		engine::ref<engine::game_object> object() const { return m_object; }
 
 
 	private:
+
+		const int flying_hp = 30;
+		const int regular_hp = 40;
+
+		int health_point = regular_hp;
+
 		// enemy's speed
 		float m_speed{ 1.f };
 

@@ -14,7 +14,11 @@ void enemy_shooter::initialise(engine::ref<engine::game_object> object, glm::vec
 	is_tank = istank;
 
 	if (is_tank) {
+
+		health_point = tank_hp;
 		shoot_speed = tank_shoot_speed;
+		m_detection_radius = 16.f;
+		m_shoot_radius = 13.f;
 	}
 }
 
@@ -106,9 +110,6 @@ void enemy_shooter::on_update(const engine::timestep& time_step, const glm::vec3
 			m_state = state::idle;
 		}
 	}
-
-	//shoot
-	//retreat
 }
 
 // move forwards until the timer runs out, then switch direction to move the other way

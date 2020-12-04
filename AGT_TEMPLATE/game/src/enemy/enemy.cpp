@@ -11,6 +11,14 @@ void enemy::initialise(engine::ref<engine::game_object> object, glm::vec3 positi
 	m_object->set_forward(forward);
 	m_object->set_position(position);
 	can_fly = canFly;
+
+	if (can_fly) {
+		m_detection_radius = 8.f;
+		m_trigger_radius = 6.f;
+
+		m_speed = 1.1f;
+		health_point = flying_hp;
+	}
 }
 
 void enemy::on_update(const engine::timestep& time_step, const glm::vec3& player_position)

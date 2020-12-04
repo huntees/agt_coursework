@@ -115,14 +115,14 @@ example_layer::example_layer()
 	mannequin_props.rotation_amount = engine::PI;
 	mannequin_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	mannequin_props.type = 0;
-	mannequin_props.bounding_shape = glm::vec3(m_skinned_mesh->size().x / 4.f,
-		m_skinned_mesh->size().y / 2.f, m_skinned_mesh->size().x / 4.f);
+	mannequin_props.bounding_shape = glm::vec3(m_skinned_mesh->size().x / 5.f,
+		m_skinned_mesh->size().y / 2.f, m_skinned_mesh->size().x / 5.f);
 	mannequin_props.friction = 0.0f;
 	m_mannequin = engine::game_object::create(mannequin_props);
 	m_mannequin->set_offset(m_skinned_mesh->offset());
 	m_player.initialise(m_mannequin);
-	m_player.set_box(mannequin_props.bounding_shape.x * 2.f * mannequin_props.scale.x, mannequin_props.bounding_shape.y * 2.f *
-		mannequin_props.scale.x, mannequin_props.bounding_shape.z * 2.f * mannequin_props.scale.x, mannequin_props.position);
+	m_player.set_box(mannequin_props.bounding_shape.x * 2.5f * mannequin_props.scale.x, mannequin_props.bounding_shape.y * 2.f *
+		mannequin_props.scale.x, mannequin_props.bounding_shape.z * 2.5f * mannequin_props.scale.x, mannequin_props.position);
 
 	// Load the terrain texture and create a terrain mesh. Create a terrain object. Set its properties
 	std::vector<engine::ref<engine::texture_2d>> terrain_textures = { engine::texture_2d::create("assets/textures/Slabs.jpg", false) };
@@ -136,12 +136,25 @@ example_layer::example_layer()
 	terrain_props.restitution = 0.92f;
 	m_terrain = engine::game_object::create(terrain_props);
 
+	//weapon holder
+	std::vector<engine::ref<engine::texture_2d>> weapon_holder_textures = { engine::texture_2d::create("assets/textures/intersection.jpg", false) };
+	engine::ref<engine::terrain> weapon_holder_shape = engine::terrain::create(10.f, 0.1f, 10.f, 1.f);
+	engine::game_object_properties weapon_holder_props;
+	weapon_holder_props.meshes = { weapon_holder_shape->mesh() };
+	weapon_holder_props.textures = weapon_holder_textures;
+	weapon_holder_props.position = { 0.f, -10.f, 0.f };
+	weapon_holder_props.is_static = true;
+	weapon_holder_props.type = 0;
+	weapon_holder_props.bounding_shape = glm::vec3(10.f, 0.1f, 10.f);
+	weapon_holder_props.restitution = 0.f;
+	m_weapon_holder = engine::game_object::create(weapon_holder_props);
+
 	//===============================================================Weapon Props============================================================================
 	engine::ref <engine::model> missile_model = engine::model::create("assets/models/static/missile/missile.obj");
 	engine::game_object_properties missile_props;
 	missile_props.meshes = missile_model->meshes();
 	missile_props.textures = missile_model->textures();
-	missile_props.position = { 0.f, -3.f, 1.f };
+	missile_props.position = { -9.f, -9.f, 9.f };
 	missile_props.type = 0;
 	missile_props.bounding_shape = missile_model->size() / 2.f;
 	missile_props.friction = 0.0f;
@@ -152,14 +165,14 @@ example_layer::example_layer()
 	missile.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
 		missile_props.position - glm::vec3(0.f, m_missile->offset().y, 0.f));
 
-	missile_props.position = { 2.f, -3.f, 2.f };
+	missile_props.position = { -7.f, -9.f, 9.f };
 	m_enemy_missile = engine::game_object::create(missile_props);
 	m_enemy_missile->set_offset(missile_model->offset());
 	enemy_missile.initialise(m_enemy_missile);
 	enemy_missile.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
 		missile_props.position - glm::vec3(0.f, m_enemy_missile->offset().y, 0.f));
 
-	missile_props.position = { 3.f, -3.f, 3.f };
+	missile_props.position = { -6.f, -9.f, 9.f };
 	m_enemy_missile2 = engine::game_object::create(missile_props);
 	m_enemy_missile2->set_offset(missile_model->offset());
 	enemy_missile2.initialise(m_enemy_missile2);
@@ -170,7 +183,7 @@ example_layer::example_layer()
 	float bouncynade_radius = 0.15f;
 	engine::ref<engine::sphere> bouncynade_shape = engine::sphere::create(5, 10, bouncynade_radius);
 	engine::game_object_properties bouncynade_props;
-	bouncynade_props.position = { 0.f, -3.f, 0.f };
+	bouncynade_props.position = { -8.f, -9.f, 9.f };
 	bouncynade_props.meshes = { bouncynade_shape->mesh() };
 	bouncynade_props.type = 1;
 	bouncynade_props.bounding_shape = glm::vec3(bouncynade_radius);
@@ -209,19 +222,6 @@ example_layer::example_layer()
 	intersection_props.restitution = 0.92f;
 	m_intersection = engine::game_object::create(intersection_props);
 
-	//weapon holder
-	std::vector<engine::ref<engine::texture_2d>> weapon_holder_textures = { engine::texture_2d::create("assets/textures/intersection.jpg", false) };
-	engine::ref<engine::terrain> weapon_holder_shape = engine::terrain::create(5.f, 0.1f, 5.f, 1.f);
-	engine::game_object_properties weapon_holder_props;
-	weapon_holder_props.meshes = { weapon_holder_shape->mesh() };
-	weapon_holder_props.textures = weapon_holder_textures;
-	weapon_holder_props.position = { 0.f, -4.f, 0.f };
-	weapon_holder_props.is_static = true;
-	weapon_holder_props.type = 0;
-	weapon_holder_props.bounding_shape = glm::vec3(5.f, 0.1f, 5.f);
-	weapon_holder_props.restitution = 0.f;
-	m_weapon_holder = engine::game_object::create(weapon_holder_props);
-
 	//pointLight_object
 	engine::ref<engine::terrain> pointLight_object_shape = engine::terrain::create(0.3f, 0.05f, 0.1f, 1.f);
 	engine::game_object_properties pointLight_object_props;
@@ -251,14 +251,14 @@ example_layer::example_layer()
 	engine::game_object_properties droid_props;
 	droid_props.meshes = droid_model->meshes();
 	droid_props.textures = droid_model->textures();
-	droid_props.position = glm::vec3(0.f, 0.5f, 0.f);
+	droid_props.position = glm::vec3(7.f, 0.5f, 0.f);
 	droid_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	droid_props.scale = glm::vec3(1.f / glm::max(droid_model->size().x, glm::max(droid_model->size().y, droid_model->size().z)));
-	droid_props.bounding_shape = droid_model->size() / 2.f;
+	droid_props.bounding_shape = glm::vec3(droid_model->size().x / 5.f, droid_model->size().y / 2.f, droid_model->size().z / 5.f);
 	droid_props.type = 0;
 	m_droid = engine::game_object::create(droid_props);
 	m_droid->set_offset(droid_model->offset());
-	m_droid_box.set_box(droid_props.bounding_shape.x * 2.f * droid_props.scale.x, droid_props.bounding_shape.y * 2.f * droid_props.scale.x, droid_props.bounding_shape.z * 2.f
+	m_droid_box.set_box(droid_props.bounding_shape.x * 8.f * droid_props.scale.x, droid_props.bounding_shape.y * 2.f * droid_props.scale.x, droid_props.bounding_shape.z * 10.f
 		* droid_props.scale.x, droid_props.position - glm::vec3(0.f, m_droid->offset().y, 0.f) * m_droid->scale());
 	m_enemy_droid.initialise(m_droid, droid_props.position, glm::vec3(1.f, 0.f, 0.f), false, false);
 
@@ -271,11 +271,11 @@ example_layer::example_layer()
 	mech_props.position = glm::vec3(4.f, 0.5f, 40.f);
 	mech_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	mech_props.scale = mech_model->size();
-	mech_props.bounding_shape = glm::vec3(mech_model->size().x / 3.5f, mech_model->size().y / 2.f, mech_model->size().z / 3.5f);
+	mech_props.bounding_shape = glm::vec3(mech_model->size().x / 3.f, mech_model->size().y / 2.f, mech_model->size().z / 3.f);
 	mech_props.type = 0;
 	m_mech = engine::game_object::create(mech_props);
 	m_mech->set_offset(mech_model->offset());
-	m_mech_box.set_box(mech_props.bounding_shape.x * 2.5f * mech_props.scale.x, mech_props.bounding_shape.y * 2.f * mech_props.scale.x, mech_props.bounding_shape.z * 2.5f
+	m_mech_box.set_box(mech_props.bounding_shape.x * 2.5f * mech_props.scale.x, mech_props.bounding_shape.y * 2.3f * mech_props.scale.x, mech_props.bounding_shape.z * 2.5f
 		* mech_props.scale.x, mech_props.position - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale());
 	m_enemy_mech.initialise(m_mech, mech_props.position, glm::vec3(1.f, 0.f, 0.f), false, true);
 
@@ -287,11 +287,11 @@ example_layer::example_layer()
 	drone_props.position = glm::vec3(-4.f, 2.f, 0.f);
 	drone_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	drone_props.scale = drone_model->size();
-	drone_props.bounding_shape = drone_model->size() / 2.5f;
+	drone_props.bounding_shape = glm::vec3(drone_model->size().x / 4.f, drone_model->size().y / 10.f, drone_model->size().z / 4.f);
 	drone_props.type = 0;
 	m_drone = engine::game_object::create(drone_props);
 	m_drone->set_offset(drone_model->offset());
-	m_drone_box.set_box(drone_props.bounding_shape.x * 2.f * drone_props.scale.x, drone_props.bounding_shape.y * 2.f * drone_props.scale.x, drone_props.bounding_shape.z * 2.f
+	m_drone_box.set_box(drone_props.bounding_shape.x * 4.f * drone_props.scale.x, drone_props.bounding_shape.y * 10.f * drone_props.scale.x, drone_props.bounding_shape.z * 5.f
 		* drone_props.scale.x, drone_props.position - glm::vec3(0.f, m_drone->offset().y, 0.f) * m_drone->scale());
 	m_enemy_drone.initialise(m_drone, drone_props.position, glm::vec3(1.f, 0.f, 0.f), true);
 
@@ -303,11 +303,11 @@ example_layer::example_layer()
 	bb8_props.position = glm::vec3(4.f, 0.8f, 0.f);
 	bb8_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	bb8_props.scale = (glm::vec3(1.f / glm::max(bb8_model->size().x, glm::max(bb8_model->size().y, bb8_model->size().z)))) * 0.8f;
-	bb8_props.bounding_shape = bb8_model->size() / 2.f;
+	bb8_props.bounding_shape = glm::vec3(bb8_model->size().x / 3.f, bb8_model->size().y / 2.f, bb8_model->size().z / 2.f);
 	bb8_props.type = 0;
 	m_bb8 = engine::game_object::create(bb8_props);
 	m_bb8->set_offset(bb8_model->offset());
-	m_bb8_box.set_box(bb8_props.bounding_shape.x * 2.f * bb8_props.scale.x, bb8_props.bounding_shape.y * 2.f * bb8_props.scale.x, bb8_props.bounding_shape.z * 2.f 
+	m_bb8_box.set_box(bb8_props.bounding_shape.x * 3.2f * bb8_props.scale.x, bb8_props.bounding_shape.y * 2.f * bb8_props.scale.x, bb8_props.bounding_shape.z * 2.5f 
 		* bb8_props.scale.x, bb8_props.position - glm::vec3(0.f, m_bb8->offset().y, 0.f) * m_bb8->scale());
 	m_enemy_bb8.initialise(m_bb8, bb8_props.position, glm::vec3(1.f, 0.f, 0.f), false);
 
@@ -909,8 +909,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	//===============================================================Objects Update============================================================================
 
-	//After a few hours of testing (yes genuinely a few hours just on boxes), there seems to be some issue with box.collision(otherBox) method
-	//where certain collision isnt picked up during certain rotation angle.
+	//After about 9 hours of testing (yes genuinely 9 hours just on boxes), boxes are rendered wrongly opposed to where they actually are
 	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
 
 	m_player.on_update(time_step);
@@ -918,10 +917,10 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
 
 	m_enemy_drone.on_update(time_step, m_player.object()->position() + glm::vec3(0.f, 0.5f, 0.f));
-	m_drone_box.on_update(m_drone->position() - glm::vec3(0.f, m_drone->offset().y, 0.f) * m_drone->scale(), m_drone->rotation_amount(), m_drone->rotation_axis());
-
+	m_drone_box.on_update(m_drone->position() - glm::vec3(0.45f, m_drone->offset().y, 0.45f) * m_drone->scale(), m_drone->rotation_amount(), m_drone->rotation_axis());
+	
 	m_enemy_bb8.on_update(time_step, m_player.object()->position());
-	m_bb8_box.on_update(m_bb8->position() - glm::vec3(0.f, m_bb8->offset().y, 0.f) * m_bb8->scale(), m_bb8->rotation_amount(), m_bb8->rotation_axis());
+	m_bb8_box.on_update(m_bb8->position() - glm::vec3(0.3f, m_bb8->offset().y, 0.3f) * m_bb8->scale(), m_bb8->rotation_amount(), m_bb8->rotation_axis());
 
 	missile.on_update(time_step);
 	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),
@@ -971,10 +970,26 @@ void example_layer::on_update(const engine::timestep& time_step)
 	if (m_missile->is_colliding() && missile.is_active()) {
 
 		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
+		if (missile.getBox().collision(m_drone_box)) {
+			m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - missile_damage);
+			std::cout << m_enemy_drone.get_health_point() << '\n';
+		}
+		else if (missile.getBox().collision(m_bb8_box)) {
+			m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - missile_damage);
+			std::cout << m_enemy_bb8.get_health_point() << '\n';
+		}
+		else if (missile.getBox().collision(m_droid_box)) {
+			m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - missile_damage);
+			std::cout << m_enemy_droid.get_health_point() << '\n';
+		}
+		else if (missile.getBox().collision(m_mech_box)) {
+			m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - missile_damage);
+			std::cout << m_enemy_mech.get_health_point() << '\n';
+		}
 
 		missile.object()->set_velocity(glm::vec3(0.f));
 		missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		missile.object()->set_position(glm::vec3(0.f, -3.f, 1.f));
+		missile.object()->set_position(glm::vec3(-9.f, -9.f, 9.f));
 		missile.set_active(false);
 	}
 
@@ -993,74 +1008,78 @@ void example_layer::on_update(const engine::timestep& time_step)
 		if (bouncynade_armtime < 0.0f)
 		{
 			m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
-			bouncynade.object()->set_position(glm::vec3(0.f,-3.f,0.f));
+			bouncynade.object()->set_position(glm::vec3(-8.f, -9.f, 9.f));
 		}
 	}
 
 	//==============================================================Enemy Attacks===============================================================================
+	//Drone melee check
 	if (m_drone_box.collision(m_player.getBox())) {
 
 		//m_enemy_drone.object()->set_velocity(glm::vec3(0.f));
 		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
 
 		if (!player_immunity) {
-			player_immunity_timer = immune_time;
+			damage_player(3);
 		}
 	}
 
+	//BB8 melee check
 	if (m_bb8_box.collision(m_player.getBox())) {
 
 		m_enemy_bb8.object()->set_velocity(glm::vec3(0.f));
 
 		if (!player_immunity) {
-			player_immunity_timer = immune_time;
+			damage_player(5);
 		}
 	}
 
+	//Mech melee check
 	if (m_mech_box.collision(m_player.getBox())) {
 
 		m_enemy_mech.object()->set_velocity(glm::vec3(0.f));
 		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
 
 		if (!player_immunity) {
-			player_immunity_timer = immune_time;
+			damage_player(30);
 		}
 	}
 
+	//Mech missile check
 	if (m_enemy_missile->is_colliding() && enemy_missile.is_active()) {
 
-		m_explosion->activate(enemy_missile.object()->position(), 4.f, 4.f);
+		//m_explosion->activate(enemy_missile.object()->position(), 4.f, 4.f);
 		if (enemy_missile.getBox().collision(m_player.getBox())) {
 			if (!player_immunity) {
-				player_immunity_timer = immune_time;
+				damage_player(10);
 			}
 		}
 
 		enemy_missile.object()->set_velocity(glm::vec3(0.f));
 		enemy_missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		enemy_missile.object()->set_position(glm::vec3(2.f, -3.f, 2.f));
+		enemy_missile.object()->set_position(glm::vec3(-7.f, -9.f, 9.f));
 		enemy_missile.set_active(false);
 	}
 
+	//Droid missile check
 	if (m_enemy_missile2->is_colliding() && enemy_missile2.is_active()) {
 
-		m_explosion->activate(enemy_missile2.object()->position(), 4.f, 4.f);
+		//m_explosion->activate(enemy_missile2.object()->position(), 4.f, 4.f);
 		if (enemy_missile2.getBox().collision(m_player.getBox())) {
 			if (!player_immunity) {
-				player_immunity_timer = immune_time;
+				damage_player(5);
 			}
 		}
 
 		enemy_missile2.object()->set_velocity(glm::vec3(0.f));
 		enemy_missile2.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		enemy_missile2.object()->set_position(glm::vec3(2.f, -3.f, 2.f));
+		enemy_missile2.object()->set_position(glm::vec3(-6.f, -9.f, 9.f));
 		enemy_missile2.set_active(false);
 	}
 
 	if (player_immunity_timer > 0.0f)
 	{
 		if (!player_immunity) {
-			m_cross_fade->activate();
 			player_immunity = true;
 		}
 
@@ -1125,10 +1144,31 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 	//putting shooter enemies down here, otherwise an issue with some update ordering causing explosion to appear infront of the shooter
 	m_enemy_mech.on_update(time_step, m_player.object()->position(), enemy_missile);
-	m_mech_box.on_update(m_mech->position() - glm::vec3(0.f, m_mech->offset().y, 0.f) * m_mech->scale(), m_mech->rotation_amount(), m_mech->rotation_axis());
-
+	m_mech_box.on_update(m_mech->position() - glm::vec3(0.6f, m_mech->offset().y, 0.6f) * m_mech->scale(), m_mech->rotation_amount(), m_mech->rotation_axis());
+	
 	m_enemy_droid.on_update(time_step, m_player.object()->position(), enemy_missile2);
-	m_droid_box.on_update(m_droid->position() - glm::vec3(0.f, m_droid->offset().y, 0.f) * m_droid->scale(), m_droid->rotation_amount(), m_droid->rotation_axis());
+	m_droid_box.on_update(m_droid->position() - glm::vec3(0.8f, m_droid->offset().y, 0.8f) * m_droid->scale(), m_droid->rotation_amount(), m_droid->rotation_axis());
+
+	if (m_enemy_drone.get_health_point() <= 0) {
+		m_enemy_drone.object()->set_position(glm::vec3(0.f, -9.f, 0.f));
+		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
+		m_enemy_drone.reset_health();
+	}
+	if (m_enemy_bb8.get_health_point() <= 0) {
+		m_enemy_bb8.object()->set_position(glm::vec3(2.f, -9.f, 0.f));
+		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
+		m_enemy_bb8.reset_health();
+	}
+	if (m_enemy_droid.get_health_point() <= 0) {
+		m_enemy_droid.object()->set_position(glm::vec3(4.f, -9.f, 0.f));
+		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
+		m_enemy_droid.reset_health();
+	}
+	if (m_enemy_mech.get_health_point() <= 0) {
+		m_enemy_mech.object()->set_position(glm::vec3(5.f, -9.f, 0.f));
+		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
+		m_enemy_mech.reset_health();
+	}
 }
 
 void example_layer::on_event(engine::event& event)
@@ -1216,13 +1256,15 @@ void example_layer::on_event(engine::event& event)
 
 	if (event.event_type() == engine::event_type_e::mouse_button_pressed)
 	{
-		if (WeaponSlot == WeaponState::Slot1) {
-			missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
-			missile.set_active(true);
-		}
-		else if (WeaponSlot == WeaponState::Slot2) {
-			bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
-			bouncynade_armed = false;
+		if (engine::input::mouse_button_pressed(0)) {
+			if (WeaponSlot == WeaponState::Slot1) {
+				missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
+				missile.set_active(true);
+			}
+			else if (WeaponSlot == WeaponState::Slot2) {
+				bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
+				bouncynade_armed = false;
+			}
 		}
 	}
 }
@@ -1232,4 +1274,11 @@ void example_layer::check_bounce()
 	//if (m_prev_sphere_y_vel < 0.f && m_game_objects.at(1)->velocity().y > 0.f)
 		//m_audio_manager->play("bounce");
 	m_prev_sphere_y_vel = m_game_objects.at(1)->velocity().y;
+}
+
+void example_layer::damage_player(int damage) {
+
+	m_cross_fade->activate();
+	m_player.set_health_point(m_player.get_health_point() - damage);
+	player_immunity_timer = immune_time;
 }

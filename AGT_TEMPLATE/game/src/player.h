@@ -25,16 +25,16 @@ public:
 	void set_health_point(int hp) { health_point = hp; }
 	int get_health_point() { return health_point; }
 
-
+	void reset_health() { health_point = player_health; } 
 
 	void set_box(float width, float height, float depth, glm::vec3 position) { m_player_box.set_box(width, height, depth, position); }
 	bounding_box& getBox() { return m_player_box; };
 
 private:
 
-	int health_point = 100;
+	const int player_health = 100;
 
-
+	int health_point = player_health;
 
 	enum State { Idle, Walking, Sprinting };
 	State playerState = Idle;

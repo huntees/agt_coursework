@@ -36,16 +36,28 @@ public:
 
 	void retreat(const engine::timestep& time_step, const glm::vec3& player_position);
 
+	void set_health_point(int hp) { health_point = hp; }
+
+	int get_health_point() { return health_point; }
+
+	void reset_health() { if (is_tank) { health_point = tank_hp; } else { health_point = regular_hp; } }
+
 	// game object bound to the enemy_shooter
 	engine::ref<engine::game_object> object() const { return m_object; }
 
 
 private:
+	bool is_tank = false;
+
+	const int tank_hp = 200;
+	const int regular_hp = 50;
+
+	int health_point = regular_hp;
 
 	const float tank_shoot_speed = 2.f;
 	const float regular_shoot_speed = 1.3f;
 
-	bool is_tank = false;
+	float shoot_speed = regular_shoot_speed;
 
 	// enemy_shooter's speed
 	float m_speed{ 1.f };
@@ -69,7 +81,6 @@ private:
 
 	bool can_fly = false;
 
-	float shoot_speed = regular_shoot_speed;
 	float shoot_interval = -1.f;
 	bool enemy_shot = false;
 };

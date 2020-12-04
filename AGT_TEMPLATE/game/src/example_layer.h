@@ -60,7 +60,9 @@ private:
 	engine::ref<engine::game_object>    m_bouncynade{};
 
 	projectile missile;
+	const int missile_damage = 10;
 	projectile bouncynade;
+	const int bouncynade_damage = 30;
 
 	enum class WeaponState { Slot1, Slot2, Slot3 };
 	WeaponState WeaponSlot = WeaponState::Slot1;
@@ -124,6 +126,7 @@ private:
 
 	bool playState = false;
 
+	void damage_player(int damage);
 
 	//===============================================================Effects============================================================================
 	jetpack_trail m_jetpack_trail;
