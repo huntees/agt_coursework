@@ -34,6 +34,9 @@ private:
 	int wave_number = 1;
 	bool resting_period = false;
 
+	bool ambience_played = false;
+	float ambience_loop_timer = -1.f;
+
 	void check_bounce();
 
 	engine::ref<engine::skybox>			m_skybox{};
@@ -85,6 +88,7 @@ private:
 	float shieldRotation = 40.f;
 	float shield_timer = 0.f;
 	float shield_respawn_time = 10.f;
+	bool shield_up = false;
 
 	enum class WeaponState { Slot1, Slot2, Slot3 };
 	WeaponState WeaponSlot = WeaponState::Slot1;
@@ -138,6 +142,7 @@ private:
 	engine::ref<screen_render>	m_intro_screen{};
 	engine::ref<screen_render>	m_HUD{};
 	engine::ref<screen_render>	m_HUD_range_finder{};
+	engine::ref<screen_render>	m_HUD_immunity{};
 	engine::ref<screen_render>	m_HUD_jetpack{};
 	engine::ref<screen_render>	m_HUD_missile{};
 	engine::ref<screen_render>	m_HUD_bouncynade{};
@@ -161,6 +166,7 @@ private:
 	jetpack_trail m_jetpack_trail;
 
 	engine::ref<cross_fade>							m_cross_fade{};
+	engine::ref<cross_fade>							m_cross_fade_damage{};
 
 	engine::ref<explosion>							m_explosion{};
 	//bool missile_active = false;

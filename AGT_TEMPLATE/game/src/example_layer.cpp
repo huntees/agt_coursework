@@ -24,12 +24,14 @@ example_layer::example_layer()
 	m_audio_manager = engine::audio_manager::instance();
 	m_audio_manager->init();
 	m_audio_manager->load_sound("assets/audio/bounce.wav", engine::sound_type::event, "bounce"); // Royalty free sound from freesound.org
-	m_audio_manager->load_sound("assets/audio/DST-impuretechnology.mp3", engine::sound_type::track, "music");  // Royalty free music from http://www.nosoapradio.us/
+	m_audio_manager->load_sound("assets/audio/ambience.mp3", engine::sound_type::track, "ambience"); 
 	m_audio_manager->load_sound("assets/audio/missile_firing.mp3", engine::sound_type::event, "missile_firing");
 	m_audio_manager->load_sound("assets/audio/bouncynade_firing.wav", engine::sound_type::event, "bouncynade_firing");
 	m_audio_manager->load_sound("assets/audio/missile_explosion.mp3", engine::sound_type::spatialised, "missile_explosion");
 	m_audio_manager->load_sound("assets/audio/bouncynade_explosion.mp3", engine::sound_type::spatialised, "bouncynade_explosion");
-	//m_audio_manager->play("music");
+	m_audio_manager->load_sound("assets/audio/glasscrack.mp3", engine::sound_type::event, "glasscrack");
+	m_audio_manager->load_sound("assets/audio/heal.mp3", engine::sound_type::event, "heal");
+	m_audio_manager->load_sound("assets/audio/shield.wav", engine::sound_type::event, "shield");
 
 
 	// Initialise the shaders, materials and lights
@@ -563,6 +565,7 @@ example_layer::example_layer()
 
 	m_HUD = screen_render::create("assets/textures/HUD/tempHUD.png", 1.6f, 0.9f);
 	m_HUD_range_finder = screen_render::create("assets/textures/HUD/range_finder.png", 1.6f, 0.9f);
+	m_HUD_immunity = screen_render::create("assets/textures/HUD/immunity.png", 1.6f, 0.9f);
 	m_HUD_jetpack = screen_render::create("assets/textures/HUD/jetpack.png", 0.12f, 0.12f);
 	m_HUD_missile = screen_render::create("assets/textures/HUD/missile.png", 0.12f, 0.12f);
 	m_HUD_bouncynade = screen_render::create("assets/textures/HUD/bouncynade.png", 0.12f, 0.12f);
@@ -570,6 +573,7 @@ example_layer::example_layer()
 	m_jetpack_trail.load_texture("assets/textures/effects/trail.png");
 	m_explosion = explosion::create("assets/textures/effects/Explosion.tga", 4, 5, 16);
 	m_cross_fade = cross_fade::create("assets/textures/effects/screencrack.png", 2.0f, 0.4f, 0.2f);
+	m_cross_fade_damage = cross_fade::create("assets/textures/HUD/damage.png", 2.0f, 1.6f, 0.9f);
 }
 
 example_layer::~example_layer() {}
@@ -995,28 +999,35 @@ void example_layer::on_render()
 
 	m_HUD->on_render(textured_lighting_shader, 0.f, 0.f, 0.01f);
 
+	//render blue border when player is immune
+	if (shield_up) {
+		m_HUD_immunity->on_render(textured_lighting_shader, 0.f, 0.f, 0.02f);
+	}
+
 	//Moves range indicator up and down based on player height
 	range_finder_height = (m_player.object()->position().y - 1.f) * 0.015f;
 	if (range_finder_height > 1.19f) {
 		range_finder_height = 1.18f;
 	}
-	m_HUD_range_finder->on_render(textured_lighting_shader, 0.f, range_finder_height, 0.02f);
+	m_HUD_range_finder->on_render(textured_lighting_shader, 0.f, range_finder_height, 0.03f);
 
 	//Renders jetpack icon if hover is on
 	if (jetpackHoverOn){
-		m_HUD_jetpack->on_render(textured_lighting_shader, 1.3f, -0.4f, 0.03f);
+		m_HUD_jetpack->on_render(textured_lighting_shader, 1.3f, -0.4f, 0.04f);
 	}
 
 	//Renders which weapon is currently selected
 	if (WeaponSlot == WeaponState::Slot1) {
-		m_HUD_missile->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.03f);
+		m_HUD_missile->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
 	}
 	else if (WeaponSlot == WeaponState::Slot2) {
-		m_HUD_bouncynade->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.03f);
+		m_HUD_bouncynade->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
 	}
 	
 
-	m_cross_fade->on_render(textured_lighting_shader);
+	m_cross_fade->on_render(textured_lighting_shader, 0.1f);
+	m_cross_fade_damage->on_render(textured_lighting_shader, 0.11f);
+
 
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("lighting_on", true);
 	engine::renderer::end_scene();
@@ -1025,6 +1036,23 @@ void example_layer::on_render()
 
 void example_layer::on_update(const engine::timestep& time_step)
 {
+	if (!ambience_played) {
+		m_audio_manager->play("ambience");
+		ambience_loop_timer = 180.f;
+		ambience_played = true;
+	}
+
+	if (ambience_loop_timer > 0.0f)
+	{
+		ambience_loop_timer -= (float)time_step;
+
+		if (ambience_loop_timer < 0.0f)
+		{
+			ambience_played = false;
+		}
+	}
+
+
 	m_intro_screen->on_update(time_step);
 
 	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
@@ -1181,6 +1209,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 	if (m_heart_box.collision(m_player.getBox()) && m_player.get_health_point() < 100) {
 
 		m_player.set_health_point(m_player.get_health_point() + 10);
+		m_audio_manager->play("heal");
 		if (m_player.get_health_point() > 100) {
 			m_player.set_health_point(100);
 		}
@@ -1199,7 +1228,12 @@ void example_layer::on_update(const engine::timestep& time_step)
 	}
 
 	if (m_shield_box.collision(m_player.getBox())) {
+
+		shield_up = true;
 		player_immunity_timer = 6.f;
+
+		m_audio_manager->play("shield");
+
 		m_shield->set_position(glm::vec3(-4.f, -9.f, 9.f));
 		shield_timer = shield_respawn_time;
 	}
@@ -1308,6 +1342,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 		if (player_immunity_timer < 0.0f)
 		{
 			player_immunity = false;
+			shield_up = false;
 		}
 	}
 
@@ -1332,6 +1367,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 	m_jetpack_trail.on_update(time_step);
 
 	m_cross_fade->on_update(time_step);
+	m_cross_fade_damage->on_update(time_step);
 
 	//jetpack light and particle logic
 	if (jetpackHoverOn) {
@@ -1500,7 +1536,7 @@ void example_layer::on_event(engine::event& event)
 		}
 		if (e.key_code() == engine::key_codes::KEY_9)
 		{
-			m_cross_fade->activate();
+			m_cross_fade->activate(true);
 		}
 		if (e.key_code() == engine::key_codes::KEY_0)
 		{
@@ -1556,7 +1592,9 @@ void example_layer::check_bounce()
 
 void example_layer::damage_player(int damage) {
 
-	m_cross_fade->activate();
+	m_cross_fade->activate(true);
+	m_cross_fade_damage->activate(false);
+	m_audio_manager->play("glasscrack");
 	m_player.set_health_point(m_player.get_health_point() - damage);
 	player_immunity_timer = immune_time;
 }

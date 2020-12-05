@@ -30,14 +30,14 @@ void cross_fade::on_update(const engine::timestep& time_step)
 		s_active = false;
 }
 
-void cross_fade::on_render(engine::ref<engine::shader> shader)
+void cross_fade::on_render(engine::ref<engine::shader> shader, float z)
 {
 	if (!s_active)
 		return;
 
 	glm::mat4 transform(1.0f);
 	//z is on 0.2f so it doesnt overlap with HUD
-	transform = glm::translate(transform, glm::vec3(random_x, random_y, 0.1f));
+	transform = glm::translate(transform, glm::vec3(random_x, random_y, z));
 
 	std::dynamic_pointer_cast<engine::gl_shader>(shader)->set_uniform("transparency", m_transparency);
 	m_texture->bind();
@@ -45,20 +45,27 @@ void cross_fade::on_render(engine::ref<engine::shader> shader)
 	std::dynamic_pointer_cast<engine::gl_shader>(shader)->set_uniform("transparency", 1.0f);
 }
 
-void cross_fade::activate()
+void cross_fade::activate(bool can_random)
 {
 	s_active = true;
 	m_transparency = 1.0f;
 	m_timer = 0.0f;
 
-	//randomises the position of the screen crack but makes sure its close to center to allow player to see it
-	do {
-		random_x = (rand() / (float)RAND_MAX) * 2 - 1;
-	} while (random_x > 0.8f || random_x < -0.8f);
+	//randomises the position of the screen crack but makes sure its close to center to allow player to see it 
+	if (can_random) {
+		do {
+			random_x = (rand() / (float)RAND_MAX) * 2 - 1;
+		} while (random_x > 0.8f || random_x < -0.8f);
 
-	do {
-		random_y = (rand() / (float)RAND_MAX) * 2 - 1;
-	} while (random_y > 0.5f || random_y < -0.5f);
+		do {
+			random_y = (rand() / (float)RAND_MAX) * 2 - 1;
+		} while (random_y > 0.5f || random_y < -0.5f);
+	}
+	else {
+		// else fit to screen
+		random_x = 0.f;
+		random_y = 0.f;
+	}
 	
 }
 

@@ -10,8 +10,8 @@ public:
 	~cross_fade();
 
 	void on_update(const engine::timestep& time_step);
-	void on_render(engine::ref<engine::shader> shader);
-	void activate();
+	void on_render(engine::ref<engine::shader> shader, float z);
+	void activate(bool can_random);
 
 	static engine::ref<cross_fade> create(const std::string& path, float max_time, float width, float height);
 
