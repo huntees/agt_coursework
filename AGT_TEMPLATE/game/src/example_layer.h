@@ -150,6 +150,9 @@ private:
 	float jetpackTrailTimer;
 	bool jetpackHoverOn = false;
 
+	bool jetpack_sound_played = false;
+	float jetpack_sound_timer;
+
 	bool playState = false;
 
 	void damage_player(int damage);

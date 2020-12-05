@@ -25,6 +25,10 @@ example_layer::example_layer()
 	m_audio_manager->init();
 	m_audio_manager->load_sound("assets/audio/bounce.wav", engine::sound_type::event, "bounce"); // Royalty free sound from freesound.org
 	m_audio_manager->load_sound("assets/audio/DST-impuretechnology.mp3", engine::sound_type::track, "music");  // Royalty free music from http://www.nosoapradio.us/
+	m_audio_manager->load_sound("assets/audio/missile_firing.mp3", engine::sound_type::event, "missile_firing");
+	m_audio_manager->load_sound("assets/audio/bouncynade_firing.wav", engine::sound_type::event, "bouncynade_firing");
+	m_audio_manager->load_sound("assets/audio/missile_explosion.mp3", engine::sound_type::spatialised, "missile_explosion");
+	m_audio_manager->load_sound("assets/audio/bouncynade_explosion.mp3", engine::sound_type::spatialised, "bouncynade_explosion");
 	//m_audio_manager->play("music");
 
 
@@ -530,11 +534,11 @@ example_layer::example_layer()
 
 
 	m_game_objects.push_back(m_terrain);
-	m_game_objects.push_back(m_weapon_holder);
 	m_game_objects.push_back(m_ball);
 	m_game_objects.push_back(m_cow);
 	//m_game_objects.push_back(m_tree);
 	//m_game_objects.push_back(m_pickup);
+	m_game_objects.push_back(m_weapon_holder);
 	m_game_objects.push_back(m_lamppost);
 	m_game_objects.push_back(m_lamppost2);
 	m_game_objects.push_back(m_red_spotLight_ball);
@@ -1073,6 +1077,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_3d_camera.on_update(time_step);
 	}
 
+	m_audio_manager->update_with_camera(m_3d_camera);
+
 	if (heartRotation > 360.f) {
 		heartRotation = 0.f;
 	}
@@ -1106,6 +1112,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 	//checks whether missile is colliding and whether the missile is active i.e if the missile has already exploded
 	if (m_missile->is_colliding() && missile.is_active()) {
 
+		m_audio_manager->play_spatialised_sound("missile_explosion", m_3d_camera.position(), m_missile->position());
 		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
 		for (int i = 0; i < m_missile->collision_objects().size(); i++) {
 
@@ -1148,6 +1155,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 		if (bouncynade_armtime < 0.0f)
 		{
+			m_audio_manager->play_spatialised_sound("bouncynade_explosion", m_3d_camera.position(), m_bouncynade->position());
 			m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
 			if (m_bouncynade_box.collision(m_drone_box)) {
 				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - bouncynade_damage);
@@ -1475,10 +1483,12 @@ void example_layer::on_event(engine::event& event)
 		if (e.key_code() == engine::key_codes::KEY_G)
 		{
 			if (WeaponSlot == WeaponState::Slot1) {
+				m_audio_manager->play("missile_firing");
 				missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
 				missile.set_active(true);
 			}
 			else if (WeaponSlot == WeaponState::Slot2) {
+				m_audio_manager->play("bouncynade_firing");
 				bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
 				bouncynade_armed = false;
 			}
@@ -1524,10 +1534,12 @@ void example_layer::on_event(engine::event& event)
 	{
 		if (engine::input::mouse_button_pressed(0)) {
 			if (WeaponSlot == WeaponState::Slot1) {
+				m_audio_manager->play("missile_firing");
 				missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
 				missile.set_active(true);
 			}
 			else if (WeaponSlot == WeaponState::Slot2) {
+				m_audio_manager->play("bouncynade_firing");
 				bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
 				bouncynade_armed = false;
 			}
@@ -1538,7 +1550,7 @@ void example_layer::on_event(engine::event& event)
 void example_layer::check_bounce()
 {
 	//if (m_prev_sphere_y_vel < 0.f && m_game_objects.at(1)->velocity().y > 0.f)
-		//m_audio_manager->play("bounce");
+	//	m_audio_manager->play("bounce");
 	m_prev_sphere_y_vel = m_game_objects.at(1)->velocity().y;
 }
 
