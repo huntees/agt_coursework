@@ -190,7 +190,7 @@ example_layer::example_layer()
 	m_missile = engine::game_object::create(missile_props);
 	m_missile->set_offset(missile_model->offset());
 	missile.initialise(m_missile);
-	missile.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
+	missile.set_box(missile_props.bounding_shape.x * 200.f, missile_props.bounding_shape.y * 70.f, missile_props.bounding_shape.z * 30.f,
 		missile_props.position - glm::vec3(0.f, m_missile->offset().y, 0.f));
 
 	missile_props.position = { -7.f, -9.f, 9.f };
@@ -207,9 +207,16 @@ example_layer::example_layer()
 	enemy_missile2.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
 		missile_props.position - glm::vec3(0.f, m_enemy_missile->offset().y, 0.f));
 
-	missile_props.position = { 0.f, -9.f, 9.f };
-	m_repulsor = engine::game_object::create(missile_props);
-	m_repulsor->set_offset(missile_model->offset());
+	//Load repulsor 
+	engine::ref<engine::terrain> repulsor_shape = engine::terrain::create(0.01f, 0.02f, 0.05f, 1.f);
+	engine::game_object_properties repulsor_props;
+	repulsor_props.meshes = { repulsor_shape->mesh() };
+	repulsor_props.position = { -5.f, -9.f, 9.f };
+	repulsor_props.type = 0;
+	repulsor_props.bounding_shape = glm::vec3(0.01f, 0.01f, 0.05f) / 2.f;
+	repulsor_props.friction = 0.0f;
+	repulsor_props.mass = 0.10f;
+	m_repulsor = engine::game_object::create(repulsor_props);
 	repulsor.initialise(m_repulsor);
 
 	// Load bouncynade
@@ -226,8 +233,6 @@ example_layer::example_layer()
 	m_bouncynade = engine::game_object::create(bouncynade_props);
 	bouncynade.initialise(m_bouncynade);
 	m_bouncynade_box.set_box(bouncynade_radius * 20.f, bouncynade_radius * 20.f, bouncynade_radius * 20.f, bouncynade_props.position);
-	m_bouncynade_box2.set_box(bouncynade_radius * 20.f, bouncynade_radius * 20.f, bouncynade_radius * 20.f, bouncynade_props.position);
-
 
 	//===============================================================Weapon Props End==========================================================================
 
@@ -706,10 +711,9 @@ void example_layer::on_render()
 	m_mech_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_drone_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_bb8_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
-	missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
-	m_bouncynade_box2.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
-	enemy_missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
-	enemy_missile2.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	//enemy_missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	//enemy_missile2.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	//repulsor.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 
 	glm::mat4 lamppostTransform = glm::mat4(1.0f);
 	lamppostTransform = glm::translate(lamppostTransform, m_lamppost->position());
@@ -911,8 +915,6 @@ void example_layer::on_render()
 	missile.on_render(textured_lighting_shader);
 	enemy_missile.on_render(textured_lighting_shader);
 	enemy_missile2.on_render(textured_lighting_shader);
-	//remove for repulsor
-	repulsor.on_render(textured_lighting_shader);
 	bouncynade.on_render(textured_lighting_shader);
 
 	engine::renderer::end_scene();
@@ -955,6 +957,9 @@ void example_layer::on_render()
 	//engine::renderer::submit(material_shader, m_ball->meshes().at(0), pointLight_transform);
 	engine::renderer::submit(material_shader, glm::translate(glm::mat4(1.f), m_white_pointLight.Position), m_pointLight_object);
 	engine::renderer::submit(material_shader, glm::translate(glm::mat4(1.f), m_white_pointLight2.Position), m_pointLight_object);
+
+	//renders repulsor object
+	repulsor.on_render(material_shader);
 
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", true);
 	//-------------------------------------------------------light ball--------------------------------------------------------
@@ -1099,11 +1104,10 @@ void example_layer::on_update(const engine::timestep& time_step)
 	repulsor.on_update(time_step);
 
 	missile.on_update(time_step);
-	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),
+	missile.getBox().on_update(missile.object()->position() - glm::vec3(1.3f, missile.object()->offset().y, 1.3f) * missile.object()->scale(),
 		missile.object()->rotation_amount(), missile.object()->rotation_axis());
 
 	m_bouncynade_box.on_update(m_bouncynade->position() - glm::vec3(1.5f, 0.f, 1.5f), 0.f, m_bouncynade->rotation_axis());
-	m_bouncynade_box2.on_update(m_bouncynade->position(), 0.f, m_bouncynade->rotation_axis());
 
 	enemy_missile.on_update(time_step);
 	enemy_missile.getBox().on_update(enemy_missile.object()->position() - glm::vec3(0.f, enemy_missile.object()->offset().y, 0.f) * enemy_missile.object()->scale(),
@@ -1186,7 +1190,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 		repulsor.object()->set_velocity(glm::vec3(0.f));
 		repulsor.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		repulsor.object()->set_position(glm::vec3(-9.f, -9.f, 9.f));
+		repulsor.object()->set_position(glm::vec3(-5.f, -9.f, 9.f));
 		repulsor.set_active(false);
 	}
 
@@ -1195,25 +1199,21 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 		m_audio_manager->play_spatialised_sound("missile_explosion", m_3d_camera.position(), m_missile->position());
 		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
-		for (int i = 0; i < m_missile->collision_objects().size(); i++) {
-
-			if (m_missile->collision_objects().at(i) == m_enemy_drone.object()) {
-				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - missile_damage);
-				std::cout << m_enemy_drone.get_health_point() << '\n';
-			}
-			else if (m_missile->collision_objects().at(i) == m_enemy_bb8.object()) {
-				m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - missile_damage);
-				std::cout << m_enemy_bb8.get_health_point() << '\n';
-			}
-			else if (m_missile->collision_objects().at(i) == m_enemy_droid.object()) {
-				m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - missile_damage);
-				std::cout << m_enemy_droid.get_health_point() << '\n';
-			}
-			else if (m_missile->collision_objects().at(i) == m_enemy_mech.object()) {
-				m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - missile_damage);
-				std::cout << m_enemy_mech.get_health_point() << '\n';
-			}
-
+		if (missile.getBox().collision(m_drone_box)) {
+			m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - missile_damage);
+			std::cout << "drone " << m_enemy_drone.get_health_point() << '\n';
+		}
+		if (missile.getBox().collision(m_bb8_box)) {
+			m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - missile_damage);
+			std::cout << "bb8 " << m_enemy_bb8.get_health_point() << '\n';
+		}
+		if (missile.getBox().collision(m_droid_box)) {
+			m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - missile_damage);
+			std::cout << "droid " << m_enemy_droid.get_health_point() << '\n';
+		}
+		if (missile.getBox().collision(m_mech_box)) {
+			m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - missile_damage);
+			std::cout << "mech " << m_enemy_mech.get_health_point() << '\n';
 		}
 
 		missile.object()->set_velocity(glm::vec3(0.f));
