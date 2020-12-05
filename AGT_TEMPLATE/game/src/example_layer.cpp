@@ -24,14 +24,18 @@ example_layer::example_layer()
 	m_audio_manager = engine::audio_manager::instance();
 	m_audio_manager->init();
 	m_audio_manager->load_sound("assets/audio/bounce.wav", engine::sound_type::event, "bounce"); // Royalty free sound from freesound.org
-	m_audio_manager->load_sound("assets/audio/ambience.mp3", engine::sound_type::track, "ambience"); 
+	m_audio_manager->load_sound("assets/audio/ambience.mp3", engine::sound_type::track, "ambience");
+	m_audio_manager->load_sound("assets/audio/repulsor_firing.mp3", engine::sound_type::event, "repulsor_firing");
 	m_audio_manager->load_sound("assets/audio/missile_firing.mp3", engine::sound_type::event, "missile_firing");
 	m_audio_manager->load_sound("assets/audio/bouncynade_firing.wav", engine::sound_type::event, "bouncynade_firing");
+	m_audio_manager->load_sound("assets/audio/repulsor_hit.mp3", engine::sound_type::spatialised, "repulsor_hit");
 	m_audio_manager->load_sound("assets/audio/missile_explosion.mp3", engine::sound_type::spatialised, "missile_explosion");
 	m_audio_manager->load_sound("assets/audio/bouncynade_explosion.mp3", engine::sound_type::spatialised, "bouncynade_explosion");
 	m_audio_manager->load_sound("assets/audio/glasscrack.mp3", engine::sound_type::event, "glasscrack");
 	m_audio_manager->load_sound("assets/audio/heal.mp3", engine::sound_type::event, "heal");
 	m_audio_manager->load_sound("assets/audio/shield.wav", engine::sound_type::event, "shield");
+	m_audio_manager->load_sound("assets/audio/weapon_switch.wav", engine::sound_type::event, "weapon_switch");
+
 
 
 	// Initialise the shaders, materials and lights
@@ -202,6 +206,11 @@ example_layer::example_layer()
 	enemy_missile2.initialise(m_enemy_missile2);
 	enemy_missile2.set_box(missile_props.bounding_shape.x * 2.f, missile_props.bounding_shape.y * 2.f, missile_props.bounding_shape.z * 2.f,
 		missile_props.position - glm::vec3(0.f, m_enemy_missile->offset().y, 0.f));
+
+	missile_props.position = { 0.f, -9.f, 9.f };
+	m_repulsor = engine::game_object::create(missile_props);
+	m_repulsor->set_offset(missile_model->offset());
+	repulsor.initialise(m_repulsor);
 
 	// Load bouncynade
 	float bouncynade_radius = 0.15f;
@@ -549,6 +558,7 @@ example_layer::example_layer()
 	m_game_objects.push_back(m_mech);
 	m_game_objects.push_back(m_drone);
 	m_game_objects.push_back(m_bb8);
+	m_game_objects.push_back(m_repulsor);
 	m_game_objects.push_back(m_missile);
 	m_game_objects.push_back(m_enemy_missile);
 	m_game_objects.push_back(m_enemy_missile2);
@@ -567,11 +577,13 @@ example_layer::example_layer()
 	m_HUD_range_finder = screen_render::create("assets/textures/HUD/range_finder.png", 1.6f, 0.9f);
 	m_HUD_immunity = screen_render::create("assets/textures/HUD/immunity.png", 1.6f, 0.9f);
 	m_HUD_jetpack = screen_render::create("assets/textures/HUD/jetpack.png", 0.12f, 0.12f);
+	m_HUD_repulsor = screen_render::create("assets/textures/HUD/repulsor.png", 0.12f, 0.12f);
 	m_HUD_missile = screen_render::create("assets/textures/HUD/missile.png", 0.12f, 0.12f);
 	m_HUD_bouncynade = screen_render::create("assets/textures/HUD/bouncynade.png", 0.12f, 0.12f);
 
 	m_jetpack_trail.load_texture("assets/textures/effects/trail.png");
 	m_explosion = explosion::create("assets/textures/effects/Explosion.tga", 4, 5, 16);
+	m_repulsor_hit = explosion::create("assets/textures/effects/hit.png", 4, 4, 16);
 	m_cross_fade = cross_fade::create("assets/textures/effects/screencrack.png", 2.0f, 0.4f, 0.2f);
 	m_cross_fade_damage = cross_fade::create("assets/textures/HUD/damage.png", 2.0f, 1.6f, 0.9f);
 }
@@ -899,6 +911,8 @@ void example_layer::on_render()
 	missile.on_render(textured_lighting_shader);
 	enemy_missile.on_render(textured_lighting_shader);
 	enemy_missile2.on_render(textured_lighting_shader);
+	//remove for repulsor
+	repulsor.on_render(textured_lighting_shader);
 	bouncynade.on_render(textured_lighting_shader);
 
 	engine::renderer::end_scene();
@@ -973,6 +987,8 @@ void example_layer::on_render()
 	//================================================================Effects Render=======================================================================
 	engine::renderer::begin_scene(m_3d_camera, textured_lighting_shader);
 
+	m_repulsor_hit->on_render(m_3d_camera, textured_lighting_shader);
+
 	m_explosion->on_render(m_3d_camera, textured_lighting_shader);
 
 	m_jetpack_trail.on_render(m_3d_camera, textured_lighting_shader);
@@ -1018,9 +1034,12 @@ void example_layer::on_render()
 
 	//Renders which weapon is currently selected
 	if (WeaponSlot == WeaponState::Slot1) {
-		m_HUD_missile->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
+		m_HUD_repulsor->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
 	}
 	else if (WeaponSlot == WeaponState::Slot2) {
+		m_HUD_missile->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
+	}
+	else if (WeaponSlot == WeaponState::Slot3) {
 		m_HUD_bouncynade->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
 	}
 	
@@ -1076,6 +1095,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 	
 	m_enemy_bb8.on_update(time_step, m_player.object()->position());
 	m_bb8_box.on_update(m_bb8->position() - glm::vec3(0.3f, m_bb8->offset().y, 0.3f) * m_bb8->scale(), m_bb8->rotation_amount(), m_bb8->rotation_axis());
+
+	repulsor.on_update(time_step);
 
 	missile.on_update(time_step);
 	missile.getBox().on_update(missile.object()->position() - glm::vec3(0.f, missile.object()->offset().y, 0.f) * missile.object()->scale(),
@@ -1137,6 +1158,38 @@ void example_layer::on_update(const engine::timestep& time_step)
 	//===============================================================Collision Update============================================================================
 
 	//==============================================================Player Stuff=================================================================================
+	//checks whether repulsor is colliding and whether the repulsor is active i.e if the repulsor has already hit
+	if (m_repulsor->is_colliding() && repulsor.is_active()) {
+
+		m_audio_manager->play_spatialised_sound("repulsor_hit", m_3d_camera.position(), m_repulsor->position());
+		m_repulsor_hit->activate(repulsor.object()->position(), 1.f, 1.f);
+		for (int i = 0; i < m_repulsor->collision_objects().size(); i++) {
+
+			if (m_repulsor->collision_objects().at(i) == m_enemy_drone.object()) {
+				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - repulsor_damage);
+				std::cout << m_enemy_drone.get_health_point() << '\n';
+			}
+			else if (m_repulsor->collision_objects().at(i) == m_enemy_bb8.object()) {
+				m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - repulsor_damage);
+				std::cout << m_enemy_bb8.get_health_point() << '\n';
+			}
+			else if (m_repulsor->collision_objects().at(i) == m_enemy_droid.object()) {
+				m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - repulsor_damage);
+				std::cout << m_enemy_droid.get_health_point() << '\n';
+			}
+			else if (m_repulsor->collision_objects().at(i) == m_enemy_mech.object()) {
+				m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - repulsor_damage);
+				std::cout << m_enemy_mech.get_health_point() << '\n';
+			}
+
+		}
+
+		repulsor.object()->set_velocity(glm::vec3(0.f));
+		repulsor.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+		repulsor.object()->set_position(glm::vec3(-9.f, -9.f, 9.f));
+		repulsor.set_active(false);
+	}
+
 	//checks whether missile is colliding and whether the missile is active i.e if the missile has already exploded
 	if (m_missile->is_colliding() && missile.is_active()) {
 
@@ -1361,6 +1414,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 
 	//===============================================================Effects Update============================================================================
+	m_repulsor_hit->on_update(time_step);
 
 	m_explosion->on_update(time_step);
 
@@ -1509,21 +1563,33 @@ void example_layer::on_event(engine::event& event)
 		if (e.key_code() == engine::key_codes::KEY_1)
 		{
 			WeaponSlot = WeaponState::Slot1;
+			m_audio_manager->play("weapon_switch");
 		}
 		if (e.key_code() == engine::key_codes::KEY_2)
 		{
 			WeaponSlot = WeaponState::Slot2;
+			m_audio_manager->play("weapon_switch");
+		}
+		if (e.key_code() == engine::key_codes::KEY_3)
+		{
+			WeaponSlot = WeaponState::Slot3;
+			m_audio_manager->play("weapon_switch");
 		}
 
 		//======================Remove these in final ver=======================
 		if (e.key_code() == engine::key_codes::KEY_G)
 		{
 			if (WeaponSlot == WeaponState::Slot1) {
+				m_audio_manager->play("repulsor_firing");
+				repulsor.fire(m_3d_camera, 180.0f, m_player.object()->position());
+				repulsor.set_active(true);
+			}
+			if (WeaponSlot == WeaponState::Slot2) {
 				m_audio_manager->play("missile_firing");
 				missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
 				missile.set_active(true);
 			}
-			else if (WeaponSlot == WeaponState::Slot2) {
+			else if (WeaponSlot == WeaponState::Slot3) {
 				m_audio_manager->play("bouncynade_firing");
 				bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
 				bouncynade_armed = false;
@@ -1570,11 +1636,16 @@ void example_layer::on_event(engine::event& event)
 	{
 		if (engine::input::mouse_button_pressed(0)) {
 			if (WeaponSlot == WeaponState::Slot1) {
+				m_audio_manager->play("repulsor_firing");
+				repulsor.fire(m_3d_camera, 180.0f, m_player.object()->position());
+				repulsor.set_active(true);
+			}
+			if (WeaponSlot == WeaponState::Slot2) {
 				m_audio_manager->play("missile_firing");
 				missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
 				missile.set_active(true);
 			}
-			else if (WeaponSlot == WeaponState::Slot2) {
+			else if (WeaponSlot == WeaponState::Slot3) {
 				m_audio_manager->play("bouncynade_firing");
 				bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
 				bouncynade_armed = false;

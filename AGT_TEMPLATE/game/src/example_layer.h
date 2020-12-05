@@ -66,6 +66,7 @@ private:
 	engine::ref<engine::game_object>    m_bench{};
 	engine::ref<engine::game_object>    m_lamppost{};
 	engine::ref<engine::game_object>    m_lamppost2{};
+	engine::ref<engine::game_object>    m_repulsor{};
 	engine::ref<engine::game_object>    m_missile{};
 	engine::ref<engine::game_object>    m_enemy_missile{};
 	engine::ref<engine::game_object>    m_enemy_missile2{};
@@ -74,6 +75,8 @@ private:
 
 	bool helmet_toggle = false;
 
+	projectile repulsor;
+	const int repulsor_damage = 10;
 	projectile missile;
 	const int missile_damage = 10;
 	projectile bouncynade;
@@ -144,6 +147,7 @@ private:
 	engine::ref<screen_render>	m_HUD_range_finder{};
 	engine::ref<screen_render>	m_HUD_immunity{};
 	engine::ref<screen_render>	m_HUD_jetpack{};
+	engine::ref<screen_render>	m_HUD_repulsor{};
 	engine::ref<screen_render>	m_HUD_missile{};
 	engine::ref<screen_render>	m_HUD_bouncynade{};
 	float range_finder_height = 0.f;
@@ -169,6 +173,7 @@ private:
 	engine::ref<cross_fade>							m_cross_fade_damage{};
 
 	engine::ref<explosion>							m_explosion{};
+	engine::ref<explosion>							m_repulsor_hit{};
 	//bool missile_active = false;
 	//bool enemy_missile_active = false;
 	//bool enemy_missile2_active = false;
