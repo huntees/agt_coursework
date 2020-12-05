@@ -430,6 +430,15 @@ example_layer::example_layer()
 	tree_props.scale = glm::vec3(tree_scale);
 	m_tree = engine::game_object::create(tree_props);
 
+	//Load ironman model
+	engine::ref <engine::model> ironman_model = engine::model::create("assets/models/static/ironman/ironman.obj");
+	engine::game_object_properties ironman_props;
+	ironman_props.meshes = ironman_model->meshes();
+	ironman_props.textures = ironman_model->textures();
+	ironman_props.position = { 0.f, 0.5f, 0.f };
+	ironman_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	m_ironman = engine::game_object::create(ironman_props);
+
 	//===============================================================World Props End=========================================================================
 
 	// Load sphere
@@ -871,6 +880,14 @@ void example_layer::on_render()
 	policeCar_transform = glm::scale(policeCar_transform, m_policeCar->scale());
 	engine::renderer::submit(textured_lighting_shader, policeCar_transform, m_policeCar);
 
+	if (helmet_toggle) {
+		glm::mat4 ironman_transform(1.0f);
+		ironman_transform = glm::translate(ironman_transform, m_ironman->position());
+		ironman_transform = glm::rotate(ironman_transform, m_ironman->rotation_amount(), m_ironman->rotation_axis());
+		ironman_transform = glm::scale(ironman_transform, m_ironman->scale());
+		engine::renderer::submit(textured_lighting_shader, ironman_transform, m_ironman);
+	}
+
 	missile.on_render(textured_lighting_shader);
 	enemy_missile.on_render(textured_lighting_shader);
 	enemy_missile2.on_render(textured_lighting_shader);
@@ -1019,6 +1036,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 	m_player.on_update(time_step);
 	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
 		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
+	m_ironman->set_position(m_player.object()->position() + glm::vec3(0.f, 0.25f, 0.f));
+	m_ironman->set_rotation_amount(atan2(m_player.object()->forward().x, m_player.object()->forward().z));
 
 	m_enemy_drone.on_update(time_step, m_player.object()->position() + glm::vec3(0.f, 0.5f, 0.f));
 	m_drone_box.on_update(m_drone->position() - glm::vec3(0.45f, m_drone->offset().y, 0.45f) * m_drone->scale(), m_drone->rotation_amount(), m_drone->rotation_axis());
@@ -1475,7 +1494,7 @@ void example_layer::on_event(engine::event& event)
 		}
 		if (e.key_code() == engine::key_codes::KEY_0)
 		{
-			m_jetpack_spotLight.DiffuseIntensity *= 0.1f;
+			helmet_toggle = !helmet_toggle;
 		}
 		if (e.key_code() == engine::key_codes::KEY_N)
 		{

@@ -67,6 +67,9 @@ private:
 	engine::ref<engine::game_object>    m_enemy_missile{};
 	engine::ref<engine::game_object>    m_enemy_missile2{};
 	engine::ref<engine::game_object>    m_bouncynade{};
+	engine::ref<engine::game_object>    m_ironman{};
+
+	bool helmet_toggle = false;
 
 	projectile missile;
 	const int missile_damage = 10;
