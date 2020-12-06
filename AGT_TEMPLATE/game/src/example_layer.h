@@ -1,7 +1,14 @@
 #pragma once
 #include <engine.h>
 #include "player.h"
-#include "intro_screen.h"
+#include "screen_render.h"
+#include "engine/entities/bounding_box_bullet.h"
+#include "effects/jetpack_trail.h"
+#include "weapons/projectile.h"
+#include "effects/explosion.h"
+#include "effects/cross_fade.h"
+#include "enemy/enemy.h"
+#include "enemy/enemy_shooter.h"
 
 class example_layer : public engine::layer
 {
@@ -14,30 +21,147 @@ public:
 	void on_event(engine::event& event) override;
 
 private:
+
+	float repulsor_force = 180.f; // 180 for 720p , 300 for 1080p
+	float missile_force = 180.f; // 180 for 720p, 350 for 1080p
+	float bouncynade_force = 54.f; // 54 for 720p, 100 for 1080p
+
+
+
 	player m_player{};
+
+	int player_score = 0;
+
+	enemy_shooter m_enemy_droid{};
+	enemy_shooter m_enemy_mech{};
+	enemy m_enemy_drone{};
+	enemy m_enemy_bb8{};
+
+	int enemy_count = 4;
+	float enemy_respawn_timer = -1.f;
+
+	int wave_number = 1;
+	bool resting_period = false;
+
+	bool ambience_played = false;
+	float ambience_loop_timer = -1.f;
 
 	void check_bounce();
 
 	engine::ref<engine::skybox>			m_skybox{};
 	engine::ref<engine::game_object>	m_terrain{};
+	engine::ref<engine::game_object>	m_road{};
+	engine::ref<engine::game_object>	m_intersection{};
+	engine::ref<engine::game_object>	m_weapon_holder{};
 	engine::ref<engine::game_object>	m_cow{};
 	engine::ref<engine::game_object>	m_tree{};
 	engine::ref<engine::game_object>	m_ball{};
 	engine::ref<engine::game_object>	m_mannequin{};
+	engine::ref<engine::game_object>	m_droid{};
+	engine::ref<engine::game_object>	m_drone{};
+	engine::ref<engine::game_object>	m_bb8{};
+	engine::ref<engine::game_object>	m_mech{};
+	engine::ref<engine::game_object>	m_heart{};
+	engine::ref<engine::game_object>	m_shield{};
 	engine::ref<engine::game_object>    m_tetrahedron{};
 	engine::ref<engine::game_object>	m_jeep{};
 	engine::ref<engine::game_object>	m_pizza{};
 	engine::ref<engine::game_object>	m_jet{};
 	engine::ref<engine::game_object>	m_office{};
 	engine::ref<engine::game_object>	m_sanfran{};
-	engine::ref<engine::game_object>	m_skyscrapers{};
+	engine::ref<engine::game_object>	m_skyscraper1{};
+	engine::ref<engine::game_object>	m_skyscraper2{};
+	engine::ref<engine::game_object>	m_skyscraper3{};
+	engine::ref<engine::game_object>	m_skyscraper4{};
+	engine::ref<engine::game_object>	m_skyscraper6{};
+	engine::ref<engine::game_object>	m_skyscraper7{};
+	engine::ref<engine::game_object>	m_skyscraper8{};
+	engine::ref<engine::game_object>	m_policeCar{};
 	engine::ref<engine::game_object>    m_hexagon{};
 	engine::ref<engine::game_object>    m_bench{};
+	engine::ref<engine::game_object>    m_lamppost{};
+	engine::ref<engine::game_object>    m_lamppost2{};
+	engine::ref<engine::game_object>    m_repulsor{};
+	engine::ref<engine::game_object>    m_missile{};
+	engine::ref<engine::game_object>    m_enemy_missile{};
+	engine::ref<engine::game_object>    m_enemy_missile2{};
+	engine::ref<engine::game_object>    m_bouncynade{};
+	engine::ref<engine::game_object>    m_ironman{};
+
+	bool helmet_toggle = false;
+
+	projectile repulsor;
+	const int repulsor_damage = 10;
+	projectile missile;
+	const int missile_damage = 7;
+	projectile bouncynade;
+	const int bouncynade_damage = 30;
+	bounding_box m_bouncynade_box;
+
+	float heartRotation = 0.f;
+	float heart_timer = 0.f;
+	float heart_respawn_time = 5.f;
+
+	float shieldRotation = 40.f;
+	float shield_timer = 0.f;
+	float shield_respawn_time = 10.f;
+	bool shield_up = false;
+
+	enum class WeaponState { Slot1, Slot2, Slot3 };
+	WeaponState WeaponSlot = WeaponState::Slot1;
+
+	projectile enemy_missile;
+	projectile enemy_missile2;
+
+	bounding_box m_droid_box;
+	bounding_box m_mech_box;
+	bounding_box m_drone_box;
+	bounding_box m_bb8_box;
+	bounding_box m_heart_box;
+	bounding_box m_shield_box;
+
+	//world collision detection
+	engine::ref<engine::game_object>    office_col{};
+	engine::ref<engine::game_object>    office_col2{};
+	engine::ref<engine::game_object>    skyscraper1_col{};
+	engine::ref<engine::game_object>    skyscraper1_col2{};
+	engine::ref<engine::game_object>    skyscraper2_col{};
+	engine::ref<engine::game_object>    skyscraper2_col2{};
+	engine::ref<engine::game_object>    skyscraper2_col3{};
+	engine::ref<engine::game_object>    skyscraper3_col{};
+	engine::ref<engine::game_object>    skyscraper3_col2{};
+	engine::ref<engine::game_object>    skyscraper3_col3{};
+	engine::ref<engine::game_object>    skyscraper4_col{};
+	engine::ref<engine::game_object>    skyscraper6_col{};
+	engine::ref<engine::game_object>    skyscraper7_col{};
+
+
+
+	const float immune_time = 2.f;
+	bool player_immunity = false;
+	float player_immunity_timer = -1.f;
+
+	bounding_box m_cow_box;
 
 	engine::ref<engine::material>		m_material{};
 	engine::ref<engine::material>		m_tetrahedron_material{};
+	engine::ref<engine::material>		m_red_spotLight_material{};
+	engine::ref<engine::material>		m_white_pointLight_material{};
 
 	engine::DirectionalLight            m_directionalLight;
+
+	engine::SpotLight m_red_spotLight;
+	engine::SpotLight m_jetpack_spotLight;
+	uint32_t num_spot_lights = 2;
+
+	engine::ref<engine::game_object>	m_red_spotLight_ball{};
+	float spotLightRotation = 0.f;
+
+	engine::PointLight m_white_pointLight;
+	engine::PointLight m_white_pointLight2;
+	uint32_t num_point_lights = 2;
+
+	engine::ref<engine::game_object>    m_pointLight_object{};
 
 	std::vector<engine::ref<engine::game_object>>     m_game_objects{};
 
@@ -49,10 +173,44 @@ private:
 	engine::orthographic_camera       m_2d_camera;
 	engine::perspective_camera        m_3d_camera;
 
-	engine::ref<intro_screen>	m_intro_screen{};
+	engine::ref<screen_render>	m_intro_screen{};
+	engine::ref<screen_render>	m_end_screen{};
+	engine::ref<screen_render>	m_HUD{};
+	engine::ref<screen_render>	m_HUD_range_finder{};
+	engine::ref<screen_render>	m_HUD_immunity{};
+	engine::ref<screen_render>	m_HUD_jetpack{};
+	engine::ref<screen_render>	m_HUD_repulsor{};
+	engine::ref<screen_render>	m_HUD_missile{};
+	engine::ref<screen_render>	m_HUD_bouncynade{};
+	float range_finder_height = 0.f;
 
-	bool firstPerson;
-	bool camSwitchDelayReady = true;
-	float camSwitchTimer;
+	enum class CamState { FirstPerson, ThirdPerson, FreeView };
+	CamState CamMode = CamState::FirstPerson;
+
+	bool jetpackTrailReady = true;
+	float jetpackTrailTimer;
+	bool jetpackHoverOn = false;
+
+	bool jetpack_sound_played = false;
+	float jetpack_sound_timer;
+
 	bool playState = false;
+
+	void damage_player(int damage);
+
+	//===============================================================Effects============================================================================
+	jetpack_trail m_jetpack_trail;
+
+	engine::ref<cross_fade>							m_cross_fade{};
+	engine::ref<cross_fade>							m_cross_fade_damage{};
+
+	engine::ref<explosion>							m_explosion{};
+	engine::ref<explosion>							m_repulsor_hit{};
+	//bool missile_active = false;
+	//bool enemy_missile_active = false;
+	//bool enemy_missile2_active = false;
+	bool bouncynade_armed = true;
+	float bouncynade_armtime = -1.f;
+
+	bool night_time = false;
 };

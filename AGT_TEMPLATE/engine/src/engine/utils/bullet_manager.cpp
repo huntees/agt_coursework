@@ -206,6 +206,7 @@ void engine::bullet_manager::add_physical_object(engine::ref<engine::game_object
 		body->setRestitution(game_object->restitution());
 		body->setFriction(game_object->friction());
 		//body->setRestitution(game_object->restitution());
+		body->setRollingFriction(game_object->rolling_friction());
 		physical_object* object = new physical_object(body);
 		physical_objects.push_back(object);
 	}
@@ -307,8 +308,13 @@ void engine::bullet_manager::dynamics_world_update(const std::vector<engine::ref
 			game_object_i->set_angular_velocity(to_vec3(physical_object_i->get_body()->getAngularVelocity()));
 
 			game_object_i->set_physical_object_index(i);
+
+			game_object_i->clear_collision_objects();
+			game_object_i->set_collision_state(false);
 		}
 	}
+
+	myTickCallback(m_dynamics_world, (float)dt, game_objects);
 }
 
 engine::ref<engine::bullet_manager> engine::bullet_manager::create(const std::vector<engine::ref<engine::game_object>>& game_objects)
@@ -321,4 +327,36 @@ void engine::bullet_manager::delete_shape(btRigidBody* rigid_body) {
 	delete rigid_body->getCollisionShape();
 	m_dynamics_world->removeRigidBody(rigid_body);
 	delete rigid_body;
+}
+
+void engine::bullet_manager::myTickCallback(btDynamicsWorld* dynamicsWorld, btScalar timeStep, const std::vector<engine::ref<engine::game_object>>& game_objects) {
+	int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
+	for (int i = 0; i < numManifolds; i++) {
+		btPersistentManifold* contactManifold = dynamicsWorld->getDispatcher() -> getManifoldByIndexInternal(i);
+		{
+			const btCollisionObject* objA = contactManifold->getBody0();
+			const btCollisionObject* objB = contactManifold->getBody1();
+			int indexA = -1;
+			int indexB = -1;
+			int j = 0;
+			while (j < dynamicsWorld->getCollisionObjectArray().size() && (indexA == -
+				1 || indexB == -1))
+
+			{
+				if (objA == dynamicsWorld->getCollisionObjectArray().at(j))
+					indexA = j;
+
+				else if (objB == dynamicsWorld->getCollisionObjectArray().at(j))
+					indexB = j;
+				j++;
+			}
+			if (indexA != -1 && indexB != -1)
+			{
+				game_objects.at(indexA)->set_collision_state(true);
+				game_objects.at(indexA) -> add_collision_object(game_objects.at(indexB));
+				game_objects.at(indexB)->set_collision_state(true);
+				game_objects.at(indexB) -> add_collision_object(game_objects.at(indexA));
+			}
+		}
+	}
 }

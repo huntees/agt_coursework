@@ -23,6 +23,7 @@ namespace engine
         float mass = 1.f;
 		float restitution = 0.1f;
 		float friction = 0.9f;
+		float rolling_friction = 0.0f;
         float rotation_amount = 0.f;
         bool is_static = false;
 	};
@@ -61,6 +62,7 @@ namespace engine
 		float     mass() const { return m_mass; }
 		float	  restitution() const { return m_restitution; }
 		float	  friction() const { return m_friction; }
+		float	  rolling_friction() const { return m_rolling_friction; }
 		int32_t   type() const { return m_type; }
 		glm::vec3 bounding_shape() const { return m_bounding_shape; }
 		const std::vector<ref<mesh>>& meshes() const { return m_meshes; }
@@ -104,6 +106,13 @@ namespace engine
 
 		// bind the object's textures if there are any
 		void bind_textures();
+
+		//for custom collision response
+		bool is_colliding() const { return s_colliding; }
+		std::vector<engine::ref<engine::game_object>> collision_objects() const { return m_collision_objects;}
+		void set_collision_state(bool col_state) { s_colliding = col_state; }
+		void clear_collision_objects() { m_collision_objects.clear(); }
+		void add_collision_object(engine::ref<engine::game_object> object) { m_collision_objects.push_back(object); }
 
     public:
         static ref<game_object> create(const game_object_properties& props);
@@ -150,6 +159,8 @@ namespace engine
 		float			m_restitution{ 0.1f };
 		// object's friction
 		float			m_friction{ 0.9f };
+		// object's rolling friction
+		float			m_rolling_friction{ 0.0f };
         // static/non-static object
 		bool			s_static{ false };
 
@@ -162,5 +173,9 @@ namespace engine
 
 		//index of the bullet physical_object corresponding to this game_object. -1 if hasn't been assigned yet
 		int32_t m_physical_object_index{-1};
+
+		//for custom collision response
+		bool s_colliding = false;
+		std::vector<engine::ref<engine::game_object>> m_collision_objects;
     };
 }

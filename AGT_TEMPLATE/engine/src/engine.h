@@ -35,6 +35,7 @@
 #include "engine/entities/shapes/tetrahedron.h"
 #include "engine/entities/shapes/hexagon.h"
 #include "engine/entities/shapes/bench.h"
+#include "engine/entities/shapes/lamppost.h"
 
 // ---utils---------------------------
 #include "engine/utils/bullet_manager.h"

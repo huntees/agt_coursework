@@ -175,6 +175,8 @@ void main()
 	{
 		result = texture(gColorMap, In.TexCoord.xy);
 
+		result.w *= transparency; 
+		
 		// uncomment the following to affect the skybox with the light colour
 		//result = light.colour * texture(gColorMap, In.TexCoord.xy);
 	}
@@ -192,7 +194,7 @@ void main()
 
 		result = texture(gColorMap, In.TexCoord.xy) * TotalLight;
 
-		result.w = transparency;
+		result.w *= transparency;
 	}
 
 	if(fog_on)

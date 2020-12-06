@@ -89,6 +89,10 @@ namespace engine
 		// vector of physical objects. Correspond 1 - 1 to the game objects vector in the active layer of the game.
 		std::vector<physical_object*> physical_objects;
 
+		//for custom collision response
+		void myTickCallback(btDynamicsWorld* dynamicsWorld, btScalar timeStep, const
+			std::vector<engine::ref<engine::game_object>>& game_objects);
+
 	protected:
 		// Dynamic world simulation
 		btDynamicsWorld*		m_dynamics_world;
