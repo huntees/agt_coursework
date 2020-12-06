@@ -13,8 +13,8 @@ player::~player()
 void player::initialise(engine::ref<engine::game_object> object)
 {
 	m_object = object;
-	m_object->set_forward(glm::vec3(0.f, 0.f, -1.f));
-	m_object->set_position(glm::vec3(0.f, 0.5, 10.f));
+	m_object->set_forward(glm::vec3(-1.f, 0.f, 0.f));
+	m_object->set_position(glm::vec3(55.0f, 1.5f, 32.0f));
 	m_object->animated_mesh()->set_default_animation(2);
 }
 
@@ -245,7 +245,7 @@ bool player::hover() {
 void player::sprint(const bool& activateSprint) {
 
 	if (activateSprint) {
-		m_speed = 8.f;
+		m_speed = 4.f;
 		animation_speed = 1.5f;
 	}
 	else {

@@ -21,6 +21,13 @@ public:
 	void on_event(engine::event& event) override;
 
 private:
+
+	float repulsor_force = 180.f; // 180 for 720p , 300 for 1080p
+	float missile_force = 180.f; // 180 for 720p, 350 for 1080p
+	float bouncynade_force = 54.f; // 54 for 720p, 100 for 1080p
+
+
+
 	player m_player{};
 
 	int player_score = 0;
@@ -167,6 +174,7 @@ private:
 	engine::perspective_camera        m_3d_camera;
 
 	engine::ref<screen_render>	m_intro_screen{};
+	engine::ref<screen_render>	m_end_screen{};
 	engine::ref<screen_render>	m_HUD{};
 	engine::ref<screen_render>	m_HUD_range_finder{};
 	engine::ref<screen_render>	m_HUD_immunity{};

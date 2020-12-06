@@ -215,7 +215,7 @@ example_layer::example_layer()
 	repulsor_props.type = 0;
 	repulsor_props.bounding_shape = glm::vec3(0.01f, 0.02f, 0.05f) / 2.f;
 	repulsor_props.friction = 0.0f;
-	repulsor_props.mass = 0.10f;
+	repulsor_props.mass = 0.05f;
 	m_repulsor = engine::game_object::create(repulsor_props);
 	repulsor.initialise(m_repulsor);
 
@@ -291,7 +291,7 @@ example_layer::example_layer()
 	engine::game_object_properties droid_props;
 	droid_props.meshes = droid_model->meshes();
 	droid_props.textures = droid_model->textures();
-	droid_props.position = glm::vec3(7.f, 0.5f, 0.f);
+	droid_props.position = glm::vec3(9.f, 0.5f, 0.f);
 	droid_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	droid_props.scale = glm::vec3(1.f / glm::max(droid_model->size().x, glm::max(droid_model->size().y, droid_model->size().z)));
 	droid_props.bounding_shape = glm::vec3(droid_model->size().x / 5.f, droid_model->size().y / 2.f, droid_model->size().z / 5.f);
@@ -324,7 +324,7 @@ example_layer::example_layer()
 	engine::game_object_properties drone_props;
 	drone_props.meshes = drone_model->meshes();
 	drone_props.textures = drone_model->textures();
-	drone_props.position = glm::vec3(-4.f, 2.f, 0.f);
+	drone_props.position = glm::vec3(-6.f, 2.f, 27.f);
 	drone_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	drone_props.scale = drone_model->size();
 	drone_props.bounding_shape = glm::vec3(drone_model->size().x / 4.f, drone_model->size().y / 10.f, drone_model->size().z / 4.f);
@@ -340,7 +340,7 @@ example_layer::example_layer()
 	engine::game_object_properties bb8_props;
 	bb8_props.meshes = bb8_model->meshes();
 	bb8_props.textures = bb8_model->textures();
-	bb8_props.position = glm::vec3(4.f, 0.8f, 0.f);
+	bb8_props.position = glm::vec3(0.f, 0.8f, 0.f);
 	bb8_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	bb8_props.scale = (glm::vec3(1.f / glm::max(bb8_model->size().x, glm::max(bb8_model->size().y, bb8_model->size().z)))) * 0.8f;
 	bb8_props.bounding_shape = glm::vec3(bb8_model->size().x / 3.f, bb8_model->size().y / 2.f, bb8_model->size().z / 2.f);
@@ -609,7 +609,7 @@ example_layer::example_layer()
 	float radius = 0.5f;
 	engine::ref<engine::sphere> sphere_shape = engine::sphere::create(10, 20, radius);
 	engine::game_object_properties sphere_props;
-	sphere_props.position = { 0.f, 5.f, -5.f };
+	sphere_props.position = { 0.f, 5.f, -50.f };
 	sphere_props.meshes = { sphere_shape->mesh() };
 	sphere_props.type = 1;
 	sphere_props.bounding_shape = glm::vec3(radius);
@@ -630,7 +630,7 @@ example_layer::example_layer()
 	//create tetrahedron mesh shape
 	engine::ref<engine::tetrahedron> tetrahedron_shape = engine::tetrahedron::create(tetrahedron_vertices);
 	engine::game_object_properties tetrahedron_props;
-	tetrahedron_props.position = { 0.f, 0.5f, -20.f };
+	tetrahedron_props.position = { 0.f, 0.5f, -55.f };
 
 	//load tetrahedron texture
 	std::vector<engine::ref<engine::texture_2d>> tetrahedron_textures =
@@ -732,11 +732,12 @@ example_layer::example_layer()
 
 	m_skinned_mesh->switch_animation(2);
 
-	//Load Intro Screen Texture and HUD
-	m_intro_screen = screen_render::create("assets/textures/tempmenu.jpg", 1.6f, 0.9f);
-	m_intro_screen->deactivate();
+	//Load Intro Screen Texture and HUD elements
+	m_intro_screen = screen_render::create("assets/textures/intromenu.jpg", 1.6f, 0.9f);
+	m_end_screen = screen_render::create("assets/textures/endscreen.jpg", 1.6f, 0.9f);
+	m_end_screen->deactivate();
 
-	m_HUD = screen_render::create("assets/textures/HUD/tempHUD.png", 1.6f, 0.9f);
+	m_HUD = screen_render::create("assets/textures/HUD/HUD.png", 1.6f, 0.9f);
 	m_HUD_range_finder = screen_render::create("assets/textures/HUD/range_finder.png", 1.6f, 0.9f);
 	m_HUD_immunity = screen_render::create("assets/textures/HUD/immunity.png", 1.6f, 0.9f);
 	m_HUD_jetpack = screen_render::create("assets/textures/HUD/jetpack.png", 0.12f, 0.12f);
@@ -861,14 +862,14 @@ void example_layer::on_render()
 
 	//=========================================================Road System End============================================================================
 
-	m_player.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	/*m_player.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_cow_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_droid_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_heart_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_shield_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_mech_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	m_drone_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
-	m_bb8_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
+	m_bb8_box.on_render(2.5f, 0.f, 0.f, textured_lighting_shader);*/
 	//enemy_missile.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	//enemy_missile2.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
 	//repulsor.getBox().on_render(2.5f, 0.f, 0.f, textured_lighting_shader);
@@ -1237,16 +1238,13 @@ void example_layer::on_render()
 
 	// Render text
 	const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
-	m_text_manager->render_text(text_shader, "Wave " + std::to_string(wave_number), (float)engine::application::window().width() * 0.47f, (float)engine::application::window().height() * 0.95f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.0003, glm::vec4(0.74f, 0.71f, 0.71f, 1.f));
-	m_text_manager->render_text(text_shader, "Score " + std::to_string(player_score), (float)engine::application::window().width() * 0.47f, (float)engine::application::window().height() * 0.03f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.0003, glm::vec4(0.74f, 0.71f, 0.71f, 1.f));
-	m_text_manager->render_text(text_shader, std::to_string(m_player.get_health_point()), (float)engine::application::window().width() * 0.1f, (float)engine::application::window().height() * 0.106f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.00043, glm::vec4(0.74f, 0.71f, 0.71f, 1.f)); //1.0 scale for 720p
 
+	if (playState) {
+		m_text_manager->render_text(text_shader, "Wave " + std::to_string(wave_number), (float)engine::application::window().width() * 0.465f, (float)engine::application::window().height() * 0.95f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.0003, glm::vec4(0.74f, 0.71f, 0.71f, 1.f));
+		m_text_manager->render_text(text_shader, "Score " + std::to_string(player_score), (float)engine::application::window().width() * 0.46f, (float)engine::application::window().height() * 0.03f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.0003, glm::vec4(0.74f, 0.71f, 0.71f, 1.f));
+		m_text_manager->render_text(text_shader, std::to_string(m_player.get_health_point()), (float)engine::application::window().width() * 0.1f, (float)engine::application::window().height() * 0.106f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.00043, glm::vec4(0.74f, 0.71f, 0.71f, 1.f)); //1.0 scale for 720p
+	}
 	//===============================================================2D Cam============================================================================
-
-	//old code for turning lighting on and off
-	//const auto hud_lighting_shader = engine::renderer::shaders_library()->get("mesh_lighting");
-	//std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->bind();
-	//std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("lighting_on", false);
 
 	engine::renderer::begin_scene(m_2d_camera, textured_lighting_shader);
 
@@ -1254,34 +1252,38 @@ void example_layer::on_render()
 
 	m_intro_screen->on_render(textured_lighting_shader, 0.f, 0.f, 0.f);
 
-	m_HUD->on_render(textured_lighting_shader, 0.f, 0.f, 0.01f);
+	m_end_screen->on_render(textured_lighting_shader, 0.f, 0.f, 0.f);
 
-	//render blue border when player is immune
-	if (shield_up) {
-		m_HUD_immunity->on_render(textured_lighting_shader, 0.f, 0.f, 0.02f);
-	}
+	if (playState) {
+		m_HUD->on_render(textured_lighting_shader, 0.f, 0.f, 0.01f);
 
-	//Moves range indicator up and down based on player height
-	range_finder_height = (m_player.object()->position().y - 1.f) * 0.015f;
-	if (range_finder_height > 1.19f) {
-		range_finder_height = 1.18f;
-	}
-	m_HUD_range_finder->on_render(textured_lighting_shader, 0.f, range_finder_height, 0.03f);
+		//render blue border when player is immune
+		if (shield_up) {
+			m_HUD_immunity->on_render(textured_lighting_shader, 0.f, 0.f, 0.02f);
+		}
 
-	//Renders jetpack icon if hover is on
-	if (jetpackHoverOn){
-		m_HUD_jetpack->on_render(textured_lighting_shader, 1.3f, -0.4f, 0.04f);
-	}
+		//Moves range indicator up and down based on player height
+		range_finder_height = (m_player.object()->position().y - 1.f) * 0.015f;
+		if (range_finder_height > 1.19f) {
+			range_finder_height = 1.18f;
+		}
+		m_HUD_range_finder->on_render(textured_lighting_shader, 0.f, range_finder_height, 0.03f);
 
-	//Renders which weapon is currently selected
-	if (WeaponSlot == WeaponState::Slot1) {
-		m_HUD_repulsor->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
-	}
-	else if (WeaponSlot == WeaponState::Slot2) {
-		m_HUD_missile->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
-	}
-	else if (WeaponSlot == WeaponState::Slot3) {
-		m_HUD_bouncynade->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
+		//Renders jetpack icon if hover is on
+		if (jetpackHoverOn) {
+			m_HUD_jetpack->on_render(textured_lighting_shader, 1.3f, -0.4f, 0.04f);
+		}
+
+		//Renders which weapon is currently selected
+		if (WeaponSlot == WeaponState::Slot1) {
+			m_HUD_repulsor->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
+		}
+		else if (WeaponSlot == WeaponState::Slot2) {
+			m_HUD_missile->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
+		}
+		else if (WeaponSlot == WeaponState::Slot3) {
+			m_HUD_bouncynade->on_render(textured_lighting_shader, 1.3f, -0.65f, 0.04f);
+		}
 	}
 	
 
@@ -1296,471 +1298,480 @@ void example_layer::on_render()
 
 void example_layer::on_update(const engine::timestep& time_step)
 {
-	if (!ambience_played) {
-		m_audio_manager->play("ambience");
-		ambience_loop_timer = 180.f;
-		ambience_played = true;
-	}
 
-	if (ambience_loop_timer > 0.0f)
-	{
-		ambience_loop_timer -= (float)time_step;
+	if (playState) {
+		if (!ambience_played) {
+			m_audio_manager->play("ambience");
+			ambience_loop_timer = 180.f;
+			ambience_played = true;
+		}
 
-		if (ambience_loop_timer < 0.0f)
+		if (ambience_loop_timer > 0.0f)
 		{
-			ambience_played = false;
-		}
-	}
+			ambience_loop_timer -= (float)time_step;
 
-
-	m_intro_screen->on_update(time_step);
-
-	m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
-
-
-	//===============================================================Objects Update============================================================================
-
-	//After about 9 hours of testing (yes genuinely 9 hours just on boxes), boxes are rendered wrongly opposed to where they actually are
-	m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
-	m_heart_box.on_update(m_heart->position() - glm::vec3(0.f, m_heart->offset().y, 0.f), m_heart->rotation_amount(), m_heart->rotation_axis());
-	m_shield_box.on_update(m_shield->position() - glm::vec3(0.f, m_shield->offset().y, 0.f), m_shield->rotation_amount(), m_shield->rotation_axis());
-
-	m_player.on_update(time_step);
-	m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
-		m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
-	m_ironman->set_position(m_player.object()->position() + glm::vec3(0.f, 0.25f, 0.f));
-	m_ironman->set_rotation_amount(atan2(m_player.object()->forward().x, m_player.object()->forward().z));
-
-	m_enemy_drone.on_update(time_step, m_player.object()->position() + glm::vec3(0.f, 0.5f, 0.f));
-	m_drone_box.on_update(m_drone->position() - glm::vec3(0.45f, m_drone->offset().y, 0.45f) * m_drone->scale(), m_drone->rotation_amount(), m_drone->rotation_axis());
-	
-	m_enemy_bb8.on_update(time_step, m_player.object()->position());
-	m_bb8_box.on_update(m_bb8->position() - glm::vec3(0.3f, m_bb8->offset().y, 0.3f) * m_bb8->scale(), m_bb8->rotation_amount(), m_bb8->rotation_axis());
-
-	repulsor.on_update(time_step);
-
-	missile.on_update(time_step);
-	missile.getBox().on_update(missile.object()->position() - glm::vec3(1.3f, missile.object()->offset().y, 1.3f) * missile.object()->scale(),
-		missile.object()->rotation_amount(), missile.object()->rotation_axis());
-
-	m_bouncynade_box.on_update(m_bouncynade->position() - glm::vec3(1.5f, 0.f, 1.5f), 0.f, m_bouncynade->rotation_axis());
-
-	enemy_missile.on_update(time_step);
-	enemy_missile.getBox().on_update(enemy_missile.object()->position() - glm::vec3(0.f, enemy_missile.object()->offset().y, 0.f) * enemy_missile.object()->scale(),
-		enemy_missile.object()->rotation_amount(), enemy_missile.object()->rotation_axis());
-
-	enemy_missile2.on_update(time_step);
-	enemy_missile2.getBox().on_update(enemy_missile2.object()->position() - glm::vec3(0.f, enemy_missile2.object()->offset().y, 0.f) * enemy_missile2.object()->scale(),
-		enemy_missile2.object()->rotation_amount(), enemy_missile2.object()->rotation_axis());
-
-	bouncynade.on_update(time_step);
-
-	//Camera Switching Logic
-	if (CamMode == CamState::FirstPerson) {
-		m_player.update_first_person_camera(m_3d_camera);
-	}
-	else if (CamMode == CamState::ThirdPerson) {
-		m_player.update_third_person_camera(m_3d_camera);
-	}
-	else if (CamMode == CamState::FreeView) {
-		m_3d_camera.on_update(time_step);
-	}
-
-	m_audio_manager->update_with_camera(m_3d_camera);
-
-	if (heartRotation > 360.f) {
-		heartRotation = 0.f;
-	}
-	heartRotation += 20.f * time_step;
-	m_heart->set_rotation_amount(glm::radians(heartRotation));
-
-	if (shieldRotation > 360.f) {
-		shieldRotation = 0.f;
-	}
-	shieldRotation += 20.f * time_step;
-	m_shield->set_rotation_amount(glm::radians(shieldRotation));
-
-
-	if (spotLightRotation > 360.f) {
-		spotLightRotation = 0.f;
-	}
-
-	spotLightRotation += 200.f * time_step;
-
-	m_red_spotLight_ball->set_rotation_axis(glm::vec3(0.f, 1.f, 0.f));
-	m_red_spotLight_ball->set_rotation_amount(glm::radians(spotLightRotation));
-	m_red_spotLight.Direction = m_red_spotLight_ball->forward();
-
-	//update jetpack light position to player
-	m_jetpack_spotLight.Position = m_player.object()->position() + glm::vec3(0.f, -0.15, 0.f);
-
-
-	//===============================================================Collision Update============================================================================
-
-	//==============================================================Player Stuff=================================================================================
-	//checks whether repulsor is colliding and whether the repulsor is active i.e if the repulsor has already hit
-	if (m_repulsor->is_colliding() && repulsor.is_active()) {
-
-		m_audio_manager->play_spatialised_sound("repulsor_hit", m_3d_camera.position(), m_repulsor->position());
-		m_repulsor_hit->activate(repulsor.object()->position(), 1.f, 1.f);
-		for (int i = 0; i < m_repulsor->collision_objects().size(); i++) {
-
-			if (m_repulsor->collision_objects().at(i) == m_enemy_drone.object()) {
-				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - repulsor_damage);
-				player_score += repulsor_damage;
+			if (ambience_loop_timer < 0.0f)
+			{
+				ambience_played = false;
 			}
-			else if (m_repulsor->collision_objects().at(i) == m_enemy_bb8.object()) {
-				m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - repulsor_damage);
-				player_score += repulsor_damage;
-			}
-			else if (m_repulsor->collision_objects().at(i) == m_enemy_droid.object()) {
-				m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - repulsor_damage);
-				player_score += repulsor_damage;
-			}
-			else if (m_repulsor->collision_objects().at(i) == m_enemy_mech.object()) {
-				m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - repulsor_damage);
-				player_score += repulsor_damage;
-			}
-
 		}
 
-		repulsor.object()->set_velocity(glm::vec3(0.f));
-		repulsor.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		repulsor.object()->set_position(glm::vec3(-5.f, -9.f, 9.f));
-		repulsor.set_active(false);
-	}
 
-	//checks whether missile is colliding and whether the missile is active i.e if the missile has already exploded
-	if (m_missile->is_colliding() && missile.is_active()) {
+		m_intro_screen->on_update(time_step);
 
-		m_audio_manager->play_spatialised_sound("missile_explosion", m_3d_camera.position(), m_missile->position());
-		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
-		if (missile.getBox().collision(m_drone_box)) {
-			m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - missile_damage);
-			player_score += missile_damage;
+		m_physics_manager->dynamics_world_update(m_game_objects, double(time_step));
+
+
+		//===============================================================Objects Update============================================================================
+
+		//After about 9 hours of testing (yes genuinely 9 hours just on boxes), boxes are rendered wrongly opposed to where they actually are
+		m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
+		m_heart_box.on_update(m_heart->position() - glm::vec3(0.f, m_heart->offset().y, 0.f), m_heart->rotation_amount(), m_heart->rotation_axis());
+		m_shield_box.on_update(m_shield->position() - glm::vec3(0.f, m_shield->offset().y, 0.f), m_shield->rotation_amount(), m_shield->rotation_axis());
+
+		m_player.on_update(time_step);
+		m_player.getBox().on_update(m_player.object()->position() - glm::vec3(0.f, m_player.object()->offset().y, 0.f) * m_player.object()->scale(),
+			m_player.object()->rotation_amount(), m_player.object()->rotation_axis());
+		m_ironman->set_position(m_player.object()->position() + glm::vec3(0.f, 0.25f, 0.f));
+		m_ironman->set_rotation_amount(atan2(m_player.object()->forward().x, m_player.object()->forward().z));
+
+		m_enemy_drone.on_update(time_step, m_player.object()->position() + glm::vec3(0.f, 0.5f, 0.f));
+		m_drone_box.on_update(m_drone->position() - glm::vec3(0.45f, m_drone->offset().y, 0.45f) * m_drone->scale(), m_drone->rotation_amount(), m_drone->rotation_axis());
+
+		m_enemy_bb8.on_update(time_step, m_player.object()->position());
+		m_bb8_box.on_update(m_bb8->position() - glm::vec3(0.3f, m_bb8->offset().y, 0.3f) * m_bb8->scale(), m_bb8->rotation_amount(), m_bb8->rotation_axis());
+
+		repulsor.on_update(time_step);
+
+		missile.on_update(time_step);
+		missile.getBox().on_update(missile.object()->position() - glm::vec3(1.3f, missile.object()->offset().y, 1.3f) * missile.object()->scale(),
+			missile.object()->rotation_amount(), missile.object()->rotation_axis());
+
+		m_bouncynade_box.on_update(m_bouncynade->position() - glm::vec3(1.5f, 0.f, 1.5f), 0.f, m_bouncynade->rotation_axis());
+
+		enemy_missile.on_update(time_step);
+		enemy_missile.getBox().on_update(enemy_missile.object()->position() - glm::vec3(0.f, enemy_missile.object()->offset().y, 0.f) * enemy_missile.object()->scale(),
+			enemy_missile.object()->rotation_amount(), enemy_missile.object()->rotation_axis());
+
+		enemy_missile2.on_update(time_step);
+		enemy_missile2.getBox().on_update(enemy_missile2.object()->position() - glm::vec3(0.f, enemy_missile2.object()->offset().y, 0.f) * enemy_missile2.object()->scale(),
+			enemy_missile2.object()->rotation_amount(), enemy_missile2.object()->rotation_axis());
+
+		bouncynade.on_update(time_step);
+
+		//Camera Switching Logic
+		if (CamMode == CamState::FirstPerson) {
+			m_player.update_first_person_camera(m_3d_camera);
 		}
-		if (missile.getBox().collision(m_bb8_box)) {
-			m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - missile_damage);
-			player_score += missile_damage;
+		else if (CamMode == CamState::ThirdPerson) {
+			m_player.update_third_person_camera(m_3d_camera);
 		}
-		if (missile.getBox().collision(m_droid_box)) {
-			m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - missile_damage);
-			player_score += missile_damage;
-		}
-		if (missile.getBox().collision(m_mech_box)) {
-			m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - missile_damage);
-			player_score += missile_damage;
+		else if (CamMode == CamState::FreeView) {
+			m_3d_camera.on_update(time_step);
 		}
 
-		missile.object()->set_velocity(glm::vec3(0.f));
-	    missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		missile.object()->set_position(glm::vec3(-9.f, -9.f, 9.f));
-		missile.set_active(false);
-	}
+		m_audio_manager->update_with_camera(m_3d_camera);
 
-	if (m_bouncynade->is_colliding() && !bouncynade_armed) {
-		bouncynade_armtime = 3.f;
-
-		//sets to false otherwise it will arm at 3.f every frame
-		bouncynade_armed = true;
-	}
-
-	//check whether it is armed and counting down
-	if (bouncynade_armtime > 0.0f && bouncynade_armed)
-	{
-		bouncynade_armtime -= (float)time_step;
-
-		if (bouncynade_armtime < 0.0f)
-		{
-			m_audio_manager->play_spatialised_sound("bouncynade_explosion", m_3d_camera.position(), m_bouncynade->position());
-			m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
-			if (m_bouncynade_box.collision(m_drone_box)) {
-				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - bouncynade_damage);
-				player_score += bouncynade_damage;
-			}
-			if (m_bouncynade_box.collision(m_bb8_box)) {
-				m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - bouncynade_damage);
-				player_score += bouncynade_damage;
-			}
-			if (m_bouncynade_box.collision(m_droid_box)) {
-				m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - bouncynade_damage);
-				player_score += bouncynade_damage;
-			}
-			if (m_bouncynade_box.collision(m_mech_box)) {
-				m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - bouncynade_damage);
-				player_score += bouncynade_damage;
-			}
-			
-			bouncynade.object()->set_position(glm::vec3(-8.f, -9.f, 9.f));
+		if (heartRotation > 360.f) {
+			heartRotation = 0.f;
 		}
-	}
+		heartRotation += 20.f * time_step;
+		m_heart->set_rotation_amount(glm::radians(heartRotation));
 
-	if (m_heart_box.collision(m_player.getBox()) && m_player.get_health_point() < 100) {
-
-		m_player.set_health_point(m_player.get_health_point() + 10);
-		m_audio_manager->play("heal");
-		if (m_player.get_health_point() > 100) {
-			m_player.set_health_point(100);
+		if (shieldRotation > 360.f) {
+			shieldRotation = 0.f;
 		}
-		m_heart->set_position(glm::vec3(-4.f, -9.f, 9.f));
-		heart_timer = heart_respawn_time;
-	}
+		shieldRotation += 20.f * time_step;
+		m_shield->set_rotation_amount(glm::radians(shieldRotation));
 
-	if (heart_timer > 0.0f)
-	{
-		heart_timer -= (float)time_step;
 
-		if (heart_timer < 0.0f)
-		{
-			m_heart->set_position(glm::vec3(20.f, 1.f, 15.f));
+		if (spotLightRotation > 360.f) {
+			spotLightRotation = 0.f;
 		}
-	}
 
-	if (m_shield_box.collision(m_player.getBox())) {
+		spotLightRotation += 200.f * time_step;
 
-		shield_up = true;
-		player_immunity_timer = 6.f;
+		m_red_spotLight_ball->set_rotation_axis(glm::vec3(0.f, 1.f, 0.f));
+		m_red_spotLight_ball->set_rotation_amount(glm::radians(spotLightRotation));
+		m_red_spotLight.Direction = m_red_spotLight_ball->forward();
 
-		m_audio_manager->play("shield");
+		//update jetpack light position to player
+		m_jetpack_spotLight.Position = m_player.object()->position() + glm::vec3(0.f, -0.15, 0.f);
 
-		m_shield->set_position(glm::vec3(-4.f, -9.f, 9.f));
-		shield_timer = shield_respawn_time;
-	}
 
-	if (shield_timer > 0.0f)
-	{
-		shield_timer -= (float)time_step;
+		//===============================================================Collision Update============================================================================
 
-		if (shield_timer < 0.0f)
-		{
-			m_shield->set_position(glm::vec3(20.f, 1.f, 7.f));
-		}
-	}
+		//==============================================================Player Stuff=================================================================================
+		//checks whether repulsor is colliding and whether the repulsor is active i.e if the repulsor has already hit
+		if (m_repulsor->is_colliding() && repulsor.is_active()) {
 
-	//==============================================================Enemy Attacks===============================================================================
-	//Drone melee check
-	if (m_drone->is_colliding()) {
-		for (int i = 0; i < m_drone->collision_objects().size(); i++) {
+			m_audio_manager->play_spatialised_sound("repulsor_hit", m_3d_camera.position(), m_repulsor->position());
+			m_repulsor_hit->activate(repulsor.object()->position(), 1.f, 1.f);
+			for (int i = 0; i < m_repulsor->collision_objects().size(); i++) {
 
-			//check for player collision and whether player can take damage **same for all other cases from this point**
-			if (m_drone->collision_objects().at(i) == m_player.object()) {
-				if (!player_immunity) {
-					damage_player(3);
+				if (m_repulsor->collision_objects().at(i) == m_enemy_drone.object()) {
+					m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - repulsor_damage);
+					player_score += repulsor_damage;
 				}
-			}
-		}
-		//m_enemy_drone.object()->set_velocity(glm::vec3(0.f));
-		//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
-	}
-
-	//BB8 melee check
-	if (m_bb8->is_colliding() && m_bb8->collision_objects().size() > 1) {
-
-		for (int i = 0; i < m_bb8->collision_objects().size(); i++) {
-
-			if (m_bb8->collision_objects().at(i) == m_player.object()) {
-				if (!player_immunity) {
-					damage_player(5);
+				else if (m_repulsor->collision_objects().at(i) == m_enemy_bb8.object()) {
+					m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - repulsor_damage);
+					player_score += repulsor_damage;
+				}
+				else if (m_repulsor->collision_objects().at(i) == m_enemy_droid.object()) {
+					m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - repulsor_damage);
+					player_score += repulsor_damage;
+				}
+				else if (m_repulsor->collision_objects().at(i) == m_enemy_mech.object()) {
+					m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - repulsor_damage);
+					player_score += repulsor_damage;
 				}
 
-				//reset velocity on collision
-				m_enemy_bb8.object()->set_velocity(glm::vec3(0.f));
 			}
+
+			repulsor.object()->set_velocity(glm::vec3(0.f));
+			repulsor.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+			repulsor.object()->set_position(glm::vec3(-5.f, -9.f, 9.f));
+			repulsor.set_active(false);
 		}
 
-	}
+		//checks whether missile is colliding and whether the missile is active i.e if the missile has already exploded
+		if (m_missile->is_colliding() && missile.is_active()) {
 
-	//Mech melee check
-	if (m_mech->is_colliding() && m_mech->collision_objects().size() > 1) {
+			m_audio_manager->play_spatialised_sound("missile_explosion", m_3d_camera.position(), m_missile->position());
+			m_explosion->activate(missile.object()->position(), 4.f, 4.f);
+			if (missile.getBox().collision(m_drone_box)) {
+				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - missile_damage);
+				player_score += missile_damage;
+			}
+			if (missile.getBox().collision(m_bb8_box)) {
+				m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - missile_damage);
+				player_score += missile_damage;
+			}
+			if (missile.getBox().collision(m_droid_box)) {
+				m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - missile_damage);
+				player_score += missile_damage;
+			}
+			if (missile.getBox().collision(m_mech_box)) {
+				m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - missile_damage);
+				player_score += missile_damage;
+			}
 
-		for (int i = 0; i < m_mech->collision_objects().size(); i++) {
-			if (m_mech->collision_objects().at(i) == m_player.object()) {
-				if (!player_immunity) {
-					damage_player(30);
+			missile.object()->set_velocity(glm::vec3(0.f));
+			missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+			missile.object()->set_position(glm::vec3(-9.f, -9.f, 9.f));
+			missile.set_active(false);
+		}
+
+		if (m_bouncynade->is_colliding() && !bouncynade_armed) {
+			bouncynade_armtime = 3.f;
+
+			//sets to false otherwise it will arm at 3.f every frame
+			bouncynade_armed = true;
+		}
+
+		//check whether it is armed and counting down
+		if (bouncynade_armtime > 0.0f && bouncynade_armed)
+		{
+			bouncynade_armtime -= (float)time_step;
+
+			if (bouncynade_armtime < 0.0f)
+			{
+				m_audio_manager->play_spatialised_sound("bouncynade_explosion", m_3d_camera.position(), m_bouncynade->position());
+				m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
+				if (m_bouncynade_box.collision(m_drone_box)) {
+					m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - bouncynade_damage);
+					player_score += bouncynade_damage;
+				}
+				if (m_bouncynade_box.collision(m_bb8_box)) {
+					m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - bouncynade_damage);
+					player_score += bouncynade_damage;
+				}
+				if (m_bouncynade_box.collision(m_droid_box)) {
+					m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - bouncynade_damage);
+					player_score += bouncynade_damage;
+				}
+				if (m_bouncynade_box.collision(m_mech_box)) {
+					m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - bouncynade_damage);
+					player_score += bouncynade_damage;
 				}
 
-				m_enemy_mech.object()->set_velocity(glm::vec3(0.f));
+				bouncynade.object()->set_position(glm::vec3(-8.f, -9.f, 9.f));
 			}
 		}
-	}
 
-	//Mech missile check
-	if (m_enemy_missile->is_colliding() && enemy_missile.is_active()) {
+		if (m_heart_box.collision(m_player.getBox()) && m_player.get_health_point() < 100) {
 
-		//m_explosion->activate(enemy_missile.object()->position(), 4.f, 4.f);
-		for (int i = 0; i < m_enemy_missile->collision_objects().size(); i++) {
-			if (m_enemy_missile->collision_objects().at(i) == m_player.object()) {
-				if (!player_immunity) {
-					damage_player(10);
+			m_player.set_health_point(m_player.get_health_point() + 10);
+			m_audio_manager->play("heal");
+			if (m_player.get_health_point() > 100) {
+				m_player.set_health_point(100);
+			}
+			m_heart->set_position(glm::vec3(-4.f, -9.f, 9.f));
+			heart_timer = heart_respawn_time;
+		}
+
+		if (heart_timer > 0.0f)
+		{
+			heart_timer -= (float)time_step;
+
+			if (heart_timer < 0.0f)
+			{
+				m_heart->set_position(glm::vec3(20.f, 1.f, 15.f));
+			}
+		}
+
+		if (m_shield_box.collision(m_player.getBox())) {
+
+			shield_up = true;
+			player_immunity_timer = 6.f;
+
+			m_audio_manager->play("shield");
+
+			m_shield->set_position(glm::vec3(-4.f, -9.f, 9.f));
+			shield_timer = shield_respawn_time;
+		}
+
+		if (shield_timer > 0.0f)
+		{
+			shield_timer -= (float)time_step;
+
+			if (shield_timer < 0.0f)
+			{
+				m_shield->set_position(glm::vec3(20.f, 1.f, 7.f));
+			}
+		}
+
+		//==============================================================Enemy Attacks===============================================================================
+		//Drone melee check
+		if (m_drone->is_colliding()) {
+			for (int i = 0; i < m_drone->collision_objects().size(); i++) {
+
+				//check for player collision and whether player can take damage **same for all other cases from this point**
+				if (m_drone->collision_objects().at(i) == m_player.object()) {
+					if (!player_immunity) {
+						damage_player(3);
+					}
+				}
+			}
+			//m_enemy_drone.object()->set_velocity(glm::vec3(0.f));
+			//m_enemy_drone.object()->set_acceleration(glm::vec3(0.f, 9.8f, 0.f));
+		}
+
+		//BB8 melee check
+		if (m_bb8->is_colliding() && m_bb8->collision_objects().size() > 1) {
+
+			for (int i = 0; i < m_bb8->collision_objects().size(); i++) {
+
+				if (m_bb8->collision_objects().at(i) == m_player.object()) {
+					if (!player_immunity) {
+						damage_player(5);
+					}
+
+					//reset velocity on collision
+					m_enemy_bb8.object()->set_velocity(glm::vec3(0.f));
+				}
+			}
+
+		}
+
+		//Mech melee check
+		if (m_mech->is_colliding() && m_mech->collision_objects().size() > 1) {
+
+			for (int i = 0; i < m_mech->collision_objects().size(); i++) {
+				if (m_mech->collision_objects().at(i) == m_player.object()) {
+					if (!player_immunity) {
+						damage_player(30);
+					}
+
+					m_enemy_mech.object()->set_velocity(glm::vec3(0.f));
 				}
 			}
 		}
 
-		enemy_missile.object()->set_velocity(glm::vec3(0.f));
-		enemy_missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		enemy_missile.object()->set_position(glm::vec3(-7.f, -9.f, 9.f));
-		enemy_missile.set_active(false);
-	}
+		//Mech missile check
+		if (m_enemy_missile->is_colliding() && enemy_missile.is_active()) {
 
-	//Droid missile check
-	if (m_enemy_missile2->is_colliding() && enemy_missile2.is_active()) {
-
-		//m_explosion->activate(enemy_missile2.object()->position(), 4.f, 4.f);
-		for (int i = 0; i < m_enemy_missile2->collision_objects().size(); i++) {
-			if (m_enemy_missile2->collision_objects().at(i) == m_player.object()) {
-				if (!player_immunity) {
-					damage_player(5);
+			//m_explosion->activate(enemy_missile.object()->position(), 4.f, 4.f);
+			for (int i = 0; i < m_enemy_missile->collision_objects().size(); i++) {
+				if (m_enemy_missile->collision_objects().at(i) == m_player.object()) {
+					if (!player_immunity) {
+						damage_player(10);
+					}
 				}
+			}
+
+			enemy_missile.object()->set_velocity(glm::vec3(0.f));
+			enemy_missile.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+			enemy_missile.object()->set_position(glm::vec3(-7.f, -9.f, 9.f));
+			enemy_missile.set_active(false);
+		}
+
+		//Droid missile check
+		if (m_enemy_missile2->is_colliding() && enemy_missile2.is_active()) {
+
+			//m_explosion->activate(enemy_missile2.object()->position(), 4.f, 4.f);
+			for (int i = 0; i < m_enemy_missile2->collision_objects().size(); i++) {
+				if (m_enemy_missile2->collision_objects().at(i) == m_player.object()) {
+					if (!player_immunity) {
+						damage_player(5);
+					}
+				}
+			}
+
+			enemy_missile2.object()->set_velocity(glm::vec3(0.f));
+			enemy_missile2.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
+			enemy_missile2.object()->set_position(glm::vec3(-6.f, -9.f, 9.f));
+			enemy_missile2.set_active(false);
+		}
+
+		if (player_immunity_timer > 0.0f)
+		{
+			if (!player_immunity) {
+				player_immunity = true;
+			}
+
+			player_immunity_timer -= (float)time_step;
+
+			if (player_immunity_timer < 0.0f)
+			{
+				player_immunity = false;
+				shield_up = false;
 			}
 		}
 
-		enemy_missile2.object()->set_velocity(glm::vec3(0.f));
-		enemy_missile2.object()->set_acceleration(glm::vec3(0.f, 0.f, 0.f));
-		enemy_missile2.object()->set_position(glm::vec3(-6.f, -9.f, 9.f));
-		enemy_missile2.set_active(false);
-	}
+		check_bounce();
 
-	if (player_immunity_timer > 0.0f)
-	{
-		if (!player_immunity) {
-			player_immunity = true;
-		}
 
-		player_immunity_timer -= (float)time_step;
-
-		if (player_immunity_timer < 0.0f)
+		if (m_ball->is_colliding() && m_ball->collision_objects().size() > 1)
 		{
-			player_immunity = false;
-			shield_up = false;
+			m_material->set_ambient(glm::vec3(0.f, 1.f, 0.f));
+			m_material->set_diffuse(glm::vec3(0.f, 1.f, 0.f));
 		}
-	}
-
-	check_bounce();
-
-
-	if (m_ball->is_colliding() && m_ball->collision_objects().size() > 1)
-	{
-		m_material->set_ambient(glm::vec3(0.f, 1.f, 0.f));
-		m_material->set_diffuse(glm::vec3(0.f, 1.f, 0.f));
-	}
-	else {
-		m_material->set_ambient(glm::vec3(1.f, 0.1f, 0.07f));
-		m_material->set_diffuse(glm::vec3(1.f, 0.1f, 0.07f));
-	}
-
-
-	//===============================================================Effects Update============================================================================
-	m_repulsor_hit->on_update(time_step);
-
-	m_explosion->on_update(time_step);
-
-	m_jetpack_trail.on_update(time_step);
-
-	m_cross_fade->on_update(time_step);
-	m_cross_fade_damage->on_update(time_step);
-
-	//jetpack light and particle logic
-	if (jetpackHoverOn) {
-
-		jetpackTrailReady = false;
-		m_jetpack_spotLight.Color = glm::vec3(1.f, 0.68f, 0.26f);
-		if (jetpackTrailTimer < 0.0f) {
-			jetpackTrailTimer = 0.03f;
+		else {
+			m_material->set_ambient(glm::vec3(1.f, 0.1f, 0.07f));
+			m_material->set_diffuse(glm::vec3(1.f, 0.1f, 0.07f));
 		}
-	}
-	else {
-		m_jetpack_spotLight.Color = glm::vec3(0.f, 0.f, 0.f);
-	}
 
-	if (engine::input::key_pressed(engine::key_codes::KEY_SPACE))
-	{
-		if (!jetpackHoverOn) {
-			m_jetpack_spotLight.Color = glm::vec3(1.f, 0.68f, 0.26f);
-		}
-		
-		if (jetpackTrailReady) {
+
+		//===============================================================Effects Update============================================================================
+		m_repulsor_hit->on_update(time_step);
+
+		m_explosion->on_update(time_step);
+
+		m_jetpack_trail.on_update(time_step);
+
+		m_cross_fade->on_update(time_step);
+		m_cross_fade_damage->on_update(time_step);
+
+		//jetpack light and particle logic
+		if (jetpackHoverOn) {
 
 			jetpackTrailReady = false;
-			jetpackTrailTimer = 0.02f;
+			m_jetpack_spotLight.Color = glm::vec3(1.f, 0.68f, 0.26f);
+			if (jetpackTrailTimer < 0.0f) {
+				jetpackTrailTimer = 0.03f;
+			}
 		}
-	}
-	else if(!jetpackHoverOn){
-		m_jetpack_spotLight.Color = glm::vec3(0.f, 0.f, 0.f);
-	}
-
-	if (jetpackTrailTimer > 0.0f)
-	{
-		jetpackTrailTimer -= (float)time_step;
-
-		if (jetpackTrailTimer < 0.0f)
-		{
-			jetpackTrailReady = true;
-			m_jetpack_trail.initialise(m_player.object()->position() + glm::vec3(0.f, -0.15f, 0.f), glm::vec3(0.f, 0.f, 0.f), 1, 1.f, 0.3f);
+		else {
+			m_jetpack_spotLight.Color = glm::vec3(0.f, 0.f, 0.f);
 		}
-	}
 
-	//putting shooter enemies down here, otherwise an issue with some update ordering causing explosion to appear infront of the shooter
-	m_enemy_mech.on_update(time_step, m_player.object()->position(), enemy_missile);
-	m_mech_box.on_update(m_mech->position() - glm::vec3(0.6f, m_mech->offset().y, 0.6f) * m_mech->scale(), m_mech->rotation_amount(), m_mech->rotation_axis());
-	
-	m_enemy_droid.on_update(time_step, m_player.object()->position(), enemy_missile2);
-	m_droid_box.on_update(m_droid->position() - glm::vec3(0.8f, m_droid->offset().y, 0.8f) * m_droid->scale(), m_droid->rotation_amount(), m_droid->rotation_axis());
-
-	if (m_enemy_drone.get_health_point() <= 0 && m_enemy_drone.is_alive()) {
-		
-		enemy_count--;
-		m_enemy_drone.set_alive(false);
-		m_enemy_drone.object()->set_position(glm::vec3(0.f, -9.f, 0.f));
-		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
-	}
-	if (m_enemy_bb8.get_health_point() <= 0 && m_enemy_bb8.is_alive()) {
-		
-		enemy_count--;
-		m_enemy_bb8.set_alive(false);
-		m_enemy_bb8.object()->set_position(glm::vec3(2.f, -9.f, 0.f));
-		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
-		
-	}
-	if (m_enemy_droid.get_health_point() <= 0 && m_enemy_droid.is_alive()) {
-
-		enemy_count--;
-		m_enemy_droid.set_alive(false);
-		m_enemy_droid.object()->set_position(glm::vec3(4.f, -9.f, 0.f));
-		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
-		
-	}
-	if (m_enemy_mech.get_health_point() <= 0 && m_enemy_mech.is_alive()) {
-		
-		enemy_count--;
-		m_enemy_mech.set_alive(false);
-		m_enemy_mech.object()->set_position(glm::vec3(5.f, -9.f, 0.f));
-		m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
-		
-	}
-
-	if (enemy_count <= 0 && !resting_period) {
-
-		wave_number++;
-		resting_period = true;
-		enemy_respawn_timer = 5.f;
-	}
-
-	if (enemy_respawn_timer > 0.0f)
-	{
-		enemy_respawn_timer -= (float)time_step;
-
-		if (enemy_respawn_timer < 0.0f)
+		if (engine::input::key_pressed(engine::key_codes::KEY_SPACE))
 		{
-			enemy_count = 4;
-			m_enemy_droid.respawn(wave_number, glm::vec3(7.f, 0.5f, 0.f));
-			m_enemy_mech.respawn(wave_number, glm::vec3(4.f, 0.5f, 40.f));
-			m_enemy_drone.respawn(wave_number, glm::vec3(-4.f, 2.f, 0.f));
-			m_enemy_bb8.respawn(wave_number, glm::vec3(4.f, 0.8f, 0.f));
-			resting_period = false;
+			if (!jetpackHoverOn) {
+				m_jetpack_spotLight.Color = glm::vec3(1.f, 0.68f, 0.26f);
+			}
+
+			if (jetpackTrailReady) {
+
+				jetpackTrailReady = false;
+				jetpackTrailTimer = 0.02f;
+			}
+		}
+		else if (!jetpackHoverOn) {
+			m_jetpack_spotLight.Color = glm::vec3(0.f, 0.f, 0.f);
+		}
+
+		if (jetpackTrailTimer > 0.0f)
+		{
+			jetpackTrailTimer -= (float)time_step;
+
+			if (jetpackTrailTimer < 0.0f)
+			{
+				jetpackTrailReady = true;
+				m_jetpack_trail.initialise(m_player.object()->position() + glm::vec3(0.f, -0.15f, 0.f), glm::vec3(0.f, 0.f, 0.f), 1, 1.f, 0.3f);
+			}
+		}
+
+		//putting shooter enemies down here, otherwise an issue with some update ordering causing explosion to appear infront of the shooter
+		m_enemy_mech.on_update(time_step, m_player.object()->position(), enemy_missile);
+		m_mech_box.on_update(m_mech->position() - glm::vec3(0.6f, m_mech->offset().y, 0.6f) * m_mech->scale(), m_mech->rotation_amount(), m_mech->rotation_axis());
+
+		m_enemy_droid.on_update(time_step, m_player.object()->position(), enemy_missile2);
+		m_droid_box.on_update(m_droid->position() - glm::vec3(0.8f, m_droid->offset().y, 0.8f) * m_droid->scale(), m_droid->rotation_amount(), m_droid->rotation_axis());
+
+		if (m_enemy_drone.get_health_point() <= 0 && m_enemy_drone.is_alive()) {
+
+			enemy_count--;
+			m_enemy_drone.set_alive(false);
+			m_enemy_drone.object()->set_position(glm::vec3(0.f, -9.f, 0.f));
+			m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
+		}
+		if (m_enemy_bb8.get_health_point() <= 0 && m_enemy_bb8.is_alive()) {
+
+			enemy_count--;
+			m_enemy_bb8.set_alive(false);
+			m_enemy_bb8.object()->set_position(glm::vec3(2.f, -9.f, 0.f));
+			m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
+
+		}
+		if (m_enemy_droid.get_health_point() <= 0 && m_enemy_droid.is_alive()) {
+
+			enemy_count--;
+			m_enemy_droid.set_alive(false);
+			m_enemy_droid.object()->set_position(glm::vec3(4.f, -9.f, 0.f));
+			m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
+
+		}
+		if (m_enemy_mech.get_health_point() <= 0 && m_enemy_mech.is_alive()) {
+
+			enemy_count--;
+			m_enemy_mech.set_alive(false);
+			m_enemy_mech.object()->set_position(glm::vec3(5.f, -9.f, 0.f));
+			m_enemy_mech.object()->set_forward(glm::vec3(0.f, 0.f, -1.f));
+
+		}
+
+		if (enemy_count <= 0 && !resting_period) {
+
+			wave_number++;
+			resting_period = true;
+			enemy_respawn_timer = 5.f;
+		}
+
+		if (enemy_respawn_timer > 0.0f)
+		{
+			enemy_respawn_timer -= (float)time_step;
+
+			if (enemy_respawn_timer < 0.0f)
+			{
+				enemy_count = 4;
+				m_enemy_droid.respawn(wave_number, glm::vec3(7.f, 0.5f, 0.f));
+				m_enemy_mech.respawn(wave_number, glm::vec3(4.f, 0.5f, 40.f));
+				m_enemy_drone.respawn(wave_number, glm::vec3(-4.f, 2.f, 0.f));
+				m_enemy_bb8.respawn(wave_number, glm::vec3(4.f, 0.8f, 0.f));
+				resting_period = false;
+			}
+		}
+
+		if (m_player.get_health_point() <= 0) {
+			m_end_screen->activate();
+			playState = false;
 		}
 	}
 }
 
+//Controls
 void example_layer::on_event(engine::event& event)
 {
 	if (event.event_type() == engine::event_type_e::key_pressed)
@@ -1794,7 +1805,13 @@ void example_layer::on_event(engine::event& event)
 		}
 		if (e.key_code() == engine::key_codes::KEY_ENTER)
 		{
-			m_intro_screen->deactivate();
+			if (!playState) {
+				m_intro_screen->deactivate();
+				m_end_screen->deactivate();
+				playState = true;
+				m_player.set_health_point(100);
+				m_player.object()->set_position(glm::vec3(55.0f, 1.5f, 32.0f));
+			}
 		}
 		if (e.key_code() == engine::key_codes::KEY_1)
 		{
@@ -1812,30 +1829,8 @@ void example_layer::on_event(engine::event& event)
 			m_audio_manager->play("weapon_switch");
 		}
 
-		//======================Remove these in final ver=======================
-		if (e.key_code() == engine::key_codes::KEY_G)
-		{
-			if (WeaponSlot == WeaponState::Slot1) {
-				m_audio_manager->play("repulsor_firing");
-				repulsor.fire(m_3d_camera, 180.0f, m_player.object()->position());
-				repulsor.set_active(true);
-			}
-			if (WeaponSlot == WeaponState::Slot2) {
-				m_audio_manager->play("missile_firing");
-				missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
-				missile.set_active(true);
-			}
-			else if (WeaponSlot == WeaponState::Slot3) {
-				m_audio_manager->play("bouncynade_firing");
-				bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
-				bouncynade_armed = false;
-			}
-		}
-		if (e.key_code() == engine::key_codes::KEY_H)
-		{
-			bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
-			bouncynade_armed = false;
-		}
+
+		// ======================Misc============================
 		if (e.key_code() == engine::key_codes::KEY_9)
 		{
 			m_cross_fade->activate(true);
@@ -1855,7 +1850,7 @@ void example_layer::on_event(engine::event& event)
 				night_time = false;
 			}
 		}
-		//======================================================================
+		//============================================================
 
 	}
 
@@ -1873,17 +1868,17 @@ void example_layer::on_event(engine::event& event)
 		if (engine::input::mouse_button_pressed(0)) {
 			if (WeaponSlot == WeaponState::Slot1) {
 				m_audio_manager->play("repulsor_firing");
-				repulsor.fire(m_3d_camera, 180.0f, m_player.object()->position());
+				repulsor.fire(m_3d_camera, repulsor_force, m_player.object()->position());
 				repulsor.set_active(true);
 			}
 			if (WeaponSlot == WeaponState::Slot2) {
 				m_audio_manager->play("missile_firing");
-				missile.fire(m_3d_camera, 180.0f, m_player.object()->position());
+				missile.fire(m_3d_camera, missile_force, m_player.object()->position());
 				missile.set_active(true);
 			}
 			else if (WeaponSlot == WeaponState::Slot3) {
 				m_audio_manager->play("bouncynade_firing");
-				bouncynade.fire(m_3d_camera, 60.0f, m_player.object()->position());
+				bouncynade.fire(m_3d_camera, bouncynade_force, m_player.object()->position());
 				bouncynade_armed = false;
 			}
 		}
