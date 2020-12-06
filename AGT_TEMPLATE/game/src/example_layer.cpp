@@ -733,8 +733,8 @@ example_layer::example_layer()
 	m_skinned_mesh->switch_animation(2);
 
 	//Load Intro Screen Texture and HUD elements
-	m_intro_screen = screen_render::create("assets/textures/intromenu.jpg", 1.6f, 0.9f);
-	m_end_screen = screen_render::create("assets/textures/endscreen.jpg", 1.6f, 0.9f);
+	m_intro_screen = screen_render::create("assets/textures/intromenu.png", 1.6f, 0.9f);
+	m_end_screen = screen_render::create("assets/textures/endscreen.png", 1.6f, 0.9f);
 	m_end_screen->deactivate();
 
 	m_HUD = screen_render::create("assets/textures/HUD/HUD.png", 1.6f, 0.9f);
