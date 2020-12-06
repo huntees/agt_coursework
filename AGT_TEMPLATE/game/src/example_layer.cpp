@@ -732,7 +732,7 @@ example_layer::example_layer()
 
 	m_skinned_mesh->switch_animation(2);
 
-	//Load Intro Screen Texture and HUD elements
+	//Load Textures and HUD elements
 	m_intro_screen = screen_render::create("assets/textures/intromenu.png", 1.6f, 0.9f);
 	m_end_screen = screen_render::create("assets/textures/endscreen.png", 1.6f, 0.9f);
 	m_end_screen->deactivate();
@@ -747,6 +747,7 @@ example_layer::example_layer()
 
 	m_jetpack_trail.load_texture("assets/textures/effects/trail.png");
 	m_explosion = explosion::create("assets/textures/effects/Explosion.tga", 4, 5, 16);
+	m_explosion2 = explosion::create("assets/textures/effects/Explosion.tga", 4, 5, 16);
 	m_repulsor_hit = explosion::create("assets/textures/effects/hit.png", 4, 4, 16);
 	m_cross_fade = cross_fade::create("assets/textures/effects/screencrack.png", 2.0f, 0.4f, 0.2f);
 	m_cross_fade_damage = cross_fade::create("assets/textures/HUD/damage.png", 2.0f, 1.6f, 0.9f);
@@ -789,7 +790,7 @@ void example_layer::on_render()
 
 	engine::renderer::submit(textured_lighting_shader, m_tetrahedron);
 
-
+	//submiting lights
 	std::dynamic_pointer_cast<engine::gl_shader>(textured_lighting_shader)->set_uniform("gNumSpotLights", (int)num_spot_lights);
 	m_red_spotLight.submit(textured_lighting_shader, 0);
 	m_jetpack_spotLight.submit(textured_lighting_shader, 1);
@@ -1140,6 +1141,7 @@ void example_layer::on_render()
 	policeCar_transform = glm::scale(policeCar_transform, m_policeCar->scale());
 	engine::renderer::submit(textured_lighting_shader, policeCar_transform, m_policeCar);
 
+	//toggles ironman helmet on the player
 	if (helmet_toggle) {
 		glm::mat4 ironman_transform(1.0f);
 		ironman_transform = glm::translate(ironman_transform, m_ironman->position());
@@ -1166,7 +1168,7 @@ void example_layer::on_render()
 
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gEyeWorldPos", m_3d_camera.position());
 
-
+	//submit lights
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("gNumSpotLights", (int)num_spot_lights);
 	m_red_spotLight.submit(material_shader, 0);
 	m_jetpack_spotLight.submit(material_shader, 1);
@@ -1180,7 +1182,7 @@ void example_layer::on_render()
 	engine::renderer::submit(material_shader, m_ball);
 
 
-	//-------------------------------------------------------light ball--------------------------------------------------------
+	//-------------------------------------------------------light objects--------------------------------------------------------
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", false);
 
 	//m_red_spotLight_material->submit(material_shader);
@@ -1191,6 +1193,8 @@ void example_layer::on_render()
 	//pointLight_transform = glm::translate(pointLight_transform, m_white_pointLight.Position);
 	//pointLight_transform = glm::scale(pointLight_transform, glm::vec3(0.2f));
 	//engine::renderer::submit(material_shader, m_ball->meshes().at(0), pointLight_transform);
+
+	//renders pointlight object
 	engine::renderer::submit(material_shader, glm::translate(glm::mat4(1.f), m_white_pointLight.Position), m_pointLight_object);
 	engine::renderer::submit(material_shader, glm::translate(glm::mat4(1.f), m_white_pointLight2.Position), m_pointLight_object);
 
@@ -1198,7 +1202,7 @@ void example_layer::on_render()
 	repulsor.on_render(material_shader);
 
 	std::dynamic_pointer_cast<engine::gl_shader>(material_shader)->set_uniform("lighting_on", true);
-	//-------------------------------------------------------light ball--------------------------------------------------------
+	//-------------------------------------------------------light objects--------------------------------------------------------
 
 	engine::renderer::end_scene();
 
@@ -1232,6 +1236,8 @@ void example_layer::on_render()
 
 	m_explosion->on_render(m_3d_camera, textured_lighting_shader);
 
+	m_explosion2->on_render(m_3d_camera, textured_lighting_shader);
+
 	m_jetpack_trail.on_render(m_3d_camera, textured_lighting_shader);
 
 	engine::renderer::end_scene();
@@ -1239,6 +1245,7 @@ void example_layer::on_render()
 	// Render text
 	const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
 
+	//Renders text if game is playing
 	if (playState) {
 		m_text_manager->render_text(text_shader, "Wave " + std::to_string(wave_number), (float)engine::application::window().width() * 0.465f, (float)engine::application::window().height() * 0.95f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.0003, glm::vec4(0.74f, 0.71f, 0.71f, 1.f));
 		m_text_manager->render_text(text_shader, "Score " + std::to_string(player_score), (float)engine::application::window().width() * 0.46f, (float)engine::application::window().height() * 0.03f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.0003, glm::vec4(0.74f, 0.71f, 0.71f, 1.f));
@@ -1254,6 +1261,7 @@ void example_layer::on_render()
 
 	m_end_screen->on_render(textured_lighting_shader, 0.f, 0.f, 0.f);
 
+	//Renders hud element when game is playing
 	if (playState) {
 		m_HUD->on_render(textured_lighting_shader, 0.f, 0.f, 0.01f);
 
@@ -1286,7 +1294,7 @@ void example_layer::on_render()
 		}
 	}
 	
-
+	//Renders crossfade for damage
 	m_cross_fade->on_render(textured_lighting_shader, 0.1f);
 	m_cross_fade_damage->on_render(textured_lighting_shader, 0.11f);
 
@@ -1298,7 +1306,7 @@ void example_layer::on_render()
 
 void example_layer::on_update(const engine::timestep& time_step)
 {
-
+	//loops ambient
 	if (playState) {
 		if (!ambience_played) {
 			m_audio_manager->play("ambience");
@@ -1324,7 +1332,6 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 		//===============================================================Objects Update============================================================================
 
-		//After about 9 hours of testing (yes genuinely 9 hours just on boxes), boxes are rendered wrongly opposed to where they actually are
 		m_cow_box.on_update(m_cow->position() - glm::vec3(0.f, m_cow->offset().y, 0.f) * m_cow->scale(), m_cow->rotation_amount(), m_cow->rotation_axis());
 		m_heart_box.on_update(m_heart->position() - glm::vec3(0.f, m_heart->offset().y, 0.f), m_heart->rotation_amount(), m_heart->rotation_axis());
 		m_shield_box.on_update(m_shield->position() - glm::vec3(0.f, m_shield->offset().y, 0.f), m_shield->rotation_amount(), m_shield->rotation_axis());
@@ -1370,8 +1377,10 @@ void example_layer::on_update(const engine::timestep& time_step)
 			m_3d_camera.on_update(time_step);
 		}
 
+		//updates player location for spatillised audio
 		m_audio_manager->update_with_camera(m_3d_camera);
 
+		//object rotations
 		if (heartRotation > 360.f) {
 			heartRotation = 0.f;
 		}
@@ -1477,7 +1486,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 			if (bouncynade_armtime < 0.0f)
 			{
 				m_audio_manager->play_spatialised_sound("bouncynade_explosion", m_3d_camera.position(), m_bouncynade->position());
-				m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
+				m_explosion2->activate(bouncynade.object()->position(), 4.f, 4.f);
 				if (m_bouncynade_box.collision(m_drone_box)) {
 					m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - bouncynade_damage);
 					player_score += bouncynade_damage;
@@ -1499,6 +1508,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 			}
 		}
 
+		//check for collision between pickups and player
 		if (m_heart_box.collision(m_player.getBox()) && m_player.get_health_point() < 100) {
 
 			m_player.set_health_point(m_player.get_health_point() + 10);
@@ -1624,6 +1634,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 			enemy_missile2.set_active(false);
 		}
 
+		//Cooloff period so player dont take damage constantly
 		if (player_immunity_timer > 0.0f)
 		{
 			if (!player_immunity) {
@@ -1658,6 +1669,8 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 		m_explosion->on_update(time_step);
 
+		m_explosion2->on_update(time_step);
+
 		m_jetpack_trail.on_update(time_step);
 
 		m_cross_fade->on_update(time_step);
@@ -1673,6 +1686,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 			}
 		}
 		else {
+			//turn light off if jetpack isnt in use
 			m_jetpack_spotLight.Color = glm::vec3(0.f, 0.f, 0.f);
 		}
 
@@ -1692,6 +1706,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 			m_jetpack_spotLight.Color = glm::vec3(0.f, 0.f, 0.f);
 		}
 
+		//timer to prevent too many jetpack particles
 		if (jetpackTrailTimer > 0.0f)
 		{
 			jetpackTrailTimer -= (float)time_step;
@@ -1710,6 +1725,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_enemy_droid.on_update(time_step, m_player.object()->position(), enemy_missile2);
 		m_droid_box.on_update(m_droid->position() - glm::vec3(0.8f, m_droid->offset().y, 0.8f) * m_droid->scale(), m_droid->rotation_amount(), m_droid->rotation_axis());
 
+		//sends enemies to holder when hp < 0
 		if (m_enemy_drone.get_health_point() <= 0 && m_enemy_drone.is_alive()) {
 
 			enemy_count--;
@@ -1742,6 +1758,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 		}
 
+		//timer before enemies respawn
 		if (enemy_count <= 0 && !resting_period) {
 
 			wave_number++;
@@ -1764,6 +1781,7 @@ void example_layer::on_update(const engine::timestep& time_step)
 			}
 		}
 
+		//if the player dies, stop the game
 		if (m_player.get_health_point() <= 0) {
 			m_end_screen->activate();
 			playState = false;
@@ -1892,6 +1910,7 @@ void example_layer::check_bounce()
 	m_prev_sphere_y_vel = m_game_objects.at(1)->velocity().y;
 }
 
+//for a quicker way of triggering player damage
 void example_layer::damage_player(int damage) {
 
 	m_cross_fade->activate(true);
