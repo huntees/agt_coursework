@@ -210,10 +210,10 @@ example_layer::example_layer()
 	//Load repulsor 
 	engine::ref<engine::terrain> repulsor_shape = engine::terrain::create(0.01f, 0.02f, 0.05f, 1.f);
 	engine::game_object_properties repulsor_props;
-	repulsor_props.meshes = { repulsor_shape->mesh() };
 	repulsor_props.position = { -5.f, -9.f, 9.f };
+	repulsor_props.meshes = { repulsor_shape->mesh() };
 	repulsor_props.type = 0;
-	repulsor_props.bounding_shape = glm::vec3(0.01f, 0.01f, 0.05f) / 2.f;
+	repulsor_props.bounding_shape = glm::vec3(0.01f, 0.02f, 0.05f) / 2.f;
 	repulsor_props.friction = 0.0f;
 	repulsor_props.mass = 0.10f;
 	m_repulsor = engine::game_object::create(repulsor_props);
@@ -413,21 +413,162 @@ example_layer::example_layer()
 	office_props.position = { 35.f, 0.5f, 0.f };
 	m_office = engine::game_object::create(office_props);
 
+	//Office collision
+	engine::ref<engine::terrain> office_col_shape = engine::terrain::create(13.5f, 26.f, 7.f, 1.f);
+	engine::game_object_properties office_col_props;
+	office_col_props.meshes = { office_col_shape->mesh() };
+	office_col_props.position = { 35.f, 2.f, -10.f };
+	office_col_props.type = 0;
+	office_col_props.bounding_shape = glm::vec3(13.5f, 26.f, 7.f);
+	office_col_props.is_static = true;
+	office_col = engine::game_object::create(office_col_props);
+
+	engine::ref<engine::terrain> office_col2_shape = engine::terrain::create(7.f, 36.f, 12.f, 1.f);
+	engine::game_object_properties office_col2_props;
+	office_col2_props.meshes = { office_col2_shape->mesh() };
+	office_col2_props.position = { 44.f, 2.f, 6.f };
+	office_col2_props.type = 0;
+	office_col2_props.bounding_shape = glm::vec3(7.f, 36.f, 12.f);
+	office_col2_props.is_static = true;
+	office_col2 = engine::game_object::create(office_col2_props);
+
 	//Load sanfran model
 	engine::ref <engine::model> sanfran_model = engine::model::create("assets/models/static/sanfran/sanfran.obj");
 	engine::game_object_properties sanfran_props;
 	sanfran_props.meshes = sanfran_model->meshes();
 	sanfran_props.textures = sanfran_model->textures();
-	sanfran_props.position = { -20.f, 1.72f, 7.f };
+	sanfran_props.position = { -30.f, 1.72f, -3.f };
+	sanfran_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	sanfran_props.rotation_amount = glm::radians(90.f);
+	sanfran_props.bounding_shape = glm::vec3(sanfran_model->size().x / 4.f, sanfran_model->size().y / 1.43f, sanfran_model->size().z / 4.f);
+	sanfran_props.type = 0;
+	sanfran_props.is_static = true;
 	m_sanfran = engine::game_object::create(sanfran_props);
 
-	//Load skyscrapers model
-	engine::ref <engine::model> skyscrapers_model = engine::model::create("assets/models/static/skyscrapers/skyscrapers.obj");
-	engine::game_object_properties skyscrapers_props;
-	skyscrapers_props.meshes = skyscrapers_model->meshes();
-	skyscrapers_props.textures = skyscrapers_model->textures();
-	skyscrapers_props.position = { -25.f, -3.5f, 33.f };
-	m_skyscrapers = engine::game_object::create(skyscrapers_props);
+	//Load skyscraper1 model
+	engine::ref <engine::model> skyscraper1_model = engine::model::create("assets/models/static/skyscrapers/skyscraper1.obj");
+	engine::game_object_properties skyscraper1_props;
+	skyscraper1_props.meshes = skyscraper1_model->meshes();
+	skyscraper1_props.textures = skyscraper1_model->textures();
+	skyscraper1_props.position = { -17.f, 0.5f, 65.f };
+	m_skyscraper1 = engine::game_object::create(skyscraper1_props);
+
+	//Load skyscraper 1 collision
+	engine::ref<engine::terrain> skyscraper1_col_shape = engine::terrain::create(4.f, 49.f, 6.f, 1.f);
+	engine::game_object_properties skyscraper1_col_props;
+	skyscraper1_col_props.meshes = { skyscraper1_col_shape->mesh() };
+	skyscraper1_col_props.position = { -21.f, 0.5f, 65.f };
+	skyscraper1_col_props.type = 0;
+	skyscraper1_col_props.bounding_shape = glm::vec3(4.f, 49.f, 6.f);
+	skyscraper1_col_props.is_static = true;
+	skyscraper1_col = engine::game_object::create(skyscraper1_col_props);
+
+	skyscraper1_col_props.position = { -21.f, 0.5f, 80.f };
+	skyscraper1_col2 = engine::game_object::create(skyscraper1_col_props);
+
+	//Load skyscraper2 model
+	engine::ref <engine::model> skyscraper2_model = engine::model::create("assets/models/static/skyscrapers/skyscraper2.obj");
+	engine::game_object_properties skyscraper2_props;
+	skyscraper2_props.meshes = skyscraper2_model->meshes();
+	skyscraper2_props.textures = skyscraper2_model->textures();
+	skyscraper2_props.position = { -42.f, 0.5f, 80.f };
+	m_skyscraper2 = engine::game_object::create(skyscraper2_props);
+
+	//Load skyscraper 2 collision
+	engine::ref<engine::terrain> skyscraper2_col_shape = engine::terrain::create(1.5f, 52.f, 5.f, 1.f);
+	engine::game_object_properties skyscraper2_col_props;
+	skyscraper2_col_props.meshes = { skyscraper2_col_shape->mesh() };
+	skyscraper2_col_props.position = { -34.f, 0.5f, 80.f };
+	skyscraper2_col_props.type = 0;
+	skyscraper2_col_props.bounding_shape = glm::vec3(1.5f, 52.f, 5.f);
+	skyscraper2_col_props.is_static = true;
+	skyscraper2_col = engine::game_object::create(skyscraper2_col_props);
+
+	skyscraper2_col_props.position = { -25.5f, 0.5f, 48.f };
+	skyscraper2_col2 = engine::game_object::create(skyscraper2_col_props);
+
+	skyscraper2_col_props.position = { 43.f, 0.5f, 54.5f };
+	skyscraper2_col_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
+	skyscraper2_col_props.rotation_amount = glm::radians(90.f);
+	skyscraper2_col3 = engine::game_object::create(skyscraper2_col_props);
+
+	//Load skyscraper3 model
+	engine::ref <engine::model> skyscraper3_model = engine::model::create("assets/models/static/skyscrapers/skyscraper3.obj");
+	engine::game_object_properties skyscraper3_props;
+	skyscraper3_props.meshes = skyscraper3_model->meshes();
+	skyscraper3_props.textures = skyscraper3_model->textures();
+	skyscraper3_props.position = { -42.f, 0.5f, 65.f };
+	m_skyscraper3 = engine::game_object::create(skyscraper3_props);
+
+	//Load skyscraper 3 collision
+	engine::ref<engine::terrain> skyscraper3_col_shape = engine::terrain::create(4.f, 55.5f, 4.f, 1.f);
+	engine::game_object_properties skyscraper3_col_props;
+	skyscraper3_col_props.meshes = { skyscraper3_col_shape->mesh() };
+	skyscraper3_col_props.position = { -41.f, 0.5f, 65.5f };
+	skyscraper3_col_props.type = 0;
+	skyscraper3_col_props.bounding_shape = glm::vec3(4.f, 55.5f, 4.f);
+	skyscraper3_col_props.is_static = true;
+	skyscraper3_col = engine::game_object::create(skyscraper3_col_props);
+
+	skyscraper3_col_props.position = { 24.f, 0.5f, 80.5f };
+	skyscraper3_col2 = engine::game_object::create(skyscraper3_col_props);
+
+	skyscraper3_col_props.position = { 38.5f, 0.5f, 79.f };
+	skyscraper3_col3 = engine::game_object::create(skyscraper3_col_props);
+
+	//Load skyscraper4 model
+	engine::ref <engine::model> skyscraper4_model = engine::model::create("assets/models/static/skyscrapers/skyscraper4.obj");
+	engine::game_object_properties skyscraper4_props;
+	skyscraper4_props.meshes = skyscraper4_model->meshes();
+	skyscraper4_props.textures = skyscraper4_model->textures();
+	skyscraper4_props.position = { 25.f, 0.5f, 62.f };
+	m_skyscraper4 = engine::game_object::create(skyscraper4_props);
+
+	//Load skyscraper 4 collision
+	engine::ref<engine::terrain> skyscraper4_col_shape = engine::terrain::create(4.7f, 54.f, 4.5f, 1.f);
+	engine::game_object_properties skyscraper4_col_props;
+	skyscraper4_col_props.meshes = { skyscraper4_col_shape->mesh() };
+	skyscraper4_col_props.position = { 25.f, 0.5f, 62.f };
+	skyscraper4_col_props.type = 0;
+	skyscraper4_col_props.bounding_shape = glm::vec3(4.7f, 54.f, 4.5f);
+	skyscraper4_col_props.is_static = true;
+	skyscraper4_col = engine::game_object::create(skyscraper4_col_props);
+
+	//Load skyscraper6 model
+	engine::ref <engine::model> skyscraper6_model = engine::model::create("assets/models/static/skyscrapers/skyscraper6.obj");
+	engine::game_object_properties skyscraper6_props;
+	skyscraper6_props.meshes = skyscraper6_model->meshes();
+	skyscraper6_props.textures = skyscraper6_model->textures();
+	skyscraper6_props.position = { -40.f, 0.5f, 48.f };
+	m_skyscraper6 = engine::game_object::create(skyscraper6_props);
+
+	//Load skyscraper 6 collision
+	engine::ref<engine::terrain> skyscraper6_col_shape = engine::terrain::create(6.f, 38.5f, 6.f, 1.f);
+	engine::game_object_properties skyscraper6_col_props;
+	skyscraper6_col_props.meshes = { skyscraper6_col_shape->mesh() };
+	skyscraper6_col_props.position = { -40.1f, 0.5f, 48.3f };
+	skyscraper6_col_props.type = 0;
+	skyscraper6_col_props.bounding_shape = glm::vec3(6.f, 38.5f, 6.f);
+	skyscraper6_col_props.is_static = true;
+	skyscraper6_col = engine::game_object::create(skyscraper6_col_props);
+
+	//Load skyscraper7 model
+	engine::ref <engine::model> skyscraper7_model = engine::model::create("assets/models/static/skyscrapers/skyscraper7.obj");
+	engine::game_object_properties skyscraper7_props;
+	skyscraper7_props.meshes = skyscraper7_model->meshes();
+	skyscraper7_props.textures = skyscraper7_model->textures();
+	skyscraper7_props.position = { 25.f, 0.5f, 47.f };
+	m_skyscraper7 = engine::game_object::create(skyscraper7_props);
+
+	//Load skyscraper 7 collision
+	engine::ref<engine::terrain> skyscraper7_col_shape = engine::terrain::create(8.5f, 38.f, 2.8f, 1.f);
+	engine::game_object_properties skyscraper7_col_props;
+	skyscraper7_col_props.meshes = { skyscraper7_col_shape->mesh() };
+	skyscraper7_col_props.position = { 25.f, 0.5f, 47.2f };
+	skyscraper7_col_props.type = 0;
+	skyscraper7_col_props.bounding_shape = glm::vec3(8.5f, 38.f, 2.8f);
+	skyscraper7_col_props.is_static = true;
+	skyscraper7_col = engine::game_object::create(skyscraper7_col_props);
 
 	//Load policeCar model
 	engine::ref <engine::model> policeCar_model = engine::model::create("assets/models/static/policecar/policecar.obj");
@@ -437,6 +578,9 @@ example_layer::example_layer()
 	policeCar_props.position = { 9.f, 0.5f, 12.f };
 	policeCar_props.rotation_axis = glm::vec3(0.f, 1.f, 0.f);
 	policeCar_props.rotation_amount = glm::radians(-45.f);
+	policeCar_props.bounding_shape = glm::vec3(policeCar_model->size().x / 2.5f, policeCar_model->size().y / 1.1f, policeCar_model->size().z / 2.5f);
+	policeCar_props.type = 0;
+	policeCar_props.is_static = true;
 	m_policeCar = engine::game_object::create(policeCar_props);
 
 	// Load the tree model. Create a tree object. Set its properties
@@ -548,13 +692,27 @@ example_layer::example_layer()
 	hexagon_props.meshes = { hexagon_shape->mesh() };
 	m_hexagon = engine::game_object::create(hexagon_props);
 
-
 	m_game_objects.push_back(m_terrain);
 	m_game_objects.push_back(m_ball);
 	m_game_objects.push_back(m_cow);
 	//m_game_objects.push_back(m_tree);
 	//m_game_objects.push_back(m_pickup);
 	m_game_objects.push_back(m_weapon_holder);
+	m_game_objects.push_back(m_sanfran);
+	m_game_objects.push_back(m_policeCar);
+	m_game_objects.push_back(office_col);
+	m_game_objects.push_back(office_col2);
+	m_game_objects.push_back(skyscraper1_col);
+	m_game_objects.push_back(skyscraper1_col2);
+	m_game_objects.push_back(skyscraper2_col);
+	m_game_objects.push_back(skyscraper2_col2);
+	m_game_objects.push_back(skyscraper2_col3);
+	m_game_objects.push_back(skyscraper3_col);
+	m_game_objects.push_back(skyscraper3_col2);
+	m_game_objects.push_back(skyscraper3_col3);
+	m_game_objects.push_back(skyscraper4_col);
+	m_game_objects.push_back(skyscraper6_col);
+	m_game_objects.push_back(skyscraper7_col);
 	m_game_objects.push_back(m_lamppost);
 	m_game_objects.push_back(m_lamppost2);
 	m_game_objects.push_back(m_red_spotLight_ball);
@@ -627,6 +785,21 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, m_terrain);
 
 	engine::renderer::submit(textured_lighting_shader, m_weapon_holder);
+	
+	//remove after done
+	engine::renderer::submit(textured_lighting_shader, office_col);
+	engine::renderer::submit(textured_lighting_shader, office_col2);
+	engine::renderer::submit(textured_lighting_shader, skyscraper1_col);
+	engine::renderer::submit(textured_lighting_shader, skyscraper1_col2);
+	engine::renderer::submit(textured_lighting_shader, skyscraper2_col);
+	engine::renderer::submit(textured_lighting_shader, skyscraper2_col2);
+	engine::renderer::submit(textured_lighting_shader, skyscraper2_col3);
+	engine::renderer::submit(textured_lighting_shader, skyscraper3_col);
+	engine::renderer::submit(textured_lighting_shader, skyscraper3_col2);
+	engine::renderer::submit(textured_lighting_shader, skyscraper3_col3);
+	engine::renderer::submit(textured_lighting_shader, skyscraper4_col);
+	engine::renderer::submit(textured_lighting_shader, skyscraper6_col);
+	engine::renderer::submit(textured_lighting_shader, skyscraper7_col);
 
 	engine::renderer::submit(textured_lighting_shader, m_tetrahedron);
 
@@ -788,6 +961,43 @@ void example_layer::on_render()
 		engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
 	}
 
+	//intersection trees
+	for (int i = 0; i < 5; ++i) {
+
+		glm::mat4 tree_transform(1.0f);
+		tree_transform = glm::translate(tree_transform, glm::vec3(12.f, 0.5f, 45.f + (i * 8)));
+		tree_transform = glm::rotate(tree_transform, m_tree->rotation_amount(), m_tree->rotation_axis());
+		tree_transform = glm::scale(tree_transform, m_tree->scale());
+		engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
+	}
+
+	for (int i = 0; i < 5; ++i) {
+
+		glm::mat4 tree_transform(1.0f);
+		tree_transform = glm::translate(tree_transform, glm::vec3(-5.2f, 0.5f, 45.f + (i * 8)));
+		tree_transform = glm::rotate(tree_transform, m_tree->rotation_amount(), m_tree->rotation_axis());
+		tree_transform = glm::scale(tree_transform, m_tree->scale());
+		engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
+	}
+
+	for (int i = 0; i < 5; ++i) {
+
+		glm::mat4 tree_transform(1.0f);
+		tree_transform = glm::translate(tree_transform, glm::vec3(18.f + (i * 8), 0.5f, 38.3f));
+		tree_transform = glm::rotate(tree_transform, m_tree->rotation_amount(), m_tree->rotation_axis());
+		tree_transform = glm::scale(tree_transform, m_tree->scale());
+		engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
+	}
+
+	for (int i = 0; i < 5; ++i) {
+
+		glm::mat4 tree_transform(1.0f);
+		tree_transform = glm::translate(tree_transform, glm::vec3(-10.f - (i * 8), 0.5f, 38.3f));
+		tree_transform = glm::rotate(tree_transform, m_tree->rotation_amount(), m_tree->rotation_axis());
+		tree_transform = glm::scale(tree_transform, m_tree->scale());
+		engine::renderer::submit(textured_lighting_shader, tree_transform, m_tree);
+	}
+
 	//glm::mat4 tree_transform(1.0f);
 	//tree_transform = glm::translate(tree_transform, glm::vec3(4.f, 0.5, -5.0f));
 	//tree_transform = glm::rotate(tree_transform, m_tree->rotation_amount(), m_tree->rotation_axis());
@@ -836,8 +1046,6 @@ void example_layer::on_render()
 	cow_transform = glm::scale(cow_transform, m_cow->scale());
 	engine::renderer::submit(textured_lighting_shader, cow_transform, m_cow);
 
-	float jeep_x_rotation = 90.f * (glm::pi<float>() / 180.f); //90 degrees multiplied by pi/180 giving radians
-
 	glm::mat4 jeep_transform(1.0f);
 	jeep_transform = glm::translate(jeep_transform, m_jeep->position() + glm::vec3(-4.f, 0.f, 0.f));
 	jeep_transform = glm::rotate(jeep_transform, m_jeep->rotation_amount(), m_jeep->rotation_axis());
@@ -856,18 +1064,6 @@ void example_layer::on_render()
 	pizza_transform2 = glm::scale(pizza_transform2, m_pizza->scale());
 	engine::renderer::submit(textured_lighting_shader, pizza_transform2, m_pizza);
 
-	glm::mat4 jet_transform(1.0f);
-	jet_transform = glm::translate(jet_transform, glm::vec3(14.f, 1.5f, 30.f));
-	jet_transform = glm::rotate(jet_transform, m_jet->rotation_amount() + glm::radians(-45.f), glm::vec3(0.f, 1.f, 0.f));
-	jet_transform = glm::scale(jet_transform, m_jet->scale());
-	engine::renderer::submit(textured_lighting_shader, jet_transform, m_jet);
-
-	glm::mat4 jet_transform2(1.0f);
-	jet_transform2 = glm::translate(jet_transform2, glm::vec3(14.f, 1.5f, 38.f));
-	jet_transform2 = glm::rotate(jet_transform2, m_jet->rotation_amount() + glm::radians(-90.f), glm::vec3(0.f, 1.f, 0.f));
-	jet_transform2 = glm::scale(jet_transform2, m_jet->scale());
-	engine::renderer::submit(textured_lighting_shader, jet_transform2, m_jet);
-
 	glm::mat4 jet_transform3(1.0f);
 	jet_transform3 = glm::translate(jet_transform3, glm::vec3(-2.f, 60.f, 18.f));
 	jet_transform3 = glm::rotate(jet_transform3, m_jet->rotation_amount() + glm::radians(-15.f), glm::vec3(0.f, 0.f, 1.f));
@@ -881,22 +1077,76 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, office_transform, m_office);
 
 	glm::mat4 sanfran_transform(1.0f);
-	sanfran_transform = glm::translate(sanfran_transform, m_sanfran->position());
-	sanfran_transform = glm::rotate(sanfran_transform, m_sanfran->rotation_amount() + glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
+	sanfran_transform = glm::translate(sanfran_transform, glm::vec3(-20.f, 1.72f, 7.f));
+	sanfran_transform = glm::rotate(sanfran_transform, m_sanfran->rotation_amount(), glm::vec3(0.f, 1.f, 0.f));
 	sanfran_transform = glm::scale(sanfran_transform, m_sanfran->scale());
 	engine::renderer::submit(textured_lighting_shader, sanfran_transform, m_sanfran);
 
-	glm::mat4 skyscrapers_transform(1.0f);
-	skyscrapers_transform = glm::translate(skyscrapers_transform, m_skyscrapers->position());
-	skyscrapers_transform = glm::rotate(skyscrapers_transform, m_skyscrapers->rotation_amount(), glm::vec3(0.f, 1.f, 0.f));
-	skyscrapers_transform = glm::scale(skyscrapers_transform, m_skyscrapers->scale());
-	engine::renderer::submit(textured_lighting_shader, skyscrapers_transform, m_skyscrapers);
+	glm::mat4 skyscraper1_transform(1.0f);
+	skyscraper1_transform = glm::translate(skyscraper1_transform, m_skyscraper1->position());
+	skyscraper1_transform = glm::rotate(skyscraper1_transform, m_skyscraper1->rotation_amount(), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper1_transform = glm::scale(skyscraper1_transform, m_skyscraper1->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper1_transform, m_skyscraper1);
 
-	glm::mat4 skyscrapers_transform2(1.0f);
-	skyscrapers_transform2 = glm::translate(skyscrapers_transform2, glm::vec3(25.f, -3.5f, 60.f));
-	skyscrapers_transform2 = glm::rotate(skyscrapers_transform2, m_skyscrapers->rotation_amount() + glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
-	skyscrapers_transform2 = glm::scale(skyscrapers_transform2, m_skyscrapers->scale());
-	engine::renderer::submit(textured_lighting_shader, skyscrapers_transform2, m_skyscrapers);
+	glm::mat4 skyscraper1_transform2(1.0f);
+	skyscraper1_transform2 = glm::translate(skyscraper1_transform2, glm::vec3(-17.f, 0.5f, 80.f));
+	skyscraper1_transform2 = glm::rotate(skyscraper1_transform2, m_skyscraper1->rotation_amount(), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper1_transform2 = glm::scale(skyscraper1_transform2, m_skyscraper1->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper1_transform2, m_skyscraper1);
+
+	glm::mat4 skyscraper2_transform(1.0f);
+	skyscraper2_transform = glm::translate(skyscraper2_transform, m_skyscraper2->position());
+	skyscraper2_transform = glm::rotate(skyscraper2_transform, m_skyscraper2->rotation_amount() + glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper2_transform = glm::scale(skyscraper2_transform, m_skyscraper2->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper2_transform, m_skyscraper2);
+
+	glm::mat4 skyscraper2_transform2(1.0f);
+	skyscraper2_transform2 = glm::translate(skyscraper2_transform2, glm::vec3(43.f, 0.5f, 47.f));
+	skyscraper2_transform2 = glm::rotate(skyscraper2_transform2, m_skyscraper2->rotation_amount() + glm::radians(90.f), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper2_transform2 = glm::scale(skyscraper2_transform2, m_skyscraper2->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper2_transform2, m_skyscraper2);
+
+	glm::mat4 skyscraper2_transform3(1.0f);
+	skyscraper2_transform3 = glm::translate(skyscraper2_transform3, glm::vec3(-18.f, 0.5f, 48.f));
+	skyscraper2_transform3 = glm::rotate(skyscraper2_transform3, m_skyscraper2->rotation_amount(), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper2_transform3 = glm::scale(skyscraper2_transform3, m_skyscraper2->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper2_transform3, m_skyscraper2);
+	
+	glm::mat4 skyscraper3_transform(1.0f);
+	skyscraper3_transform = glm::translate(skyscraper3_transform, m_skyscraper3->position());
+	skyscraper3_transform = glm::rotate(skyscraper3_transform, m_skyscraper3->rotation_amount() + glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper3_transform = glm::scale(skyscraper3_transform, m_skyscraper3->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper3_transform, m_skyscraper3);
+
+	glm::mat4 skyscraper3_transform2(1.0f);
+	skyscraper3_transform2 = glm::translate(skyscraper3_transform2, glm::vec3(23.f, 0.5f, 80.f));
+	skyscraper3_transform2 = glm::rotate(skyscraper3_transform2, m_skyscraper3->rotation_amount() + glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper3_transform2 = glm::scale(skyscraper3_transform2, m_skyscraper3->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper3_transform2, m_skyscraper3);
+
+	glm::mat4 skyscraper3_transform3(1.0f);
+	skyscraper3_transform3 = glm::translate(skyscraper3_transform3, glm::vec3(38.f, 0.5f, 80.f));
+	skyscraper3_transform3 = glm::rotate(skyscraper3_transform3, m_skyscraper3->rotation_amount() + glm::radians(-90.f), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper3_transform3 = glm::scale(skyscraper3_transform3, m_skyscraper3->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper3_transform3, m_skyscraper3);
+
+	glm::mat4 skyscraper4_transform(1.0f);
+	skyscraper4_transform = glm::translate(skyscraper4_transform, m_skyscraper4->position());
+	skyscraper4_transform = glm::rotate(skyscraper4_transform, m_skyscraper4->rotation_amount() + glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper4_transform = glm::scale(skyscraper4_transform, m_skyscraper4->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper4_transform, m_skyscraper4);
+
+	glm::mat4 skyscraper6_transform(1.0f);
+	skyscraper6_transform = glm::translate(skyscraper6_transform, m_skyscraper6->position());
+	skyscraper6_transform = glm::rotate(skyscraper6_transform, m_skyscraper6->rotation_amount() + glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper6_transform = glm::scale(skyscraper6_transform, m_skyscraper6->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper6_transform, m_skyscraper6);
+
+	glm::mat4 skyscraper7_transform(1.0f);
+	skyscraper7_transform = glm::translate(skyscraper7_transform, m_skyscraper7->position());
+	skyscraper7_transform = glm::rotate(skyscraper7_transform, m_skyscraper7->rotation_amount() + glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+	skyscraper7_transform = glm::scale(skyscraper7_transform, m_skyscraper7->scale());
+	engine::renderer::submit(textured_lighting_shader, skyscraper7_transform, m_skyscraper7);
 
 	glm::mat4 policeCar_transform(1.0f);
 	policeCar_transform = glm::translate(policeCar_transform, m_policeCar->position());

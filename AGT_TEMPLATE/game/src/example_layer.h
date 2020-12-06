@@ -60,7 +60,13 @@ private:
 	engine::ref<engine::game_object>	m_jet{};
 	engine::ref<engine::game_object>	m_office{};
 	engine::ref<engine::game_object>	m_sanfran{};
-	engine::ref<engine::game_object>	m_skyscrapers{};
+	engine::ref<engine::game_object>	m_skyscraper1{};
+	engine::ref<engine::game_object>	m_skyscraper2{};
+	engine::ref<engine::game_object>	m_skyscraper3{};
+	engine::ref<engine::game_object>	m_skyscraper4{};
+	engine::ref<engine::game_object>	m_skyscraper6{};
+	engine::ref<engine::game_object>	m_skyscraper7{};
+	engine::ref<engine::game_object>	m_skyscraper8{};
 	engine::ref<engine::game_object>	m_policeCar{};
 	engine::ref<engine::game_object>    m_hexagon{};
 	engine::ref<engine::game_object>    m_bench{};
@@ -104,6 +110,23 @@ private:
 	bounding_box m_bb8_box;
 	bounding_box m_heart_box;
 	bounding_box m_shield_box;
+
+	//world collision detection
+	engine::ref<engine::game_object>    office_col{};
+	engine::ref<engine::game_object>    office_col2{};
+	engine::ref<engine::game_object>    skyscraper1_col{};
+	engine::ref<engine::game_object>    skyscraper1_col2{};
+	engine::ref<engine::game_object>    skyscraper2_col{};
+	engine::ref<engine::game_object>    skyscraper2_col2{};
+	engine::ref<engine::game_object>    skyscraper2_col3{};
+	engine::ref<engine::game_object>    skyscraper3_col{};
+	engine::ref<engine::game_object>    skyscraper3_col2{};
+	engine::ref<engine::game_object>    skyscraper3_col3{};
+	engine::ref<engine::game_object>    skyscraper4_col{};
+	engine::ref<engine::game_object>    skyscraper6_col{};
+	engine::ref<engine::game_object>    skyscraper7_col{};
+
+
 
 	const float immune_time = 2.f;
 	bool player_immunity = false;

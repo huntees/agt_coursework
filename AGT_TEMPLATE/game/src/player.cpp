@@ -245,7 +245,7 @@ bool player::hover() {
 void player::sprint(const bool& activateSprint) {
 
 	if (activateSprint) {
-		m_speed = 4.f;
+		m_speed = 8.f;
 		animation_speed = 1.5f;
 	}
 	else {
