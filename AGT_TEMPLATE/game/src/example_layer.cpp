@@ -785,21 +785,6 @@ void example_layer::on_render()
 	engine::renderer::submit(textured_lighting_shader, m_terrain);
 
 	engine::renderer::submit(textured_lighting_shader, m_weapon_holder);
-	
-	//remove after done
-	engine::renderer::submit(textured_lighting_shader, office_col);
-	engine::renderer::submit(textured_lighting_shader, office_col2);
-	engine::renderer::submit(textured_lighting_shader, skyscraper1_col);
-	engine::renderer::submit(textured_lighting_shader, skyscraper1_col2);
-	engine::renderer::submit(textured_lighting_shader, skyscraper2_col);
-	engine::renderer::submit(textured_lighting_shader, skyscraper2_col2);
-	engine::renderer::submit(textured_lighting_shader, skyscraper2_col3);
-	engine::renderer::submit(textured_lighting_shader, skyscraper3_col);
-	engine::renderer::submit(textured_lighting_shader, skyscraper3_col2);
-	engine::renderer::submit(textured_lighting_shader, skyscraper3_col3);
-	engine::renderer::submit(textured_lighting_shader, skyscraper4_col);
-	engine::renderer::submit(textured_lighting_shader, skyscraper6_col);
-	engine::renderer::submit(textured_lighting_shader, skyscraper7_col);
 
 	engine::renderer::submit(textured_lighting_shader, m_tetrahedron);
 
@@ -1252,8 +1237,9 @@ void example_layer::on_render()
 
 	// Render text
 	const auto text_shader = engine::renderer::shaders_library()->get("text_2D");
-	m_text_manager->render_text(text_shader, std::to_string(wave_number), 10.f, (float)engine::application::window().height() - 25.f, 0.5f, glm::vec4(1.f, 0.5f, 0.f, 1.f));
-	m_text_manager->render_text(text_shader, std::to_string(m_player.get_health_point()), (float)engine::application::window().width() * 0.1f, (float)engine::application::window().height() * 0.106f, 1.3f, glm::vec4(0.74f, 0.71f, 0.71f, 1.f)); //1.0 scale for 720p
+	m_text_manager->render_text(text_shader, "Wave " + std::to_string(wave_number), (float)engine::application::window().width() * 0.47f, (float)engine::application::window().height() * 0.95f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.0003, glm::vec4(0.74f, 0.71f, 0.71f, 1.f));
+	m_text_manager->render_text(text_shader, "Score " + std::to_string(player_score), (float)engine::application::window().width() * 0.47f, (float)engine::application::window().height() * 0.03f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.0003, glm::vec4(0.74f, 0.71f, 0.71f, 1.f));
+	m_text_manager->render_text(text_shader, std::to_string(m_player.get_health_point()), (float)engine::application::window().width() * 0.1f, (float)engine::application::window().height() * 0.106f, ((float)engine::application::window().width() + (float)engine::application::window().height()) * 0.00043, glm::vec4(0.74f, 0.71f, 0.71f, 1.f)); //1.0 scale for 720p
 
 	//===============================================================2D Cam============================================================================
 
@@ -1421,19 +1407,19 @@ void example_layer::on_update(const engine::timestep& time_step)
 
 			if (m_repulsor->collision_objects().at(i) == m_enemy_drone.object()) {
 				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - repulsor_damage);
-				std::cout << m_enemy_drone.get_health_point() << '\n';
+				player_score += repulsor_damage;
 			}
 			else if (m_repulsor->collision_objects().at(i) == m_enemy_bb8.object()) {
 				m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - repulsor_damage);
-				std::cout << m_enemy_bb8.get_health_point() << '\n';
+				player_score += repulsor_damage;
 			}
 			else if (m_repulsor->collision_objects().at(i) == m_enemy_droid.object()) {
 				m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - repulsor_damage);
-				std::cout << m_enemy_droid.get_health_point() << '\n';
+				player_score += repulsor_damage;
 			}
 			else if (m_repulsor->collision_objects().at(i) == m_enemy_mech.object()) {
 				m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - repulsor_damage);
-				std::cout << m_enemy_mech.get_health_point() << '\n';
+				player_score += repulsor_damage;
 			}
 
 		}
@@ -1451,19 +1437,19 @@ void example_layer::on_update(const engine::timestep& time_step)
 		m_explosion->activate(missile.object()->position(), 4.f, 4.f);
 		if (missile.getBox().collision(m_drone_box)) {
 			m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - missile_damage);
-			std::cout << "drone " << m_enemy_drone.get_health_point() << '\n';
+			player_score += missile_damage;
 		}
 		if (missile.getBox().collision(m_bb8_box)) {
 			m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - missile_damage);
-			std::cout << "bb8 " << m_enemy_bb8.get_health_point() << '\n';
+			player_score += missile_damage;
 		}
 		if (missile.getBox().collision(m_droid_box)) {
 			m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - missile_damage);
-			std::cout << "droid " << m_enemy_droid.get_health_point() << '\n';
+			player_score += missile_damage;
 		}
 		if (missile.getBox().collision(m_mech_box)) {
 			m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - missile_damage);
-			std::cout << "mech " << m_enemy_mech.get_health_point() << '\n';
+			player_score += missile_damage;
 		}
 
 		missile.object()->set_velocity(glm::vec3(0.f));
@@ -1490,19 +1476,19 @@ void example_layer::on_update(const engine::timestep& time_step)
 			m_explosion->activate(bouncynade.object()->position(), 4.f, 4.f);
 			if (m_bouncynade_box.collision(m_drone_box)) {
 				m_enemy_drone.set_health_point(m_enemy_drone.get_health_point() - bouncynade_damage);
-				std::cout << "drone " << m_enemy_drone.get_health_point() << '\n';
+				player_score += bouncynade_damage;
 			}
 			if (m_bouncynade_box.collision(m_bb8_box)) {
 				m_enemy_bb8.set_health_point(m_enemy_bb8.get_health_point() - bouncynade_damage);
-				std::cout << "bb8 " << m_enemy_bb8.get_health_point() << '\n';
+				player_score += bouncynade_damage;
 			}
 			if (m_bouncynade_box.collision(m_droid_box)) {
 				m_enemy_droid.set_health_point(m_enemy_droid.get_health_point() - bouncynade_damage);
-				std::cout << "droid " << m_enemy_droid.get_health_point() << '\n';
+				player_score += bouncynade_damage;
 			}
 			if (m_bouncynade_box.collision(m_mech_box)) {
 				m_enemy_mech.set_health_point(m_enemy_mech.get_health_point() - bouncynade_damage);
-				std::cout << "mech " << m_enemy_mech.get_health_point() << '\n';
+				player_score += bouncynade_damage;
 			}
 			
 			bouncynade.object()->set_position(glm::vec3(-8.f, -9.f, 9.f));

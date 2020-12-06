@@ -23,6 +23,8 @@ public:
 private:
 	player m_player{};
 
+	int player_score = 0;
+
 	enemy_shooter m_enemy_droid{};
 	enemy_shooter m_enemy_mech{};
 	enemy m_enemy_drone{};
