@@ -1,0 +1,79 @@
+#pragma once
+#include <engine.h>
+
+class enemy
+{
+	enum class state
+	{
+		idle,
+		on_guard,
+		chasing
+	};
+
+	public:
+		enemy();
+		~enemy();
+
+		// set the parameters for the enemy
+		void initialise(engine::ref<engine::game_object> object, glm::vec3 position, glm::vec3 forward, bool can_fly);
+
+		// update the enemy
+		void on_update(const engine::timestep& time_step, const glm::vec3& player_position);
+
+		// methods controlling the enemy’s behaviour in a certain state
+		void patrol(const engine::timestep& time_step);
+
+		void face_player(const engine::timestep& time_step, const glm::vec3& player_position);
+
+		void chase_player(const engine::timestep& time_step, const glm::vec3& player_position);
+
+		void set_health_point(int hp) { health_point = hp; }
+
+		int get_health_point() { return health_point; }
+
+		void reset_health() { if (can_fly) { health_point = flying_hp * wave; } else { health_point = regular_hp * wave; } }
+
+		void set_alive(bool b) { alive = b; }
+
+		bool is_alive() { return alive; }
+
+		void respawn(int& wave_number, glm::vec3& pos) {
+			wave = wave_number;
+			alive = true;
+			reset_health();
+			m_object->set_position(pos);
+		}
+
+		// game object bound to the enemy
+		engine::ref<engine::game_object> object() const { return m_object; }
+
+
+	private:
+		bool alive = true;
+
+		int wave = 1;
+
+		const int flying_hp = 30;
+		const int regular_hp = 40;
+
+		int health_point = regular_hp;
+
+		// enemy's speed
+		float m_speed{ 1.f };
+
+		// timer controlling the direction switch and the reset value for this timer
+		float m_default_time{ 4.f };
+		float m_switch_direction_timer = m_default_time;
+
+		// threshold distances
+		float m_detection_radius{ 6.f };
+		float m_trigger_radius{ 3.f };
+
+		// game object bound to the enemy
+		engine::ref< engine::game_object> m_object;
+
+		//current state of the enemy's state machine
+		state m_state = state::idle;
+
+		bool can_fly = false;
+};

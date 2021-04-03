@@ -2,7 +2,7 @@
 #include "cuboid.h"
 #include <engine.h>
 
-engine::cuboid::cuboid(glm::vec3 half_extents, bool inwards) : m_half_extents(half_extents), m_inwards(inwards)
+engine::cuboid::cuboid(glm::vec3 half_extents, bool inwards, float textureRes) : m_half_extents(half_extents), m_inwards(inwards)
 {
 	float orientation = 1;
 	if (inwards)
@@ -36,10 +36,10 @@ engine::cuboid::cuboid(glm::vec3 half_extents, bool inwards) : m_half_extents(ha
 		{ {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },		{-1.0f * orientation, 0.0f, 0.0f},		{ 0.f, 1.f } },
 
 		//top
-		{ {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },		{ 0.0f,  1.0f * orientation, 0.0f},		{ 0.f * 400, 0.f * 400 } },
-		{ { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },		{ 0.0f,  1.0f * orientation, 0.0f},		{ 1.f * 400, 0.f * 400 } },
-		{ { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },		{ 0.0f,  1.0f * orientation, 0.0f},		{ 1.f * 400, 1.f * 400 } },
-		{ {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },		{ 0.0f,  1.0f * orientation, 0.0f},		{ 0.f * 400, 1.f * 400 } },
+		{ {-1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },		{ 0.0f,  1.0f * orientation, 0.0f},		{ 0.f * textureRes, 0.f * textureRes } },
+		{ { 1.f * m_half_extents.x,  1.f * m_half_extents.y,  1.f * m_half_extents.z },		{ 0.0f,  1.0f * orientation, 0.0f},		{ 1.f * textureRes, 0.f * textureRes } },
+		{ { 1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },		{ 0.0f,  1.0f * orientation, 0.0f},		{ 1.f * textureRes, 1.f * textureRes } },
+		{ {-1.f * m_half_extents.x,  1.f * m_half_extents.y, -1.f * m_half_extents.z },		{ 0.0f,  1.0f * orientation, 0.0f},		{ 0.f * textureRes, 1.f * textureRes } },
 
 		//bottom
 		{ {-1.f * m_half_extents.x, -1.f * m_half_extents.y, -1.f * m_half_extents.z },		{ 0.0f, -1.0f * orientation, 0.0f},		{ 0.f, 0.f } },
@@ -63,7 +63,7 @@ engine::cuboid::cuboid(glm::vec3 half_extents, bool inwards) : m_half_extents(ha
 
 engine::cuboid::~cuboid() {}
 
-engine::ref<engine::cuboid> engine::cuboid::create(glm::vec3 half_extents, bool inwards)
+engine::ref<engine::cuboid> engine::cuboid::create(glm::vec3 half_extents, bool inwards, float textureRes)
 {
-	return std::make_shared<engine::cuboid>(half_extents, inwards);
+	return std::make_shared<engine::cuboid>(half_extents, inwards, textureRes);
 }
