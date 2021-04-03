@@ -205,6 +205,7 @@ private:
 	engine::ref<cross_fade>							m_cross_fade_damage{};
 
 	engine::ref<explosion>							m_explosion{};
+	engine::ref<explosion>							m_explosion2{};
 	engine::ref<explosion>							m_repulsor_hit{};
 	//bool missile_active = false;
 	//bool enemy_missile_active = false;

@@ -26,6 +26,7 @@ void enemy_shooter::on_update(const engine::timestep& time_step, const glm::vec3
 {
 	float distance_to_player = glm::distance(m_object->position(), player_position);
 
+	//allow target to fly
 	if (can_fly) {
 		//m_object->set_acceleration(glm::vec3(m_object->acceleration().x, 9.8f, m_object->acceleration().z));
 		//m_object->set_velocity(glm::vec3(m_object->velocity().x, 0.f, m_object->velocity().z));
@@ -151,6 +152,7 @@ void enemy_shooter::chase_player(const engine::timestep& time_step, const glm::v
 
 void enemy_shooter::shoot_player(const engine::timestep& time_step, projectile& missile, float mod)
 {
+	//how often the enemy shoots
 	if (!enemy_shot) {
 		missile.enemy_fire(*this, 180.0f);
 		missile.set_active(true);
@@ -171,6 +173,7 @@ void enemy_shooter::shoot_player(const engine::timestep& time_step, projectile& 
 	}
 }
 
+//moves back if player gets too close
 void enemy_shooter::retreat(const engine::timestep& time_step, const glm::vec3& player_position)
 {
 	//normalizing so when enemy shoots, the front vector isnt somewhere far away from the model

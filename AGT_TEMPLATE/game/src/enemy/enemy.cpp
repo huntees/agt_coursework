@@ -25,6 +25,7 @@ void enemy::on_update(const engine::timestep& time_step, const glm::vec3& player
 {
 	float distance_to_player = glm::distance(m_object->position(), player_position);
 
+	//allow target to fly
 	if (can_fly) {
 		//m_object->set_acceleration(glm::vec3(m_object->acceleration().x, 9.8f, m_object->acceleration().z));
 		//m_object->set_velocity(glm::vec3(m_object->velocity().x, 0.f, m_object->velocity().z));

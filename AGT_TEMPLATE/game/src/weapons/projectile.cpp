@@ -33,6 +33,7 @@ void projectile::fire(const engine::perspective_camera& camera, float force, glm
 	m_object->set_rotation_amount(m_phi);
 }
 
+//for enemy's shooting
 void projectile::enemy_fire(const enemy_shooter& enemy, float force)
 {
 	m_object->set_velocity(glm::vec3(0.f));
